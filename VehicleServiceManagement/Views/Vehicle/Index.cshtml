@@ -1,0 +1,66 @@
+﻿@model IEnumerable<VehicleServiceManagement.Models.Vehicle>
+
+@{
+    ViewData["Title"] = "My Vehicles";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Vehicles</h2>
+
+    ```
+    <a asp-action="Create" class="btn btn-success">
+        Add Vehicle
+    </a>
+    ```
+
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You have not added any vehicles yet.
+    </div>
+}
+else
+{
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark"> <tr> <th>Vehicle Number</th> <th>Make</th> <th>Model</th> <th>Year</th> <th>Actions</th> </tr> </thead>
+
+            ```
+            <tbody>
+                @foreach (var vehicle in Model)
+                {
+                    <tr>
+                        <td>@vehicle.VehicleNumber</td>
+                        <td>@vehicle.Make</td>
+                        <td>@vehicle.Model</td>
+                        <td>@vehicle.Year</td>
+                        <td>
+                            <a asp-action="Details"
+                               asp-route-id="@vehicle.Id"
+                               class="btn btn-sm btn-info">
+                                Details
+                            </a>
+
+                            <a asp-action="Edit"
+                               asp-route-id="@vehicle.Id"
+                               class="btn btn-sm btn-primary">
+                                Edit
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@vehicle.Id"
+                               class="btn btn-sm btn-danger">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+```
+
+}

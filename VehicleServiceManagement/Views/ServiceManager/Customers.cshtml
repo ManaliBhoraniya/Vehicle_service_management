@@ -1,0 +1,54 @@
+﻿@model IEnumerable<VehicleServiceManagement.Models.Customer>
+
+@{
+ViewData["Title"] = "Customers";
+}
+
+<h2 class="mb-4">Customers</h2>
+
+@if (!Model.Any())
+{ <div class="alert alert-info">
+No customers found. </div>
+}
+else
+{ <div class="table-responsive"> <table class="table table-bordered table-hover">
+
+```
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Vehicles</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var customer in Model)
+            {
+                <tr>
+                    <td>@customer.Id</td>
+
+                    <td>@customer.Name</td>
+
+                    <td>@customer.User?.Email</td>
+
+                    <td>@customer.Phone</td>
+
+                    <td>
+                        @(customer.Vehicles?.Count ?? 0)
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+```
+
+}
+
+<a asp-action="Index"
+class="btn btn-secondary">
+Back to Dashboard </a>

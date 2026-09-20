@@ -1,0 +1,102 @@
+﻿@model VehicleServiceManagement.Models.ServiceAssignment
+
+@{
+ViewData["Title"] = "Create Assignment";
+
+```
+var requests =
+    ViewBag.ServiceRequests as IEnumerable<VehicleServiceManagement.Models.ServiceRequest>;
+
+var workers =
+    ViewBag.Workers as IEnumerable<VehicleServiceManagement.Models.Worker>;
+```
+
+}
+
+<h2>Create Service Assignment</h2>
+
+<div class="row">
+    <div class="col-md-7">
+
+```
+    <form asp-action="Create" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="ServiceRequestId"
+                   class="form-label">
+                Service Request
+            </label>
+
+            <select asp-for="ServiceRequestId"
+                    class="form-select">
+
+                <option value="">
+                    -- Select Service Request --
+                </option>
+
+                @if (requests != null)
+                {
+                    foreach (var request in requests)
+                    {
+                        <option value="@request.Id">
+                            Request #@request.Id -
+                            @request.Vehicle?.VehicleNumber
+                        </option>
+                    }
+                }
+            </select>
+
+            <span asp-validation-for="ServiceRequestId"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="WorkerId"
+                   class="form-label">
+                Worker
+            </label>
+
+            <select asp-for="WorkerId"
+                    class="form-select">
+
+                <option value="">
+                    -- Select Worker --
+                </option>
+
+                @if (workers != null)
+                {
+                    foreach (var worker in workers)
+                    {
+                        <option value="@worker.Id">
+                            @worker.User?.UserName
+                        </option>
+                    }
+                }
+            </select>
+
+            <span asp-validation-for="WorkerId"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit"
+                class="btn btn-success">
+            Assign Service
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
+```
+
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" />
+}

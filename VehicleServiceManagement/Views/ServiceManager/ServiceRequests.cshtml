@@ -1,0 +1,100 @@
+﻿@model IEnumerable<VehicleServiceManagement.Models.ServiceRequest>
+
+@{
+ViewData["Title"] = "Manage Service Requests";
+}
+
+<h2 class="mb-4">Manage Service Requests</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+
+```
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Update Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Id</td>
+
+                <td>
+                    @request.Vehicle?.Customer?.Name
+                </td>
+
+                <td>
+                    @request.Vehicle?.VehicleNumber
+                </td>
+
+                <td>
+                    @request.RequestDate.ToString("dd-MM-yyyy HH:mm")
+                </td>
+
+                <td>
+                    <span class="badge bg-secondary">
+                        @request.Status
+                    </span>
+                </td>
+
+                <td>
+                    <form asp-action="UpdateRequestStatus"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="id"
+                               value="@request.Id" />
+
+                        <div class="input-group">
+
+                            <select name="status"
+                                    class="form-select">
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Assigned">
+                                    Assigned
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                                <option value="Cancelled">
+                                    Cancelled
+                                </option>
+
+                            </select>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Update
+                            </button>
+
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+```
+
+</div>
+
+<a asp-action="Index"
+class="btn btn-secondary">
+Back to Dashboard </a>
