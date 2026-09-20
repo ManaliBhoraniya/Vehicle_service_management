@@ -1,12 +1,69 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\VehicleServiceManagement\\",
-  "Documents": [],
+  "WorkspaceRootPath": "D:\\Vehicle_service_management\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{325BE755-9BF1-FF7B-3BB5-92E4EE78C81F}|VehicleServiceManagement\\VehicleServiceManagement.csproj|d:\\vehicle_service_management\\vehicleservicemanagement\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{325BE755-9BF1-FF7B-3BB5-92E4EE78C81F}|VehicleServiceManagement\\VehicleServiceManagement.csproj|solutionrelative:vehicleservicemanagement\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{325BE755-9BF1-FF7B-3BB5-92E4EE78C81F}|VehicleServiceManagement\\VehicleServiceManagement.csproj|d:\\vehicle_service_management\\vehicleservicemanagement\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{325BE755-9BF1-FF7B-3BB5-92E4EE78C81F}|VehicleServiceManagement\\VehicleServiceManagement.csproj|solutionrelative:vehicleservicemanagement\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{325BE755-9BF1-FF7B-3BB5-92E4EE78C81F}|VehicleServiceManagement\\VehicleServiceManagement.csproj|d:\\vehicle_service_management\\vehicleservicemanagement\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{325BE755-9BF1-FF7B-3BB5-92E4EE78C81F}|VehicleServiceManagement\\VehicleServiceManagement.csproj|solutionrelative:vehicleservicemanagement\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Vehicle_service_management\\VehicleServiceManagement\\appsettings.json",
+              "RelativeDocumentMoniker": "VehicleServiceManagement\\appsettings.json",
+              "ToolTip": "D:\\Vehicle_service_management\\VehicleServiceManagement\\appsettings.json",
+              "RelativeToolTip": "VehicleServiceManagement\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-09-20T08:47:10.381Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Vehicle_service_management\\VehicleServiceManagement\\Program.cs",
+              "RelativeDocumentMoniker": "VehicleServiceManagement\\Program.cs",
+              "ToolTip": "D:\\Vehicle_service_management\\VehicleServiceManagement\\Program.cs",
+              "RelativeToolTip": "VehicleServiceManagement\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-20T08:46:41.678Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "D:\\Vehicle_service_management\\VehicleServiceManagement\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "VehicleServiceManagement\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "D:\\Vehicle_service_management\\VehicleServiceManagement\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "VehicleServiceManagement\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-20T08:46:04.503Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
