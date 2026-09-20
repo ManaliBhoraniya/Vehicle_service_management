@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm mt-5">
+            <div class="card-header text-center">
+                <h3>Create Account</h3>
+            </div>
+
+            ```
+            <div class="card-body">
+                <form asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email"
+                               name="email"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password"
+                               name="password"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password"
+                               name="confirmPassword"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Register
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a asp-action="Login">Already have an account? Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    ```
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

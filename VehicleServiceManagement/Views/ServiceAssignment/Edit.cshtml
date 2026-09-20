@@ -1,0 +1,83 @@
+﻿@model VehicleServiceManagement.Models.ServiceAssignment
+
+@{
+    ViewData["Title"] = "Edit Assignment";
+
+```
+var workers =
+    ViewBag.Workers as IEnumerable<VehicleServiceManagement.Models.Worker>;
+```
+
+}
+
+<h2>Edit Service Assignment</h2>
+
+<form asp-action="Edit"
+      asp-route-id="@Model.Id"
+      method="post">
+
+    ```
+    @Html.AntiForgeryToken()
+
+    <input type="hidden"
+           asp-for="Id" />
+
+    <input type="hidden"
+           asp-for="ServiceRequestId" />
+
+    <input type="hidden"
+           asp-for="AssignedDate" />
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label class="form-label">
+            Service Request
+        </label>
+
+        <input class="form-control"
+               value="#@Model.ServiceRequestId"
+               readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WorkerId"
+               class="form-label">
+            Worker
+        </label>
+
+        <select asp-for="WorkerId"
+                class="form-select">
+
+            @if (workers != null)
+            {
+                foreach (var worker in workers)
+                {
+                    <option value="@worker.Id">
+                        @worker.User?.UserName
+                    </option>
+                }
+            }
+        </select>
+
+        <span asp-validation-for="WorkerId"
+              class="text-danger"></span>
+    </div>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Save Changes
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+    ```
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
