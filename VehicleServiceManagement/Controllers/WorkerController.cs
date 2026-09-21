@@ -11,27 +11,33 @@ namespace VehicleServiceManagement.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public WorkerController(ApplicationDbContext context)
+        public WorkerController(
+            ApplicationDbContext context)
         {
             _context = context;
         }
 
         // GET: /Worker
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var workers = await _context.Workers
-                .Include(w => w.User)
-                .ToListAsync();
+            var workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .ToListAsync();
 
             return View(workers);
         }
 
         // GET: /Worker/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var worker = await _context.Workers
-                .Include(w => w.User)
-                .FirstOrDefaultAsync(w => w.Id == id);
+            var worker =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .FirstOrDefaultAsync(
+                        w => w.Id == id);
 
             if (worker == null)
                 return NotFound();
@@ -51,12 +57,14 @@ namespace VehicleServiceManagement.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(Worker worker)
+        public async Task<IActionResult> Create(
+            Worker worker)
         {
             if (!ModelState.IsValid)
                 return View(worker);
 
             _context.Workers.Add(worker);
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -67,8 +75,10 @@ namespace VehicleServiceManagement.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
-            var worker = await _context.Workers
-                .FirstOrDefaultAsync(w => w.Id == id);
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.Id == id);
 
             if (worker == null)
                 return NotFound();
@@ -80,7 +90,9 @@ namespace VehicleServiceManagement.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, Worker worker)
+        public async Task<IActionResult> Edit(
+            int id,
+            Worker worker)
         {
             if (id != worker.Id)
                 return BadRequest();
@@ -88,7 +100,23 @@ namespace VehicleServiceManagement.Controllers
             if (!ModelState.IsValid)
                 return View(worker);
 
-            _context.Workers.Update(worker);
+            var existingWorker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.Id == id);
+
+            if (existingWorker == null)
+                return NotFound();
+
+            existingWorker.ApplicationUserId =
+                worker.ApplicationUserId;
+
+            existingWorker.Profession =
+                worker.Profession;
+
+            existingWorker.IsAvailable =
+                worker.IsAvailable;
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -99,8 +127,11 @@ namespace VehicleServiceManagement.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            var worker = await _context.Workers
-                .FirstOrDefaultAsync(w => w.Id == id);
+            var worker =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .FirstOrDefaultAsync(
+                        w => w.Id == id);
 
             if (worker == null)
                 return NotFound();
@@ -112,15 +143,19 @@ namespace VehicleServiceManagement.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(
+            int id)
         {
-            var worker = await _context.Workers
-                .FirstOrDefaultAsync(w => w.Id == id);
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.Id == id);
 
             if (worker == null)
                 return NotFound();
 
             _context.Workers.Remove(worker);
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

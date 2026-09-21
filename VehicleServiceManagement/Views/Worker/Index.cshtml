@@ -5,16 +5,16 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
+
     <h2>Workers</h2>
 
-    ```
     @if (User.IsInRole("Admin"))
     {
-        <a asp-action="Create" class="btn btn-success">
+        <a asp-action="Create"
+           class="btn btn-success">
             Add Worker
         </a>
     }
-    ```
 
 </div>
 
@@ -26,27 +26,69 @@
 }
 else
 {
-
     <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark"> <tr> <th>Worker ID</th> <th>Name</th> <th>Email</th> <th>Actions</th> </tr> </thead>
 
-            ```
+        <table class="table table-bordered table-hover">
+
+            <thead class="table-dark">
+
+                <tr>
+                    <th>Worker ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Profession</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
             <tbody>
+
                 @foreach (var worker in Model)
                 {
                     <tr>
-                        <td>@worker.Id</td>
 
                         <td>
-                            @worker.User?.UserName
+                            @worker.Id
                         </td>
 
                         <td>
-                            @worker.User?.Email
+                            @worker.ApplicationUser?.Name
                         </td>
 
                         <td>
+                            @worker.ApplicationUser?.UserName
+                        </td>
+
+                        <td>
+                            @worker.ApplicationUser?.Email
+                        </td>
+
+                        <td>
+                            @worker.Profession
+                        </td>
+
+                        <td>
+
+                            @if (worker.IsAvailable)
+                            {
+                                <span class="badge bg-success">
+                                    Available
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Busy
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
                             <a asp-action="Details"
                                asp-route-id="@worker.Id"
                                class="btn btn-sm btn-info">
@@ -67,12 +109,15 @@ else
                                     Delete
                                 </a>
                             }
+
                         </td>
+
                     </tr>
                 }
-            </tbody>
-        </table>
-    </div>
-```
 
+            </tbody>
+
+        </table>
+
+    </div>
 }

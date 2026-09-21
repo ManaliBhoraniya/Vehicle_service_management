@@ -9,36 +9,45 @@
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Create" method="post">
+
             @Html.AntiForgeryToken()
 
-            ```
             <div asp-validation-summary="ModelOnly"
                  class="text-danger"></div>
 
             <div class="mb-3">
                 <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" />
+
+                <input asp-for="Name"
+                       class="form-control" />
+
                 <span asp-validation-for="Name"
                       class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Phone" class="form-label"></label>
-                <input asp-for="Phone" class="form-control" />
+
+                <input asp-for="Phone"
+                       class="form-control" />
+
                 <span asp-validation-for="Phone"
                       class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Address" class="form-label"></label>
+
                 <textarea asp-for="Address"
                           class="form-control"
                           rows="3"></textarea>
+
                 <span asp-validation-for="Address"
                       class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-success">
+            <button type="submit"
+                    class="btn btn-success">
                 Save Profile
             </button>
 
@@ -46,10 +55,9 @@
                class="btn btn-secondary">
                 Cancel
             </a>
+
         </form>
     </div>
-    ```
-
 </div>
 
 @section Scripts {

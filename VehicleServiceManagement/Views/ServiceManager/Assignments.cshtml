@@ -1,72 +1,85 @@
 ﻿@model IEnumerable<VehicleServiceManagement.Models.ServiceAssignment>
 
 @{
-ViewData["Title"] = "Assignments";
+    ViewData["Title"] = "Assignments";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
+
     <h2>Service Assignments</h2>
 
-```
-<a asp-controller="ServiceAssignment"
-   asp-action="Create"
-   class="btn btn-success">
-    Create Assignment
-</a>
-```
+    <a asp-controller="ServiceAssignment"
+       asp-action="Create"
+       class="btn btn-success">
+        Create Assignment
+    </a>
 
 </div>
 
 @if (!Model.Any())
-{ <div class="alert alert-info">
-No assignments found. </div>
+{
+    <div class="alert alert-info">
+        No assignments found.
+    </div>
 }
 else
-{ <div class="table-responsive"> <table class="table table-bordered table-hover">
+{
+    <div class="table-responsive">
 
-```
-        <thead class="table-dark">
-            <tr>
-                <th>Assignment ID</th>
-                <th>Request ID</th>
-                <th>Vehicle</th>
-                <th>Worker</th>
-                <th>Assigned Date</th>
-            </tr>
-        </thead>
+        <table class="table table-bordered table-hover">
 
-        <tbody>
-            @foreach (var assignment in Model)
-            {
+            <thead class="table-dark">
                 <tr>
-                    <td>@assignment.Id</td>
-
-                    <td>
-                        #@assignment.ServiceRequestId
-                    </td>
-
-                    <td>
-                        @assignment.ServiceRequest?.Vehicle?.VehicleNumber
-                    </td>
-
-                    <td>
-                        @assignment.Worker?.User?.UserName
-                    </td>
-
-                    <td>
-                        @assignment.AssignedDate.ToString(
-                            "dd-MM-yyyy HH:mm")
-                    </td>
+                    <th>Assignment ID</th>
+                    <th>Request ID</th>
+                    <th>Vehicle</th>
+                    <th>Worker</th>
+                    <th>Service Date</th>
+                    <th>Service Time</th>
                 </tr>
-            }
-        </tbody>
+            </thead>
 
-    </table>
-</div>
-```
+            <tbody>
 
+                @foreach (var assignment in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @assignment.Id
+                        </td>
+
+                        <td>
+                            #@assignment.ServiceRequestId
+                        </td>
+
+                        <td>
+                            @assignment.ServiceRequest?.Vehicle?.VehicleNumber
+                        </td>
+
+                        <td>
+                            @assignment.Worker?.ApplicationUser?.Name
+                        </td>
+
+                        <td>
+                            @assignment.ServiceDate.ToString("dd-MM-yyyy")
+                        </td>
+
+                        <td>
+                            @assignment.ServiceTime.ToString(@"hh\:mm")
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
 }
 
 <a asp-action="Index"
-class="btn btn-secondary">
-Back to Dashboard </a>
+   class="btn btn-secondary">
+    Back to Dashboard
+</a>

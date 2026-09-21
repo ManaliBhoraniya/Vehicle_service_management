@@ -1,116 +1,146 @@
 ﻿@{
-ViewData["Title"] = "Service Manager Dashboard";
+    ViewData["Title"] = "Service Manager Dashboard";
 }
 
 <h2 class="mb-4">Service Manager Dashboard</h2>
 
 <div class="row g-4">
 
-```
-<div class="col-md-3">
-    <div class="card shadow-sm">
-        <div class="card-body text-center">
-            <h6>Customers</h6>
-            <h2>@ViewBag.CustomerCount</h2>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
 
-            <a asp-action="Customers"
-               class="btn btn-outline-primary btn-sm">
-                View Customers
-            </a>
+                <h6>Customers</h6>
+
+                <h2>
+                    @ViewBag.CustomerCount
+                </h2>
+
+                <a asp-action="Customers"
+                   class="btn btn-outline-primary btn-sm">
+                    View Customers
+                </a>
+
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-md-3">
-    <div class="card shadow-sm">
-        <div class="card-body text-center">
-            <h6>Vehicles</h6>
-            <h2>@ViewBag.VehicleCount</h2>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
 
-            <a asp-action="Vehicles"
-               class="btn btn-outline-primary btn-sm">
-                View Vehicles
-            </a>
+                <h6>Vehicles</h6>
+
+                <h2>
+                    @ViewBag.VehicleCount
+                </h2>
+
+                <a asp-action="Vehicles"
+                   class="btn btn-outline-primary btn-sm">
+                    View Vehicles
+                </a>
+
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-md-3">
-    <div class="card shadow-sm">
-        <div class="card-body text-center">
-            <h6>Workers</h6>
-            <h2>@ViewBag.WorkerCount</h2>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
 
-            <a asp-action="Workers"
-               class="btn btn-outline-primary btn-sm">
-                View Workers
-            </a>
+                <h6>Workers</h6>
+
+                <h2>
+                    @ViewBag.WorkerCount
+                </h2>
+
+                <a asp-action="Workers"
+                   class="btn btn-outline-primary btn-sm">
+                    View Workers
+                </a>
+
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-md-3">
-    <div class="card shadow-sm">
-        <div class="card-body text-center">
-            <h6>Service Requests</h6>
-            <h2>@ViewBag.ServiceRequestCount</h2>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
 
-            <a asp-action="ServiceRequests"
-               class="btn btn-outline-primary btn-sm">
-                View Requests
-            </a>
+                <h6>Service Requests</h6>
+
+                <h2>
+                    @ViewBag.ServiceRequestCount
+                </h2>
+
+                <a asp-action="ServiceRequests"
+                   class="btn btn-outline-primary btn-sm">
+                    View Requests
+                </a>
+
+            </div>
         </div>
     </div>
-</div>
-```
 
 </div>
 
 <div class="row g-4 mt-2">
 
-```
-<div class="col-md-4">
-    <div class="card border-warning shadow-sm">
-        <div class="card-body text-center">
-            <h5>Pending Requests</h5>
-            <h2>@ViewBag.PendingRequests</h2>
-        </div>
-    </div>
-</div>
+    <div class="col-md-4">
+        <div class="card border-warning shadow-sm">
+            <div class="card-body text-center">
 
-<div class="col-md-4">
-    <div class="card border-primary shadow-sm">
-        <div class="card-body text-center">
-            <h5>Assigned Requests</h5>
-            <h2>@ViewBag.AssignedRequests</h2>
-        </div>
-    </div>
-</div>
+                <h5>Pending Requests</h5>
 
-<div class="col-md-4">
-    <div class="card border-success shadow-sm">
-        <div class="card-body text-center">
-            <h5>Completed Requests</h5>
-            <h2>@ViewBag.CompletedRequests</h2>
+                <h2>
+                    @ViewBag.PendingRequests
+                </h2>
+
+            </div>
         </div>
     </div>
-</div>
-```
+
+    <div class="col-md-4">
+        <div class="card border-primary shadow-sm">
+            <div class="card-body text-center">
+
+                <h5>Assigned Requests</h5>
+
+                <h2>
+                    @ViewBag.AssignedRequests
+                </h2>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-success shadow-sm">
+            <div class="card-body text-center">
+
+                <h5>Completed Requests</h5>
+
+                <h2>
+                    @ViewBag.CompletedRequests
+                </h2>
+
+            </div>
+        </div>
+    </div>
 
 </div>
 
 <div class="mt-4">
+
     <a asp-action="Assignments"
        class="btn btn-primary">
         Manage Assignments
     </a>
 
-```
-<a asp-controller="Worker"
-   asp-action="Create"
-   class="btn btn-success">
-    Add Worker
-</a>
-```
+    <a asp-controller="Worker"
+       asp-action="Create"
+       class="btn btn-success">
+        Add Worker
+    </a>
 
 </div>

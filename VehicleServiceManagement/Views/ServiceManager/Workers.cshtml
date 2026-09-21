@@ -1,71 +1,112 @@
 ﻿@model IEnumerable<VehicleServiceManagement.Models.Worker>
 
 @{
-ViewData["Title"] = "Workers";
+    ViewData["Title"] = "Workers";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
+
     <h2>Workers</h2>
 
-```
-<a asp-controller="Worker"
-   asp-action="Create"
-   class="btn btn-success">
-    Add Worker
-</a>
-```
+    <a asp-controller="Worker"
+       asp-action="Create"
+       class="btn btn-success">
+        Add Worker
+    </a>
 
 </div>
 
 @if (!Model.Any())
-{ <div class="alert alert-info">
-No workers found. </div>
+{
+    <div class="alert alert-info">
+        No workers found.
+    </div>
 }
 else
-{ <div class="table-responsive"> <table class="table table-bordered table-hover">
+{
+    <div class="table-responsive">
 
-```
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+        <table class="table table-bordered table-hover">
 
-        <tbody>
-            @foreach (var worker in Model)
-            {
+            <thead class="table-dark">
+
                 <tr>
-                    <td>@worker.Id</td>
-
-                    <td>
-                        @worker.User?.UserName
-                    </td>
-
-                    <td>
-                        @worker.User?.Email
-                    </td>
-
-                    <td>
-                        <a asp-controller="Worker"
-                           asp-action="Details"
-                           asp-route-id="@worker.Id"
-                           class="btn btn-sm btn-info">
-                            Details
-                        </a>
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Profession</th>
+                    <th>Available</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
 
-    </table>
-</div>
-```
+            </thead>
 
+            <tbody>
+
+                @foreach (var worker in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @worker.Id
+                        </td>
+
+                        <td>
+                            @worker.ApplicationUser?.Name
+                        </td>
+
+                        <td>
+                            @worker.ApplicationUser?.UserName
+                        </td>
+
+                        <td>
+                            @worker.ApplicationUser?.Email
+                        </td>
+
+                        <td>
+                            @worker.Profession
+                        </td>
+
+                        <td>
+
+                            @if (worker.IsAvailable)
+                            {
+                                <span class="badge bg-success">
+                                    Available
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Busy
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            <a asp-controller="Worker"
+                               asp-action="Details"
+                               asp-route-id="@worker.Id"
+                               class="btn btn-sm btn-info">
+                                Details
+                            </a>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
 }
 
 <a asp-action="Index"
-class="btn btn-secondary">
-Back to Dashboard </a>
+   class="btn btn-secondary">
+    Back to Dashboard
+</a>

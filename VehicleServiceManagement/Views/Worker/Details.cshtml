@@ -7,10 +7,11 @@
 <h2>Worker Details</h2>
 
 <div class="card shadow-sm">
+
     <div class="card-body">
 
-        ```
         <dl class="row">
+
             <dt class="col-sm-3">
                 Worker ID
             </dt>
@@ -20,11 +21,19 @@
             </dd>
 
             <dt class="col-sm-3">
+                Name
+            </dt>
+
+            <dd class="col-sm-9">
+                @Model.ApplicationUser?.Name
+            </dd>
+
+            <dt class="col-sm-3">
                 Username
             </dt>
 
             <dd class="col-sm-9">
-                @Model.User?.UserName
+                @Model.ApplicationUser?.UserName
             </dd>
 
             <dt class="col-sm-3">
@@ -32,8 +41,38 @@
             </dt>
 
             <dd class="col-sm-9">
-                @Model.User?.Email
+                @Model.ApplicationUser?.Email
             </dd>
+
+            <dt class="col-sm-3">
+                Profession
+            </dt>
+
+            <dd class="col-sm-9">
+                @Model.Profession
+            </dd>
+
+            <dt class="col-sm-3">
+                Availability
+            </dt>
+
+            <dd class="col-sm-9">
+
+                @if (Model.IsAvailable)
+                {
+                    <span class="badge bg-success">
+                        Available
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">
+                        Busy
+                    </span>
+                }
+
+            </dd>
+
         </dl>
 
         <a asp-action="Edit"
@@ -46,7 +85,7 @@
            class="btn btn-secondary">
             Back
         </a>
+
     </div>
-    ```
 
 </div>

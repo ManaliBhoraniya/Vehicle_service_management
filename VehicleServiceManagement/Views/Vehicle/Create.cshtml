@@ -8,10 +8,12 @@
 
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create" method="post">
+
+        <form asp-action="Create"
+              method="post">
+
             @Html.AntiForgeryToken()
 
-            ```
             <div asp-validation-summary="ModelOnly"
                  class="text-danger"></div>
 
@@ -28,39 +30,26 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Make"
+                <label asp-for="VehicleModel"
                        class="form-label">
                 </label>
 
-                <input asp-for="Make"
+                <input asp-for="VehicleModel"
                        class="form-control" />
 
-                <span asp-validation-for="Make"
+                <span asp-validation-for="VehicleModel"
                       class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Model"
+                <label asp-for="VehicleType"
                        class="form-label">
                 </label>
 
-                <input asp-for="Model"
+                <input asp-for="VehicleType"
                        class="form-control" />
 
-                <span asp-validation-for="Model"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Year"
-                       class="form-label">
-                </label>
-
-                <input asp-for="Year"
-                       class="form-control"
-                       type="number" />
-
-                <span asp-validation-for="Year"
+                <span asp-validation-for="VehicleType"
                       class="text-danger"></span>
             </div>
 
@@ -73,10 +62,10 @@
                class="btn btn-secondary">
                 Cancel
             </a>
-        </form>
-    </div>
-    ```
 
+        </form>
+
+    </div>
 </div>
 
 @section Scripts {

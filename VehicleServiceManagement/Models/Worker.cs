@@ -10,10 +10,10 @@ namespace VehicleServiceManagement.Models
         public int ApplicationUserId { get; set; }
 
         [Required]
-        public string Profession { get; set; }
+        public string Profession { get; set; } = string.Empty;
 
         public bool IsAvailable { get; set; }
 
-        public ApplicationUser ApplicationUser { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

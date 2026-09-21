@@ -8,19 +8,33 @@
 
 <div class="card shadow-sm">
     <div class="card-body">
+
         <dl class="row">
-            <dt class="col-sm-3">Vehicle Number</dt>
-            <dd class="col-sm-9">@Model.VehicleNumber</dd>
 
-            ```
-            <dt class="col-sm-3">Make</dt>
-            <dd class="col-sm-9">@Model.Make</dd>
+            <dt class="col-sm-3">
+                Vehicle Number
+            </dt>
 
-            <dt class="col-sm-3">Model</dt>
-            <dd class="col-sm-9">@Model.Model</dd>
+            <dd class="col-sm-9">
+                @Model.VehicleNumber
+            </dd>
 
-            <dt class="col-sm-3">Year</dt>
-            <dd class="col-sm-9">@Model.Year</dd>
+            <dt class="col-sm-3">
+                Vehicle Model
+            </dt>
+
+            <dd class="col-sm-9">
+                @Model.VehicleModel
+            </dd>
+
+            <dt class="col-sm-3">
+                Vehicle Type
+            </dt>
+
+            <dd class="col-sm-9">
+                @Model.VehicleType
+            </dd>
+
         </dl>
 
         <a asp-action="Edit"
@@ -33,7 +47,6 @@
            class="btn btn-secondary">
             Back
         </a>
-    </div>
-    ```
 
+    </div>
 </div>

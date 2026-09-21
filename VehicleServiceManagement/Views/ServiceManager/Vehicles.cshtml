@@ -1,57 +1,70 @@
 ﻿@model IEnumerable<VehicleServiceManagement.Models.Vehicle>
 
 @{
-ViewData["Title"] = "Vehicles";
+    ViewData["Title"] = "Vehicles";
 }
 
 <h2 class="mb-4">All Vehicles</h2>
 
 @if (!Model.Any())
-{ <div class="alert alert-info">
-No vehicles found. </div>
+{
+    <div class="alert alert-info">
+        No vehicles found.
+    </div>
 }
 else
-{ <div class="table-responsive"> <table class="table table-bordered table-hover">
+{
+    <div class="table-responsive">
 
-```
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Vehicle Number</th>
-                <th>Make</th>
-                <th>Model</th>
-                <th>Year</th>
-                <th>Customer</th>
-            </tr>
-        </thead>
+        <table class="table table-bordered table-hover">
 
-        <tbody>
-            @foreach (var vehicle in Model)
-            {
+            <thead class="table-dark">
                 <tr>
-                    <td>@vehicle.Id</td>
-
-                    <td>@vehicle.VehicleNumber</td>
-
-                    <td>@vehicle.Make</td>
-
-                    <td>@vehicle.Model</td>
-
-                    <td>@vehicle.Year</td>
-
-                    <td>
-                        @vehicle.Customer?.Name
-                    </td>
+                    <th>ID</th>
+                    <th>Vehicle Number</th>
+                    <th>Vehicle Model</th>
+                    <th>Vehicle Type</th>
+                    <th>Customer</th>
                 </tr>
-            }
-        </tbody>
+            </thead>
 
-    </table>
-</div>
-```
+            <tbody>
 
+                @foreach (var vehicle in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @vehicle.Id
+                        </td>
+
+                        <td>
+                            @vehicle.VehicleNumber
+                        </td>
+
+                        <td>
+                            @vehicle.VehicleModel
+                        </td>
+
+                        <td>
+                            @vehicle.VehicleType
+                        </td>
+
+                        <td>
+                            @vehicle.Customer?.Name
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
 }
 
 <a asp-action="Index"
-class="btn btn-secondary">
-Back to Dashboard </a>
+   class="btn btn-secondary">
+    Back to Dashboard
+</a>

@@ -10,25 +10,56 @@
       asp-route-id="@Model.Id"
       method="post">
 
-    ```
     @Html.AntiForgeryToken()
 
-    <input type="hidden" asp-for="Id" />
+    <input type="hidden"
+           asp-for="Id" />
+
+    <input type="hidden"
+           asp-for="ApplicationUserId" />
 
     <div asp-validation-summary="ModelOnly"
-         class="text-danger mb-3"></div>
+         class="text-danger mb-3">
+    </div>
 
     <div class="mb-3">
-        <label asp-for="UserId"
-               class="form-label">
-            User ID
+
+        <label class="form-label">
+            Application User
         </label>
 
-        <input asp-for="UserId"
+        <input class="form-control"
+               value="@Model.ApplicationUser?.UserName"
+               readonly />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="Profession"
+               class="form-label">
+            Profession
+        </label>
+
+        <input asp-for="Profession"
                class="form-control" />
 
-        <span asp-validation-for="UserId"
-              class="text-danger"></span>
+        <span asp-validation-for="Profession"
+              class="text-danger">
+        </span>
+
+    </div>
+
+    <div class="mb-3 form-check">
+
+        <input asp-for="IsAvailable"
+               class="form-check-input" />
+
+        <label asp-for="IsAvailable"
+               class="form-check-label">
+            Is Available
+        </label>
+
     </div>
 
     <button type="submit"
@@ -40,7 +71,6 @@
        class="btn btn-secondary">
         Cancel
     </a>
-    ```
 
 </form>
 

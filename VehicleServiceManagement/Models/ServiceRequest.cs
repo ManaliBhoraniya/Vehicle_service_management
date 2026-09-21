@@ -13,16 +13,13 @@ namespace VehicleServiceManagement.Models
         public int VehicleId { get; set; }
 
         [Required]
-        public string Complaint { get; set; }
+        public DateTime RequestDate { get; set; }
 
         [Required]
-        public string RequiredService { get; set; }
+        public string Status { get; set; } = "Pending";
 
-        [Required]
-        public string Status { get; set; }
+        public Customer? Customer { get; set; }
 
-        public Customer Customer { get; set; }
-
-        public Vehicle Vehicle { get; set; }
+        public Vehicle? Vehicle { get; set; }
     }
 }

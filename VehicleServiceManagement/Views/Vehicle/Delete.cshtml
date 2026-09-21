@@ -12,19 +12,19 @@
 
 <div class="card">
     <div class="card-body">
-        <h5>@Model.VehicleNumber</h5>
 
-        ```
+        <h5>
+            @Model.VehicleNumber
+        </h5>
+
         <p>
-            <strong>Make:</strong> @Model.Make
+            <strong>Vehicle Model:</strong>
+            @Model.VehicleModel
         </p>
 
         <p>
-            <strong>Model:</strong> @Model.Model
-        </p>
-
-        <p>
-            <strong>Year:</strong> @Model.Year
+            <strong>Vehicle Type:</strong>
+            @Model.VehicleType
         </p>
 
         <form asp-action="Delete"
@@ -42,8 +42,8 @@
                class="btn btn-secondary">
                 Cancel
             </a>
-        </form>
-    </div>
-    ```
 
+        </form>
+
+    </div>
 </div>

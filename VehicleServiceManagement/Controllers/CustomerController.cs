@@ -22,6 +22,7 @@ namespace VehicleServiceManagement.Controllers
         }
 
         // GET: /Customer
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -30,7 +31,10 @@ namespace VehicleServiceManagement.Controllers
                 return Challenge();
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+                .Include(c => c.ApplicationUser)
+                .Include(c => c.Vehicles)
+                .FirstOrDefaultAsync(
+                    c => c.ApplicationUserId == user.Id);
 
             if (customer == null)
                 return RedirectToAction(nameof(Create));
@@ -48,7 +52,8 @@ namespace VehicleServiceManagement.Controllers
                 return Challenge();
 
             var existingCustomer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+                .FirstOrDefaultAsync(
+                    c => c.ApplicationUserId == user.Id);
 
             if (existingCustomer != null)
                 return RedirectToAction(nameof(Index));
@@ -69,10 +74,23 @@ namespace VehicleServiceManagement.Controllers
             if (!ModelState.IsValid)
                 return View(customer);
 
-            customer.UserId = user.Id;
+            var existingCustomer = await _context.Customers
+                .FirstOrDefaultAsync(
+                    c => c.ApplicationUserId == user.Id);
+
+            if (existingCustomer != null)
+                return RedirectToAction(nameof(Index));
+
+            customer.ApplicationUserId = user.Id;
 
             _context.Customers.Add(customer);
+
             await _context.SaveChangesAsync();
+
+            // Also keep the Identity user's display name updated
+            user.Name = customer.Name;
+
+            await _userManager.UpdateAsync(user);
 
             return RedirectToAction(nameof(Index));
         }
@@ -87,7 +105,8 @@ namespace VehicleServiceManagement.Controllers
                 return Challenge();
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+                .FirstOrDefaultAsync(
+                    c => c.ApplicationUserId == user.Id);
 
             if (customer == null)
                 return NotFound();
@@ -106,7 +125,8 @@ namespace VehicleServiceManagement.Controllers
                 return Challenge();
 
             var existingCustomer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+                .FirstOrDefaultAsync(
+                    c => c.ApplicationUserId == user.Id);
 
             if (existingCustomer == null)
                 return NotFound();
@@ -117,6 +137,11 @@ namespace VehicleServiceManagement.Controllers
             existingCustomer.Name = customer.Name;
             existingCustomer.Phone = customer.Phone;
             existingCustomer.Address = customer.Address;
+
+            // Keep ApplicationUser.Name synchronized
+            user.Name = customer.Name;
+
+            await _userManager.UpdateAsync(user);
 
             await _context.SaveChangesAsync();
 

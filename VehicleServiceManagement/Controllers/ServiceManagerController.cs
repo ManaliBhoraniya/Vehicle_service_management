@@ -10,7 +10,8 @@ namespace VehicleServiceManagement.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ServiceManagerController(ApplicationDbContext context)
+        public ServiceManagerController(
+            ApplicationDbContext context)
         {
             _context = context;
         }
@@ -18,11 +19,14 @@ namespace VehicleServiceManagement.Controllers
         // GET: /ServiceManager
         public async Task<IActionResult> Index()
         {
-            ViewBag.CustomerCount = await _context.Customers.CountAsync();
+            ViewBag.CustomerCount =
+                await _context.Customers.CountAsync();
 
-            ViewBag.VehicleCount = await _context.Vehicles.CountAsync();
+            ViewBag.VehicleCount =
+                await _context.Vehicles.CountAsync();
 
-            ViewBag.WorkerCount = await _context.Workers.CountAsync();
+            ViewBag.WorkerCount =
+                await _context.Workers.CountAsync();
 
             ViewBag.ServiceRequestCount =
                 await _context.ServiceRequests.CountAsync();
@@ -43,11 +47,12 @@ namespace VehicleServiceManagement.Controllers
         }
 
         // GET: /ServiceManager/ServiceRequests
+        [HttpGet]
         public async Task<IActionResult> ServiceRequests()
         {
             var requests = await _context.ServiceRequests
                 .Include(s => s.Vehicle)
-                .ThenInclude(v => v.Customer)
+                    .ThenInclude(v => v.Customer)
                 .OrderByDescending(s => s.RequestDate)
                 .ToListAsync();
 
@@ -61,8 +66,9 @@ namespace VehicleServiceManagement.Controllers
             int id,
             string status)
         {
-            var request = await _context.ServiceRequests
-                .FirstOrDefaultAsync(s => s.Id == id);
+            var request =
+                await _context.ServiceRequests
+                    .FirstOrDefaultAsync(s => s.Id == id);
 
             if (request == null)
                 return NotFound();
@@ -75,42 +81,47 @@ namespace VehicleServiceManagement.Controllers
         }
 
         // GET: /ServiceManager/Customers
+        [HttpGet]
         public async Task<IActionResult> Customers()
         {
             var customers = await _context.Customers
-                .Include(c => c.User)
-                .Include(c => c.Vehicles)
+                .Include(c => c.ApplicationUser)
                 .ToListAsync();
 
             return View(customers);
         }
 
         // GET: /ServiceManager/Workers
+        [HttpGet]
         public async Task<IActionResult> Workers()
         {
             var workers = await _context.Workers
-                .Include(w => w.User)
+                .Include(w => w.ApplicationUser)
                 .ToListAsync();
 
             return View(workers);
         }
 
         // GET: /ServiceManager/Vehicles
+        [HttpGet]
         public async Task<IActionResult> Vehicles()
         {
             var vehicles = await _context.Vehicles
                 .Include(v => v.Customer)
+                    .ThenInclude(c => c.ApplicationUser)
                 .ToListAsync();
 
             return View(vehicles);
         }
 
         // GET: /ServiceManager/Assignments
+        [HttpGet]
         public async Task<IActionResult> Assignments()
         {
             var assignments = await _context.ServiceAssignments
                 .Include(a => a.ServiceRequest)
                 .Include(a => a.Worker)
+                    .ThenInclude(w => w.ApplicationUser)
                 .ToListAsync();
 
             return View(assignments);

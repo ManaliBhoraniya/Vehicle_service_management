@@ -11,7 +11,8 @@ namespace VehicleServiceManagement.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ServiceAssignmentController(ApplicationDbContext context)
+        public ServiceAssignmentController(
+            ApplicationDbContext context)
         {
             _context = context;
         }
@@ -22,6 +23,7 @@ namespace VehicleServiceManagement.Controllers
             var assignments = await _context.ServiceAssignments
                 .Include(a => a.ServiceRequest)
                 .Include(a => a.Worker)
+                    .ThenInclude(w => w.ApplicationUser)
                 .ToListAsync();
 
             return View(assignments);
@@ -31,14 +33,17 @@ namespace VehicleServiceManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.ServiceRequests = await _context.ServiceRequests
-                .Where(s => s.Status != "Completed" &&
-                            s.Status != "Cancelled")
-                .ToListAsync();
+            ViewBag.ServiceRequests =
+                await _context.ServiceRequests
+                    .Where(s => s.Status != "Completed" &&
+                                s.Status != "Cancelled")
+                    .ToListAsync();
 
-            ViewBag.Workers = await _context.Workers
-                .Include(w => w.User)
-                .ToListAsync();
+            ViewBag.Workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Where(w => w.IsAvailable)
+                    .ToListAsync();
 
             return View();
         }
@@ -51,29 +56,31 @@ namespace VehicleServiceManagement.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.ServiceRequests = await _context.ServiceRequests
-                    .Where(s => s.Status != "Completed" &&
-                                s.Status != "Cancelled")
-                    .ToListAsync();
-
-                ViewBag.Workers = await _context.Workers
-                    .Include(w => w.User)
-                    .ToListAsync();
+                await LoadCreateData();
 
                 return View(assignment);
             }
 
-            assignment.AssignedDate = DateTime.Now;
-
             _context.ServiceAssignments.Add(assignment);
 
-            var serviceRequest = await _context.ServiceRequests
-                .FirstOrDefaultAsync(s =>
-                    s.Id == assignment.ServiceRequestId);
+            var serviceRequest =
+                await _context.ServiceRequests
+                    .FirstOrDefaultAsync(
+                        s => s.Id == assignment.ServiceRequestId);
 
             if (serviceRequest != null)
             {
                 serviceRequest.Status = "Assigned";
+            }
+
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.Id == assignment.WorkerId);
+
+            if (worker != null)
+            {
+                worker.IsAvailable = false;
             }
 
             await _context.SaveChangesAsync();
@@ -82,14 +89,17 @@ namespace VehicleServiceManagement.Controllers
         }
 
         // GET: /ServiceAssignment/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var assignment = await _context.ServiceAssignments
-                .Include(a => a.ServiceRequest)
-                .ThenInclude(s => s.Vehicle)
-                .Include(a => a.Worker)
-                .ThenInclude(w => w.User)
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var assignment =
+                await _context.ServiceAssignments
+                    .Include(a => a.ServiceRequest)
+                        .ThenInclude(s => s.Vehicle)
+                    .Include(a => a.Worker)
+                        .ThenInclude(w => w.ApplicationUser)
+                    .FirstOrDefaultAsync(
+                        a => a.Id == id);
 
             if (assignment == null)
                 return NotFound();
@@ -101,15 +111,20 @@ namespace VehicleServiceManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var assignment = await _context.ServiceAssignments
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var assignment =
+                await _context.ServiceAssignments
+                    .FirstOrDefaultAsync(
+                        a => a.Id == id);
 
             if (assignment == null)
                 return NotFound();
 
-            ViewBag.Workers = await _context.Workers
-                .Include(w => w.User)
-                .ToListAsync();
+            ViewBag.Workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Where(w => w.IsAvailable ||
+                                w.Id == assignment.WorkerId)
+                    .ToListAsync();
 
             return View(assignment);
         }
@@ -126,14 +141,36 @@ namespace VehicleServiceManagement.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Workers = await _context.Workers
-                    .Include(w => w.User)
-                    .ToListAsync();
+                ViewBag.Workers =
+                    await _context.Workers
+                        .Include(w => w.ApplicationUser)
+                        .Where(w => w.IsAvailable ||
+                                    w.Id == assignment.WorkerId)
+                        .ToListAsync();
 
                 return View(assignment);
             }
 
-            _context.ServiceAssignments.Update(assignment);
+            var existingAssignment =
+                await _context.ServiceAssignments
+                    .FirstOrDefaultAsync(
+                        a => a.Id == id);
+
+            if (existingAssignment == null)
+                return NotFound();
+
+            existingAssignment.WorkerId =
+                assignment.WorkerId;
+
+            existingAssignment.ServiceRequestId =
+                assignment.ServiceRequestId;
+
+            existingAssignment.ServiceDate =
+                assignment.ServiceDate;
+
+            existingAssignment.ServiceTime =
+                assignment.ServiceTime;
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -144,8 +181,10 @@ namespace VehicleServiceManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var assignment = await _context.ServiceAssignments
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var assignment =
+                await _context.ServiceAssignments
+                    .FirstOrDefaultAsync(
+                        a => a.Id == id);
 
             if (assignment == null)
                 return NotFound();
@@ -155,6 +194,21 @@ namespace VehicleServiceManagement.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadCreateData()
+        {
+            ViewBag.ServiceRequests =
+                await _context.ServiceRequests
+                    .Where(s => s.Status != "Completed" &&
+                                s.Status != "Cancelled")
+                    .ToListAsync();
+
+            ViewBag.Workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Where(w => w.IsAvailable)
+                    .ToListAsync();
         }
     }
 }

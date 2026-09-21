@@ -1,54 +1,70 @@
 ﻿@model IEnumerable<VehicleServiceManagement.Models.Customer>
 
 @{
-ViewData["Title"] = "Customers";
+    ViewData["Title"] = "Customers";
 }
 
 <h2 class="mb-4">Customers</h2>
 
 @if (!Model.Any())
-{ <div class="alert alert-info">
-No customers found. </div>
+{
+    <div class="alert alert-info">
+        No customers found.
+    </div>
 }
 else
-{ <div class="table-responsive"> <table class="table table-bordered table-hover">
+{
+    <div class="table-responsive">
 
-```
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Vehicles</th>
-            </tr>
-        </thead>
+        <table class="table table-bordered table-hover">
 
-        <tbody>
-            @foreach (var customer in Model)
-            {
+            <thead class="table-dark">
                 <tr>
-                    <td>@customer.Id</td>
-
-                    <td>@customer.Name</td>
-
-                    <td>@customer.User?.Email</td>
-
-                    <td>@customer.Phone</td>
-
-                    <td>
-                        @(customer.Vehicles?.Count ?? 0)
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Vehicles</th>
                 </tr>
-            }
-        </tbody>
+            </thead>
 
-    </table>
-</div>
-```
+            <tbody>
 
+                @foreach (var customer in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @customer.Id
+                        </td>
+
+                        <td>
+                            @customer.Name
+                        </td>
+
+                        <td>
+                            @customer.ApplicationUser?.Email
+                        </td>
+
+                        <td>
+                            @customer.Phone
+                        </td>
+
+                        <td>
+                            @(customer.Vehicles?.Count ?? 0)
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
 }
 
 <a asp-action="Index"
-class="btn btn-secondary">
-Back to Dashboard </a>
+   class="btn btn-secondary">
+    Back to Dashboard
+</a>

@@ -9,7 +9,6 @@
 <div class="card shadow-sm">
     <div class="card-body">
 
-        ```
         <dl class="row">
 
             <dt class="col-sm-4">
@@ -37,19 +36,43 @@
             </dd>
 
             <dt class="col-sm-4">
+                Vehicle Model
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.ServiceRequest?.Vehicle?.VehicleModel
+            </dd>
+
+            <dt class="col-sm-4">
                 Worker
             </dt>
 
             <dd class="col-sm-8">
-                @Model.Worker?.User?.UserName
+                @Model.Worker?.ApplicationUser?.Name
             </dd>
 
             <dt class="col-sm-4">
-                Assigned Date
+                Profession
             </dt>
 
             <dd class="col-sm-8">
-                @Model.AssignedDate.ToString("dd-MM-yyyy HH:mm")
+                @Model.Worker?.Profession
+            </dd>
+
+            <dt class="col-sm-4">
+                Service Date
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.ServiceDate.ToString("dd-MM-yyyy")
+            </dd>
+
+            <dt class="col-sm-4">
+                Service Time
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.ServiceTime.ToString(@"hh\:mm")
             </dd>
 
         </dl>
@@ -64,7 +87,6 @@
            class="btn btn-secondary">
             Back
         </a>
-    </div>
-    ```
 
+    </div>
 </div>

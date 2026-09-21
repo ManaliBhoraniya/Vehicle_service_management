@@ -1,22 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace VehicleServiceManagement.Models
 {
-    public class ApplicationUser
+    public class ApplicationUser : IdentityUser<int>
     {
-        public int Id { get; set; }
-
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
-        public string Password { get; set; }
-
-        [Required]
-        public string Role { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

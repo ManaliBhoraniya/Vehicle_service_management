@@ -1,0 +1,153 @@
+﻿@model VehicleServiceManagement.Models.ServiceRequest
+
+@{
+    ViewData["Title"] = "Create Service Request";
+
+    var vehicles =
+        ViewBag.Vehicles as IEnumerable<VehicleServiceManagement.Models.Vehicle>;
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Create Service Request</h2>
+
+    <div class="row">
+
+        <div class="col-md-7">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        New Service Request
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <form asp-action="Create"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <!-- Vehicle -->
+                        <div class="mb-3">
+
+                            <label asp-for="VehicleId"
+                                   class="form-label">
+                                Select Vehicle
+                            </label>
+
+                            <select asp-for="VehicleId"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Select Vehicle --
+                                </option>
+
+                                @if (vehicles != null)
+                                {
+                                    foreach (var vehicle in vehicles)
+                                    {
+                                        <option value="@vehicle.Id">
+                                            @vehicle.VehicleNumber
+                                            -
+                                            @vehicle.VehicleModel
+                                        </option>
+                                    }
+                                }
+
+                            </select>
+
+                            <span asp-validation-for="VehicleId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Request Date -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Request Date
+                            </label>
+
+                            <input class="form-control"
+                                   value="@DateTime.Now.ToString("dd-MM-yyyy HH:mm")"
+                                   readonly />
+
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <input class="form-control"
+                                   value="Pending"
+                                   readonly />
+
+                        </div>
+
+                        <div class="mt-4">
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Submit Service Request
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-secondary">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-5">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <h5>
+                        Service Request Information
+                    </h5>
+
+                    <p class="text-muted">
+                        Select one of your registered vehicles
+                        to create a service request.
+                    </p>
+
+                    <ul class="text-muted">
+                        <li>Your request will initially be marked as Pending.</li>
+                        <li>A service manager can assign a worker.</li>
+                        <li>You can track the request status from My Service Requests.</li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

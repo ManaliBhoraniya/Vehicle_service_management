@@ -10,8 +10,20 @@ namespace VehicleServiceManagement.Models
         public int ApplicationUserId { get; set; }
 
         [Required]
-        public string Phone { get; set; }
+        [StringLength(100)]
+        public string Name { get; set; } = string.Empty;
 
-        public ApplicationUser ApplicationUser { get; set; }
+        [Required]
+        [Phone]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(250)]
+        public string Address { get; set; } = string.Empty;
+
+        public ApplicationUser? ApplicationUser { get; set; }
+
+        public ICollection<Vehicle> Vehicles { get; set; }
+            = new List<Vehicle>();
     }
 }

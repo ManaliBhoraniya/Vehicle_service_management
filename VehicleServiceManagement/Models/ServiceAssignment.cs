@@ -18,8 +18,8 @@ namespace VehicleServiceManagement.Models
         [Required]
         public TimeSpan ServiceTime { get; set; }
 
-        public ServiceRequest ServiceRequest { get; set; }
+        public ServiceRequest? ServiceRequest { get; set; }
 
-        public Worker Worker { get; set; }
+        public Worker? Worker { get; set; }
     }
 }

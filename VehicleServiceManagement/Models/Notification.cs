@@ -13,10 +13,10 @@ namespace VehicleServiceManagement.Models
         public int ServiceRequestId { get; set; }
 
         [Required]
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
 
-        public Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
 
-        public ServiceRequest ServiceRequest { get; set; }
+        public ServiceRequest? ServiceRequest { get; set; }
     }
 }

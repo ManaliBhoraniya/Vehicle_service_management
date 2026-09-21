@@ -1,0 +1,132 @@
+﻿@model VehicleServiceManagement.Models.ServiceRequest
+
+@{
+    ViewData["Title"] = "Service Request Details";
+}
+
+<h2>Service Request Details</h2>
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <strong>
+            Service Request #@Model.Id
+        </strong>
+    </div>
+
+    <div class="card-body">
+
+        <dl class="row">
+
+            <dt class="col-sm-4">
+                Request ID
+            </dt>
+
+            <dd class="col-sm-8">
+                #@Model.Id
+            </dd>
+
+            <dt class="col-sm-4">
+                Vehicle Number
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.Vehicle?.VehicleNumber
+            </dd>
+
+            <dt class="col-sm-4">
+                Vehicle Model
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.Vehicle?.VehicleModel
+            </dd>
+
+            <dt class="col-sm-4">
+                Vehicle Type
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.Vehicle?.VehicleType
+            </dd>
+
+            <dt class="col-sm-4">
+                Request Date
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.RequestDate.ToString("dd-MM-yyyy HH:mm")
+            </dd>
+
+            <dt class="col-sm-4">
+                Status
+            </dt>
+
+            <dd class="col-sm-8">
+
+                @if (Model.Status == "Pending")
+                {
+                    <span class="badge bg-warning text-dark">
+                        Pending
+                    </span>
+                }
+                else if (Model.Status == "Assigned")
+                {
+                    <span class="badge bg-primary">
+                        Assigned
+                    </span>
+                }
+                else if (Model.Status == "Completed")
+                {
+                    <span class="badge bg-success">
+                        Completed
+                    </span>
+                }
+                else if (Model.Status == "Cancelled")
+                {
+                    <span class="badge bg-danger">
+                        Cancelled
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">
+                        @Model.Status
+                    </span>
+                }
+
+            </dd>
+
+        </dl>
+
+        <div class="mt-3">
+
+            @if (User.IsInRole("Customer") &&
+                 Model.Status != "Completed" &&
+                 Model.Status != "Cancelled")
+            {
+                <form asp-action="Cancel"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      class="d-inline">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="btn btn-danger"
+                            onclick="return confirm('Are you sure you want to cancel this request?');">
+                        Cancel Request
+                    </button>
+
+                </form>
+            }
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Back to Requests
+            </a>
+
+        </div>
+
+    </div>
+</div>

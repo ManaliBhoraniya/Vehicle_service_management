@@ -10,21 +10,74 @@
     Are you sure you want to delete this worker?
 </div>
 
-<div class="card">
+<div class="card shadow-sm">
+
     <div class="card-body">
 
-        ```
-        <p>
-            <strong>Worker ID:</strong> @Model.Id
-        </p>
+        <dl class="row">
 
-        <p>
-            <strong>Username:</strong> @Model.User?.UserName
-        </p>
+            <dt class="col-sm-4">
+                Worker ID
+            </dt>
 
-        <p>
-            <strong>Email:</strong> @Model.User?.Email
-        </p>
+            <dd class="col-sm-8">
+                @Model.Id
+            </dd>
+
+            <dt class="col-sm-4">
+                Name
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.ApplicationUser?.Name
+            </dd>
+
+            <dt class="col-sm-4">
+                Username
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.ApplicationUser?.UserName
+            </dd>
+
+            <dt class="col-sm-4">
+                Email
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.ApplicationUser?.Email
+            </dd>
+
+            <dt class="col-sm-4">
+                Profession
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.Profession
+            </dd>
+
+            <dt class="col-sm-4">
+                Availability
+            </dt>
+
+            <dd class="col-sm-8">
+
+                @if (Model.IsAvailable)
+                {
+                    <span class="badge bg-success">
+                        Available
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">
+                        Busy
+                    </span>
+                }
+
+            </dd>
+
+        </dl>
 
         <form asp-action="Delete"
               asp-route-id="@Model.Id"
@@ -41,8 +94,9 @@
                class="btn btn-secondary">
                 Cancel
             </a>
+
         </form>
+
     </div>
-    ```
 
 </div>

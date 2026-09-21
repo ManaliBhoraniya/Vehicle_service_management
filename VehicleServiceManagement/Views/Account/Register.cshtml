@@ -3,58 +3,192 @@
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-5">
+
+    <div class="col-md-6">
+
         <div class="card shadow-sm mt-5">
+
             <div class="card-header text-center">
                 <h3>Create Account</h3>
             </div>
 
-            ```
             <div class="card-body">
-                <form asp-action="Register" method="post">
+
+                <form asp-action="Register"
+                      method="post">
+
                     @Html.AntiForgeryToken()
 
-                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="All"
+                         class="text-danger mb-3">
+                    </div>
 
+                    <!-- Name -->
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+
+                        <label class="form-label">
+                            Name
+                        </label>
+
+                        <input type="text"
+                               name="name"
+                               class="form-control"
+                               placeholder="Enter your name"
+                               required />
+
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Email
+                        </label>
+
                         <input type="email"
                                name="email"
                                class="form-control"
+                               placeholder="Enter your email"
                                required />
+
                     </div>
 
+                    <!-- Role -->
                     <div class="mb-3">
-                        <label class="form-label">Password</label>
+
+                        <label class="form-label">
+                            Register As
+                        </label>
+
+                        <select name="role"
+                                id="role"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                -- Select Role --
+                            </option>
+
+                            <option value="Customer">
+                                Customer
+                            </option>
+
+                            <option value="Worker">
+                                Worker
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Profession -->
+                    <div class="mb-3"
+                         id="professionSection"
+                         style="display:none;">
+
+                        <label class="form-label">
+                            Profession
+                        </label>
+
+                        <input type="text"
+                               name="profession"
+                               id="profession"
+                               class="form-control"
+                               placeholder="e.g. Mechanic" />
+
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Password
+                        </label>
+
                         <input type="password"
                                name="password"
                                class="form-control"
+                               placeholder="Enter your password"
                                required />
+
+                        <div class="form-text">
+                            Minimum 6 characters with uppercase,
+                            lowercase, number and special character.
+                        </div>
+
                     </div>
 
+                    <!-- Confirm Password -->
                     <div class="mb-3">
-                        <label class="form-label">Confirm Password</label>
+
+                        <label class="form-label">
+                            Confirm Password
+                        </label>
+
                         <input type="password"
                                name="confirmPassword"
                                class="form-control"
+                               placeholder="Confirm your password"
                                required />
+
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100">
+                    <button type="submit"
+                            class="btn btn-success w-100">
                         Register
                     </button>
+
                 </form>
 
                 <div class="text-center mt-3">
-                    <a asp-action="Login">Already have an account? Login</a>
+
+                    <span>
+                        Already have an account?
+                    </span>
+
+                    <a asp-action="Login">
+                        Login
+                    </a>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
-    ```
 
 </div>
 
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.getElementById("role").addEventListener("change", function () {
+
+            var professionSection =
+                document.getElementById("professionSection");
+
+            var profession =
+                document.getElementById("profession");
+
+            if (this.value === "Worker") {
+
+                professionSection.style.display = "block";
+                profession.required = true;
+
+            }
+            else {
+
+                professionSection.style.display = "none";
+                profession.required = false;
+                profession.value = "";
+
+            }
+
+        });
+
+    </script>
 }
