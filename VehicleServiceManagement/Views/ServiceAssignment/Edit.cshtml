@@ -1,79 +1,202 @@
 ﻿@model VehicleServiceManagement.Models.ServiceAssignment
 
 @{
-    ViewData["Title"] = "Edit Assignment";
+    ViewData["Title"] = "Edit Service Assignment";
 
     var workers =
-        ViewBag.Workers as IEnumerable<VehicleServiceManagement.Models.Worker>;
+        ViewBag.Workers as List<VehicleServiceManagement.Models.Worker>
+        ?? new List<VehicleServiceManagement.Models.Worker>();
+
+    var serviceRequests =
+        ViewBag.ServiceRequests as List<VehicleServiceManagement.Models.ServiceRequest>
+        ?? new List<VehicleServiceManagement.Models.ServiceRequest>();
 }
 
-<h2>Edit Service Assignment</h2>
+<div class="container mt-4">
 
-<form asp-action="Edit"
-      asp-route-id="@Model.Id"
-      method="post">
+    <div class="card shadow">
 
-    @Html.AntiForgeryToken()
+        <div class="card-header">
+            <h3>Edit Service Assignment</h3>
+        </div>
 
-    <input type="hidden"
-           asp-for="Id" />
+        <div class="card-body">
 
-    <input type="hidden"
-           asp-for="ServiceRequestId" />
+            <form asp-action="Edit"
+                  asp-route-id="@Model.ServiceAssignmentId"
+                  method="post">
 
-    <input type="hidden"
-           asp-for="ServiceDate" />
+                @Html.AntiForgeryToken()
 
-    <div asp-validation-summary="ModelOnly"
-         class="text-danger mb-3"></div>
+                <input type="hidden"
+                       asp-for="ServiceAssignmentId" />
 
-    <div class="mb-3">
-        <label class="form-label">
-            Service Request
-        </label>
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
 
-        <input class="form-control"
-               value="#@Model.ServiceRequestId"
-               readonly />
+
+                <!-- Service Request -->
+
+                <div class="mb-3">
+
+                    <label asp-for="ServiceRequestId"
+                           class="form-label">
+                        Service Request
+                    </label>
+
+                    <select asp-for="ServiceRequestId"
+                            class="form-select">
+
+                        @foreach (var request in serviceRequests)
+                        {
+                            <option value="@request.ServiceRequestId">
+
+                                #@request.ServiceRequestId
+                                -
+                                @request.ServiceType
+
+                                @if (!string.IsNullOrWhiteSpace(request.CustomerName))
+                                {
+                                    <text>
+                                        - @request.CustomerName
+                                    </text>
+                                }
+
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="ServiceRequestId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- Worker -->
+
+                <div class="mb-3">
+
+                    <label asp-for="WorkerId"
+                           class="form-label">
+                        Worker
+                    </label>
+
+                    <select asp-for="WorkerId"
+                            class="form-select">
+
+                        @foreach (var worker in workers)
+                        {
+                            <option value="@worker.WorkerId">
+
+                                @if (worker.ApplicationUser != null)
+                                {
+                                    @worker.ApplicationUser.Name
+                                }
+                                else
+                                {
+                                    @worker.Profession
+                                }
+
+                                - @worker.Profession
+
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="WorkerId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- Status -->
+
+                <div class="mb-3">
+
+                    <label asp-for="Status"
+                           class="form-label">
+                        Status
+                    </label>
+
+                    <select asp-for="Status"
+                            class="form-select">
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="In Progress">
+                            In Progress
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                        <option value="Cancelled">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="Status"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- Notes -->
+
+                <div class="mb-3">
+
+                    <label asp-for="Notes"
+                           class="form-label">
+                        Notes
+                    </label>
+
+                    <textarea asp-for="Notes"
+                              class="form-control"
+                              rows="4"></textarea>
+
+                    <span asp-validation-for="Notes"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Save Changes
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
 
-    <div class="mb-3">
-        <label asp-for="WorkerId"
-               class="form-label">
-            Worker
-        </label>
+</div>
 
-        <select asp-for="WorkerId"
-                class="form-select">
-
-            @if (workers != null)
-            {
-                foreach (var worker in workers)
-                {
-                    <option value="@worker.Id">
-                        @worker.ApplicationUser?.UserName
-                    </option>
-                }
-            }
-
-        </select>
-
-        <span asp-validation-for="WorkerId"
-              class="text-danger"></span>
-    </div>
-
-    <button type="submit"
-            class="btn btn-primary">
-        Save Changes
-    </button>
-
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Cancel
-    </a>
-
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
+    }
 }

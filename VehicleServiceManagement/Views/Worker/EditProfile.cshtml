@@ -1,0 +1,98 @@
+﻿@model VehicleServiceManagement.Models.Worker
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container mt-4">
+
+    <h1>Edit Profile</h1>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <form asp-action="EditProfile"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="workerId"
+                       value="@Model.WorkerId" />
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Name
+                    </label>
+
+                    <input type="text"
+                           name="name"
+                           value="@Model.ApplicationUser?.Name"
+                           class="form-control"
+                           required />
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           value="@Model.ApplicationUser?.Email"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Phone
+                    </label>
+
+                    <input type="text"
+                           name="phone"
+                           value="@Model.ApplicationUser?.PhoneNumber"
+                           class="form-control" />
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Profession
+                    </label>
+
+                    <input type="text"
+                           name="profession"
+                           value="@Model.Profession"
+                           class="form-control"
+                           required />
+
+                </div>
+
+
+                <button type="submit"
+                        class="btn btn-success">
+                    Save Changes
+                </button>
+
+                <a asp-action="Profile"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

@@ -3,138 +3,203 @@
 @{
     ViewData["Title"] = "Create Service Assignment";
 
-    var serviceRequests =
-        ViewBag.ServiceRequests as IEnumerable<VehicleServiceManagement.Models.ServiceRequest>;
-
     var workers =
-        ViewBag.Workers as IEnumerable<VehicleServiceManagement.Models.Worker>;
+        ViewBag.Workers as List<VehicleServiceManagement.Models.Worker>
+        ?? new List<VehicleServiceManagement.Models.Worker>();
+
+    var serviceRequests =
+        ViewBag.ServiceRequests as List<VehicleServiceManagement.Models.ServiceRequest>
+        ?? new List<VehicleServiceManagement.Models.ServiceRequest>();
 }
 
-<h2>Create Service Assignment</h2>
+<div class="container mt-4">
 
-<div class="row">
-    <div class="col-md-7">
+    <div class="card shadow">
 
-        <form asp-action="Create" method="post">
+        <div class="card-header">
+            <h3>Create Service Assignment</h3>
+        </div>
 
-            @Html.AntiForgeryToken()
+        <div class="card-body">
 
-            <div asp-validation-summary="ModelOnly"
-                 class="text-danger mb-3">
-            </div>
+            <form asp-action="Create" method="post">
 
-            <!-- Service Request -->
-            <div class="mb-3">
-                <label asp-for="ServiceRequestId"
-                       class="form-label">
-                    Service Request
-                </label>
+                @Html.AntiForgeryToken()
 
-                <select asp-for="ServiceRequestId"
-                        class="form-select">
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
 
-                    <option value="">
-                        -- Select Service Request --
-                    </option>
 
-                    @if (serviceRequests != null)
-                    {
-                        foreach (var request in serviceRequests)
+                <!-- Service Request -->
+
+                <div class="mb-3">
+
+                    <label asp-for="ServiceRequestId"
+                           class="form-label">
+                        Service Request
+                    </label>
+
+                    <select asp-for="ServiceRequestId"
+                            class="form-select">
+
+                        <option value="">
+                            -- Select Service Request --
+                        </option>
+
+                        @foreach (var request in serviceRequests)
                         {
-                            <option value="@request.Id">
-                                Request #@request.Id -
-                                @request.Vehicle?.VehicleNumber
-                            </option>
-                        }
-                    }
+                            <option value="@request.ServiceRequestId">
 
-                </select>
-
-                <span asp-validation-for="ServiceRequestId"
-                      class="text-danger">
-                </span>
-            </div>
-
-            <!-- Worker -->
-            <div class="mb-3">
-                <label asp-for="WorkerId"
-                       class="form-label">
-                    Worker
-                </label>
-
-                <select asp-for="WorkerId"
-                        class="form-select">
-
-                    <option value="">
-                        -- Select Worker --
-                    </option>
-
-                    @if (workers != null)
-                    {
-                        foreach (var worker in workers)
-                        {
-                            <option value="@worker.Id">
-                                @worker.ApplicationUser?.Name
+                                #@request.ServiceRequestId
                                 -
-                                @worker.Profession
+                                @request.ServiceType
+
+                                @if (!string.IsNullOrWhiteSpace(request.CustomerName))
+                                {
+                                    <text>
+                                        - @request.CustomerName
+                                    </text>
+                                }
+
                             </option>
                         }
-                    }
 
-                </select>
+                    </select>
 
-                <span asp-validation-for="WorkerId"
-                      class="text-danger">
-                </span>
-            </div>
+                    <span asp-validation-for="ServiceRequestId"
+                          class="text-danger">
+                    </span>
 
-            <!-- Service Date -->
-            <div class="mb-3">
-                <label asp-for="ServiceDate"
-                       class="form-label">
-                    Service Date
-                </label>
+                </div>
 
-                <input asp-for="ServiceDate"
-                       type="date"
-                       class="form-control" />
 
-                <span asp-validation-for="ServiceDate"
-                      class="text-danger">
-                </span>
-            </div>
+                <!-- Worker -->
 
-            <!-- Service Time -->
-            <div class="mb-3">
-                <label asp-for="ServiceTime"
-                       class="form-label">
-                    Service Time
-                </label>
+                <div class="mb-3">
 
-                <input asp-for="ServiceTime"
-                       type="time"
-                       class="form-control" />
+                    <label asp-for="WorkerId"
+                           class="form-label">
+                        Worker
+                    </label>
 
-                <span asp-validation-for="ServiceTime"
-                      class="text-danger">
-                </span>
-            </div>
+                    <select asp-for="WorkerId"
+                            class="form-select">
 
-            <button type="submit"
-                    class="btn btn-success">
-                Create Assignment
-            </button>
+                        <option value="">
+                            -- Select Worker --
+                        </option>
 
-            <a asp-action="Index"
-               class="btn btn-secondary">
-                Cancel
-            </a>
+                        @foreach (var worker in workers)
+                        {
+                            <option value="@worker.WorkerId">
 
-        </form>
+                                @if (worker.ApplicationUser != null)
+                                {
+                                    @worker.ApplicationUser.Name
+                                }
+                                else
+                                {
+                                    @worker.Profession
+                                }
+
+                                - @worker.Profession
+
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="WorkerId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- Status -->
+
+                <div class="mb-3">
+
+                    <label asp-for="Status"
+                           class="form-label">
+                        Status
+                    </label>
+
+                    <select asp-for="Status"
+                            class="form-select">
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="In Progress">
+                            In Progress
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                        <option value="Cancelled">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="Status"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- Notes -->
+
+                <div class="mb-3">
+
+                    <label asp-for="Notes"
+                           class="form-label">
+                        Notes
+                    </label>
+
+                    <textarea asp-for="Notes"
+                              class="form-control"
+                              rows="4"></textarea>
+
+                    <span asp-validation-for="Notes"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Assign Service
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
+
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
+    }
 }

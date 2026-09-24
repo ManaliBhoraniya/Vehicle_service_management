@@ -1,25 +1,41 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VehicleServiceManagement.Models
 {
     public class ServiceRequest
     {
-        public int Id { get; set; }
+        [Key]
+        public int ServiceRequestId { get; set; }
+
+        // Allows existing code using .Id to continue working
+        [NotMapped]
+        public int Id
+        {
+            get => ServiceRequestId;
+            set => ServiceRequestId = value;
+        }
 
         [Required]
-        public int CustomerId { get; set; }
+        public string ServiceType { get; set; } = string.Empty;
 
-        [Required]
-        public int VehicleId { get; set; }
+        public string? Description { get; set; }
 
-        [Required]
-        public DateTime RequestDate { get; set; }
-
-        [Required]
         public string Status { get; set; } = "Pending";
+
+        public DateTime RequestDate { get; set; } = DateTime.Now;
+
+        // Customer
+        public int CustomerId { get; set; }
 
         public Customer? Customer { get; set; }
 
+        // Vehicle
+        public int VehicleId { get; set; }
+
         public Vehicle? Vehicle { get; set; }
+
+        // Existing project property
+        public string? CustomerName { get; set; }
     }
 }

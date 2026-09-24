@@ -12,8 +12,8 @@ using VehicleServiceManagement.Data;
 namespace VehicleServiceManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260921063229_AddIdentityTables")]
-    partial class AddIdentityTables
+    [Migration("20260924115305_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -187,7 +187,6 @@ namespace VehicleServiceManagement.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
@@ -262,54 +261,34 @@ namespace VehicleServiceManagement.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("VehicleServiceManagement.Models.Notification", b =>
+            modelBuilder.Entity("VehicleServiceManagement.Models.ServiceAssignment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ServiceAssignmentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceAssignmentId"));
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Message")
-                        .IsRequired()
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ServiceRequestId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ServiceRequestId");
-
-                    b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("VehicleServiceManagement.Models.ServiceAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ServiceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ServiceRequestId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("ServiceTime")
-                        .HasColumnType("time");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WorkerId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("ServiceAssignmentId");
 
                     b.HasIndex("ServiceRequestId");
 
@@ -320,17 +299,27 @@ namespace VehicleServiceManagement.Migrations
 
             modelBuilder.Entity("VehicleServiceManagement.Models.ServiceRequest", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ServiceRequestId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceRequestId"));
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ServiceType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -339,7 +328,7 @@ namespace VehicleServiceManagement.Migrations
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("ServiceRequestId");
 
                     b.HasIndex("CustomerId");
 
@@ -380,11 +369,11 @@ namespace VehicleServiceManagement.Migrations
 
             modelBuilder.Entity("VehicleServiceManagement.Models.Worker", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("WorkerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkerId"));
 
                     b.Property<int>("ApplicationUserId")
                         .HasColumnType("int");
@@ -396,11 +385,49 @@ namespace VehicleServiceManagement.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("ResumeFileName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.Property<string>("ResumeFilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WorkerId");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique();
 
                     b.ToTable("Workers");
+                });
+
+            modelBuilder.Entity("VehicleServiceManagement.Models.WorkerAvailability", b =>
+                {
+                    b.Property<int>("WorkerAvailabilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkerAvailabilityId"));
+
+                    b.Property<string>("DayOfWeek")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeSpan?>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeSpan?>("StartTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("WorkerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WorkerAvailabilityId");
+
+                    b.HasIndex("WorkerId");
+
+                    b.ToTable("WorkerAvailabilities");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -465,37 +492,18 @@ namespace VehicleServiceManagement.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("VehicleServiceManagement.Models.Notification", b =>
-                {
-                    b.HasOne("VehicleServiceManagement.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("VehicleServiceManagement.Models.ServiceRequest", "ServiceRequest")
-                        .WithMany()
-                        .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("ServiceRequest");
-                });
-
             modelBuilder.Entity("VehicleServiceManagement.Models.ServiceAssignment", b =>
                 {
                     b.HasOne("VehicleServiceManagement.Models.ServiceRequest", "ServiceRequest")
                         .WithMany()
                         .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("VehicleServiceManagement.Models.Worker", "Worker")
-                        .WithMany()
+                        .WithMany("ServiceAssignments")
                         .HasForeignKey("WorkerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ServiceRequest");
@@ -508,13 +516,13 @@ namespace VehicleServiceManagement.Migrations
                     b.HasOne("VehicleServiceManagement.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("VehicleServiceManagement.Models.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -536,17 +544,40 @@ namespace VehicleServiceManagement.Migrations
             modelBuilder.Entity("VehicleServiceManagement.Models.Worker", b =>
                 {
                     b.HasOne("VehicleServiceManagement.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
+                        .WithOne("Worker")
+                        .HasForeignKey("VehicleServiceManagement.Models.Worker", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("VehicleServiceManagement.Models.WorkerAvailability", b =>
+                {
+                    b.HasOne("VehicleServiceManagement.Models.Worker", "Worker")
+                        .WithMany("Availabilities")
+                        .HasForeignKey("WorkerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Worker");
+                });
+
+            modelBuilder.Entity("VehicleServiceManagement.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Worker");
+                });
+
             modelBuilder.Entity("VehicleServiceManagement.Models.Customer", b =>
                 {
                     b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("VehicleServiceManagement.Models.Worker", b =>
+                {
+                    b.Navigation("Availabilities");
+
+                    b.Navigation("ServiceAssignments");
                 });
 #pragma warning restore 612, 618
         }

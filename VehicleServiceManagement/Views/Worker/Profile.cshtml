@@ -1,0 +1,129 @@
+﻿@model VehicleServiceManagement.Models.Worker
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+
+    <h1>My Profile</h1>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h4>Worker Information</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Name:</strong>
+                        @(Model.ApplicationUser?.Name ?? "-")
+                    </p>
+
+                    <p>
+                        <strong>Username:</strong>
+                        @(Model.ApplicationUser?.UserName ?? "-")
+                    </p>
+
+                    <p>
+                        <strong>Email:</strong>
+                        @(Model.ApplicationUser?.Email ?? "-")
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Phone:</strong>
+                        @(Model.ApplicationUser?.PhoneNumber
+                            ?? "Not provided")
+                    </p>
+
+                    <p>
+                        <strong>Profession:</strong>
+                        @Model.Profession
+                    </p>
+
+                    <p>
+                        <strong>Availability:</strong>
+
+                        @if (Model.IsAvailable)
+                        {
+                            <span class="badge bg-success">
+                                Available
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">
+                                Not Available
+                            </span>
+                        }
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h5>Resume</h5>
+
+            @if (!string.IsNullOrEmpty(
+                Model.ResumeFilePath))
+            {
+                <p>
+                    @Model.ResumeFileName
+                </p>
+
+                <a href="@Model.ResumeFilePath"
+                   target="_blank"
+                   class="btn btn-primary">
+                    View Resume
+                </a>
+            }
+            else
+            {
+                <p class="text-muted">
+                    No resume uploaded.
+                </p>
+            }
+
+            <hr />
+
+            <a asp-action="EditProfile"
+               class="btn btn-primary">
+                Edit Profile
+            </a>
+
+            <a asp-action="Dashboard"
+               class="btn btn-secondary">
+                Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

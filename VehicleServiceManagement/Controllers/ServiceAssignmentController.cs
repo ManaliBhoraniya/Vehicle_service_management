@@ -23,7 +23,7 @@ namespace VehicleServiceManagement.Controllers
             var assignments = await _context.ServiceAssignments
                 .Include(a => a.ServiceRequest)
                 .Include(a => a.Worker)
-                    .ThenInclude(w => w.ApplicationUser)
+                    .ThenInclude(w => w!.ApplicationUser)
                 .ToListAsync();
 
             return View(assignments);
@@ -33,17 +33,7 @@ namespace VehicleServiceManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            ViewBag.ServiceRequests =
-                await _context.ServiceRequests
-                    .Where(s => s.Status != "Completed" &&
-                                s.Status != "Cancelled")
-                    .ToListAsync();
-
-            ViewBag.Workers =
-                await _context.Workers
-                    .Include(w => w.ApplicationUser)
-                    .Where(w => w.IsAvailable)
-                    .ToListAsync();
+            await LoadCreateData();
 
             return View();
         }
@@ -61,27 +51,65 @@ namespace VehicleServiceManagement.Controllers
                 return View(assignment);
             }
 
-            _context.ServiceAssignments.Add(assignment);
-
+            // Check service request
             var serviceRequest =
                 await _context.ServiceRequests
                     .FirstOrDefaultAsync(
-                        s => s.Id == assignment.ServiceRequestId);
+                        s => s.ServiceRequestId ==
+                             assignment.ServiceRequestId);
 
-            if (serviceRequest != null)
+            if (serviceRequest == null)
             {
-                serviceRequest.Status = "Assigned";
+                ModelState.AddModelError(
+                    "ServiceRequestId",
+                    "Selected service request was not found.");
+
+                await LoadCreateData();
+
+                return View(assignment);
             }
 
+            // Check worker
             var worker =
                 await _context.Workers
                     .FirstOrDefaultAsync(
-                        w => w.Id == assignment.WorkerId);
+                        w => w.WorkerId ==
+                             assignment.WorkerId);
 
-            if (worker != null)
+            if (worker == null)
             {
-                worker.IsAvailable = false;
+                ModelState.AddModelError(
+                    "WorkerId",
+                    "Selected worker was not found.");
+
+                await LoadCreateData();
+
+                return View(assignment);
             }
+
+            // Worker must be available
+            if (!worker.IsAvailable)
+            {
+                ModelState.AddModelError(
+                    "WorkerId",
+                    "Selected worker is not available.");
+
+                await LoadCreateData();
+
+                return View(assignment);
+            }
+
+            // Set initial values
+            assignment.Status = "Pending";
+            assignment.AssignedDate = DateTime.Now;
+
+            _context.ServiceAssignments.Add(assignment);
+
+            // Update service request
+            serviceRequest.Status = "Assigned";
+
+            // Worker becomes unavailable
+            worker.IsAvailable = false;
 
             await _context.SaveChangesAsync();
 
@@ -95,14 +123,15 @@ namespace VehicleServiceManagement.Controllers
             var assignment =
                 await _context.ServiceAssignments
                     .Include(a => a.ServiceRequest)
-                        .ThenInclude(s => s.Vehicle)
                     .Include(a => a.Worker)
-                        .ThenInclude(w => w.ApplicationUser)
+                        .ThenInclude(w => w!.ApplicationUser)
                     .FirstOrDefaultAsync(
-                        a => a.Id == id);
+                        a => a.ServiceAssignmentId == id);
 
             if (assignment == null)
+            {
                 return NotFound();
+            }
 
             return View(assignment);
         }
@@ -114,16 +143,28 @@ namespace VehicleServiceManagement.Controllers
             var assignment =
                 await _context.ServiceAssignments
                     .FirstOrDefaultAsync(
-                        a => a.Id == id);
+                        a => a.ServiceAssignmentId == id);
 
             if (assignment == null)
+            {
                 return NotFound();
+            }
 
             ViewBag.Workers =
                 await _context.Workers
                     .Include(w => w.ApplicationUser)
-                    .Where(w => w.IsAvailable ||
-                                w.Id == assignment.WorkerId)
+                    .Where(w =>
+                        w.IsAvailable ||
+                        w.WorkerId == assignment.WorkerId)
+                    .ToListAsync();
+
+            ViewBag.ServiceRequests =
+                await _context.ServiceRequests
+                    .Where(s =>
+                        s.Status != "Completed" &&
+                        s.Status != "Cancelled" ||
+                        s.ServiceRequestId ==
+                        assignment.ServiceRequestId)
                     .ToListAsync();
 
             return View(assignment);
@@ -136,17 +177,14 @@ namespace VehicleServiceManagement.Controllers
             int id,
             ServiceAssignment assignment)
         {
-            if (id != assignment.Id)
+            if (id != assignment.ServiceAssignmentId)
+            {
                 return BadRequest();
+            }
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Workers =
-                    await _context.Workers
-                        .Include(w => w.ApplicationUser)
-                        .Where(w => w.IsAvailable ||
-                                    w.Id == assignment.WorkerId)
-                        .ToListAsync();
+                await LoadEditData(assignment);
 
                 return View(assignment);
             }
@@ -154,10 +192,48 @@ namespace VehicleServiceManagement.Controllers
             var existingAssignment =
                 await _context.ServiceAssignments
                     .FirstOrDefaultAsync(
-                        a => a.Id == id);
+                        a => a.ServiceAssignmentId == id);
 
             if (existingAssignment == null)
+            {
                 return NotFound();
+            }
+
+            // Check worker
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.WorkerId ==
+                             assignment.WorkerId);
+
+            if (worker == null)
+            {
+                ModelState.AddModelError(
+                    "WorkerId",
+                    "Selected worker was not found.");
+
+                await LoadEditData(assignment);
+
+                return View(assignment);
+            }
+
+            // Check service request
+            var serviceRequest =
+                await _context.ServiceRequests
+                    .FirstOrDefaultAsync(
+                        s => s.ServiceRequestId ==
+                             assignment.ServiceRequestId);
+
+            if (serviceRequest == null)
+            {
+                ModelState.AddModelError(
+                    "ServiceRequestId",
+                    "Selected service request was not found.");
+
+                await LoadEditData(assignment);
+
+                return View(assignment);
+            }
 
             existingAssignment.WorkerId =
                 assignment.WorkerId;
@@ -165,11 +241,11 @@ namespace VehicleServiceManagement.Controllers
             existingAssignment.ServiceRequestId =
                 assignment.ServiceRequestId;
 
-            existingAssignment.ServiceDate =
-                assignment.ServiceDate;
+            existingAssignment.Status =
+                assignment.Status;
 
-            existingAssignment.ServiceTime =
-                assignment.ServiceTime;
+            existingAssignment.Notes =
+                assignment.Notes;
 
             await _context.SaveChangesAsync();
 
@@ -184,10 +260,23 @@ namespace VehicleServiceManagement.Controllers
             var assignment =
                 await _context.ServiceAssignments
                     .FirstOrDefaultAsync(
-                        a => a.Id == id);
+                        a => a.ServiceAssignmentId == id);
 
             if (assignment == null)
+            {
                 return NotFound();
+            }
+
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.WorkerId ==
+                             assignment.WorkerId);
+
+            if (worker != null)
+            {
+                worker.IsAvailable = true;
+            }
 
             _context.ServiceAssignments.Remove(assignment);
 
@@ -200,14 +289,36 @@ namespace VehicleServiceManagement.Controllers
         {
             ViewBag.ServiceRequests =
                 await _context.ServiceRequests
-                    .Where(s => s.Status != "Completed" &&
-                                s.Status != "Cancelled")
+                    .Where(s =>
+                        s.Status != "Completed" &&
+                        s.Status != "Cancelled")
                     .ToListAsync();
 
             ViewBag.Workers =
                 await _context.Workers
                     .Include(w => w.ApplicationUser)
                     .Where(w => w.IsAvailable)
+                    .ToListAsync();
+        }
+
+        private async Task LoadEditData(
+            ServiceAssignment assignment)
+        {
+            ViewBag.Workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Where(w =>
+                        w.IsAvailable ||
+                        w.WorkerId == assignment.WorkerId)
+                    .ToListAsync();
+
+            ViewBag.ServiceRequests =
+                await _context.ServiceRequests
+                    .Where(s =>
+                        (s.Status != "Completed" &&
+                         s.Status != "Cancelled") ||
+                        s.ServiceRequestId ==
+                        assignment.ServiceRequestId)
                     .ToListAsync();
         }
     }

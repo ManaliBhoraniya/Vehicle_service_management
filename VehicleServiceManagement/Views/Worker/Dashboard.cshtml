@@ -1,0 +1,420 @@
+﻿@model VehicleServiceManagement.Models.Worker
+
+@{
+    ViewData["Title"] = "Worker Dashboard";
+
+    var pending = Model.ServiceAssignments
+        .Count(x => x.Status == "Pending");
+
+    var inProgress = Model.ServiceAssignments
+        .Count(x => x.Status == "In Progress");
+
+    var completed = Model.ServiceAssignments
+        .Count(x => x.Status == "Completed");
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1>Worker Dashboard</h1>
+
+            <p class="text-muted">
+                Welcome,
+                <strong>
+                    @(Model.ApplicationUser?.Name ?? "Worker")
+                </strong>
+            </p>
+        </div>
+
+        @if (Model.IsAvailable)
+        {
+            <span class="badge bg-success fs-6">
+                ● Available
+            </span>
+        }
+        else
+        {
+            <span class="badge bg-danger fs-6">
+                ● Not Available
+            </span>
+        }
+
+    </div>
+
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+
+    <!-- PROFILE -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h4 class="mb-0">
+                My Profile
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Name:</strong>
+                        @(Model.ApplicationUser?.Name ?? "-")
+                    </p>
+
+                    <p>
+                        <strong>Username:</strong>
+                        @(Model.ApplicationUser?.UserName ?? "-")
+                    </p>
+
+                    <p>
+                        <strong>Email:</strong>
+                        @(Model.ApplicationUser?.Email ?? "-")
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Phone:</strong>
+                        @(Model.ApplicationUser?.PhoneNumber
+                            ?? "Not provided")
+                    </p>
+
+                    <p>
+                        <strong>Profession:</strong>
+                        @Model.Profession
+                    </p>
+
+                    <a asp-action="Profile"
+                       class="btn btn-primary">
+                        View Profile
+                    </a>
+
+                    <a asp-action="EditProfile"
+                       class="btn btn-outline-primary">
+                        Edit Profile
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WORK SUMMARY -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
+
+                    <h1 class="text-warning">
+                        @pending
+                    </h1>
+
+                    <h5>Pending Work</h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
+
+                    <h1 class="text-primary">
+                        @inProgress
+                    </h1>
+
+                    <h5>In Progress</h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
+
+                    <h1 class="text-success">
+                        @completed
+                    </h1>
+
+                    <h5>Completed</h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESUME -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h4>My Resume</h4>
+        </div>
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrEmpty(
+                Model.ResumeFilePath))
+            {
+                <p>
+                    <strong>
+                        @Model.ResumeFileName
+                    </strong>
+                </p>
+
+                <a href="@Model.ResumeFilePath"
+                   target="_blank"
+                   class="btn btn-outline-primary">
+                    View Resume
+                </a>
+            }
+            else
+            {
+                <p class="text-muted">
+                    No resume uploaded.
+                </p>
+            }
+
+            <form asp-action="UploadResume"
+                  method="post"
+                  enctype="multipart/form-data"
+                  class="mt-3">
+
+                @Html.AntiForgeryToken()
+
+                <div class="input-group">
+
+                    <input type="file"
+                           name="resume"
+                           class="form-control"
+                           accept=".pdf,.doc,.docx"
+                           required />
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Upload Resume
+                    </button>
+
+                </div>
+
+                <small class="text-muted">
+                    PDF, DOC or DOCX. Maximum 5 MB.
+                </small>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- AVAILABILITY -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h4>Availability</h4>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.IsAvailable)
+            {
+                <p class="text-success">
+                    You are currently available for work.
+                </p>
+
+                <form asp-action="UpdateAvailability"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="isAvailable"
+                           value="false" />
+
+                    <button class="btn btn-danger"
+                            type="submit">
+                        Mark Unavailable
+                    </button>
+
+                </form>
+            }
+            else
+            {
+                <p class="text-danger">
+                    You are currently unavailable.
+                </p>
+
+                <form asp-action="UpdateAvailability"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="isAvailable"
+                           value="true" />
+
+                    <button class="btn btn-success"
+                            type="submit">
+                        Mark Available
+                    </button>
+
+                </form>
+            }
+
+            <a asp-action="Availability"
+               class="btn btn-outline-secondary mt-3">
+                Manage Working Hours
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- WORK -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h4>My Assigned Work</h4>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.ServiceAssignments.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered">
+
+                        <thead class="table-dark">
+
+                            <tr>
+                                <th>Service</th>
+                                <th>Assigned Date</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var assignment
+                                in Model.ServiceAssignments
+                                    .OrderByDescending(
+                                        x => x.AssignedDate)
+                                    .Take(5))
+                            {
+                                <tr>
+
+                                    <td>
+                                        @(assignment
+                                            .ServiceRequest
+                                            ?.ServiceType
+                                            ?? "Service")
+                                    </td>
+
+                                    <td>
+                                        @assignment.AssignedDate
+                                        .ToString("dd-MM-yyyy")
+                                    </td>
+
+                                    <td>
+
+                                        @if (assignment.Status
+                                            == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+                                        }
+                                        else if (
+                                            assignment.Status
+                                            == "In Progress")
+                                        {
+                                            <span class="badge bg-primary">
+                                                In Progress
+                                            </span>
+                                        }
+                                        else if (
+                                            assignment.Status
+                                            == "Completed")
+                                        {
+                                            <span class="badge bg-success">
+                                                Completed
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @assignment.Status
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    No work has been assigned to you yet.
+                </div>
+            }
+
+            <a asp-action="MyServices"
+               class="btn btn-primary">
+                View All My Work
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

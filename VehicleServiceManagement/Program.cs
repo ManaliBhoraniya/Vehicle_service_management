@@ -29,8 +29,6 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-
-// Create default Identity roles
 using (var scope = app.Services.CreateScope())
 {
     var roleManager =
@@ -54,7 +52,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -73,6 +70,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern:
+        "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

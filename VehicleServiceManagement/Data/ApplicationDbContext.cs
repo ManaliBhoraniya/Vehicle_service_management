@@ -14,80 +14,85 @@ namespace VehicleServiceManagement.Data
         {
         }
 
-        public DbSet<Customer> Customers { get; set; }
-        public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Worker> Workers { get; set; }
-        public DbSet<ServiceRequest> ServiceRequests { get; set; }
-        public DbSet<ServiceAssignment> ServiceAssignments { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
 
-        protected override void OnModelCreating(
-            ModelBuilder modelBuilder)
+        public DbSet<WorkerAvailability> WorkerAvailabilities
         {
-            base.OnModelCreating(modelBuilder);
+            get; set;
+        }
+
+        public DbSet<ServiceAssignment> ServiceAssignments
+        {
+            get; set;
+        }
+
+        public DbSet<ServiceRequest> ServiceRequests
+        {
+            get; set;
+        }
+
+        public DbSet<Customer> Customers
+        {
+            get; set;
+        }
+
+        public DbSet<Vehicle> Vehicles
+        {
+            get; set;
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // Worker -> ApplicationUser
+            builder.Entity<Worker>()
+                .HasOne(w => w.ApplicationUser)
+                .WithOne(u => u.Worker)
+                .HasForeignKey<Worker>(w => w.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Customer -> ApplicationUser
-            modelBuilder.Entity<Customer>()
+            builder.Entity<Customer>()
                 .HasOne(c => c.ApplicationUser)
                 .WithMany()
                 .HasForeignKey(c => c.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Customer -> Vehicles
-            modelBuilder.Entity<Vehicle>()
-                .HasOne(v => v.Customer)
-                .WithMany(c => c.Vehicles)
-                .HasForeignKey(v => v.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Worker -> ApplicationUser
-            modelBuilder.Entity<Worker>()
-                .HasOne(w => w.ApplicationUser)
-                .WithMany()
-                .HasForeignKey(w => w.ApplicationUserId)
+            // WorkerAvailability -> Worker
+            builder.Entity<WorkerAvailability>()
+                .HasOne(a => a.Worker)
+                .WithMany(w => w.Availabilities)
+                .HasForeignKey(a => a.WorkerId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // ServiceRequest -> Customer
-            modelBuilder.Entity<ServiceRequest>()
-                .HasOne(sr => sr.Customer)
+            builder.Entity<ServiceRequest>()
+                .HasOne(s => s.Customer)
                 .WithMany()
-                .HasForeignKey(sr => sr.CustomerId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(s => s.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ServiceRequest -> Vehicle
-            modelBuilder.Entity<ServiceRequest>()
-                .HasOne(sr => sr.Vehicle)
+            builder.Entity<ServiceRequest>()
+                .HasOne(s => s.Vehicle)
                 .WithMany()
-                .HasForeignKey(sr => sr.VehicleId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(s => s.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ServiceAssignment -> Worker
+            builder.Entity<ServiceAssignment>()
+                .HasOne(sa => sa.Worker)
+                .WithMany(w => w.ServiceAssignments)
+                .HasForeignKey(sa => sa.WorkerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ServiceAssignment -> ServiceRequest
-            modelBuilder.Entity<ServiceAssignment>()
+            builder.Entity<ServiceAssignment>()
                 .HasOne(sa => sa.ServiceRequest)
                 .WithMany()
                 .HasForeignKey(sa => sa.ServiceRequestId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            // ServiceAssignment -> Worker
-            modelBuilder.Entity<ServiceAssignment>()
-                .HasOne(sa => sa.Worker)
-                .WithMany()
-                .HasForeignKey(sa => sa.WorkerId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            // Notification -> Customer
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.Customer)
-                .WithMany()
-                .HasForeignKey(n => n.CustomerId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            // Notification -> ServiceRequest
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.ServiceRequest)
-                .WithMany()
-                .HasForeignKey(n => n.ServiceRequestId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -76,32 +76,33 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =========================
-            // ROLE BASED REDIRECTION
-            // =========================
-
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            // ADMIN
+            if (await _userManager.IsInRoleAsync(
+                user, "Admin"))
             {
                 return RedirectToAction(
                     "Index",
                     "ServiceManager");
             }
 
-            if (await _userManager.IsInRoleAsync(user, "Worker"))
+            // WORKER
+            if (await _userManager.IsInRoleAsync(
+                user, "Worker"))
             {
                 return RedirectToAction(
-                    "Index",
+                    "Dashboard",
                     "Worker");
             }
 
-            if (await _userManager.IsInRoleAsync(user, "Customer"))
+            // CUSTOMER
+            if (await _userManager.IsInRoleAsync(
+                user, "Customer"))
             {
                 return RedirectToAction(
                     "Index",
                     "Customer");
             }
 
-            // User has no valid application role
             await _signInManager.SignOutAsync();
 
             ModelState.AddModelError(
@@ -131,10 +132,6 @@ namespace VehicleServiceManagement.Controllers
             string role,
             string profession)
         {
-            // -------------------------
-            // Basic validation
-            // -------------------------
-
             if (string.IsNullOrWhiteSpace(name) ||
                 string.IsNullOrWhiteSpace(email) ||
                 string.IsNullOrWhiteSpace(password) ||
@@ -157,11 +154,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // -------------------------
-            // Only Customer and Worker
-            // can be selected publicly
-            // -------------------------
-
             if (role != "Customer" &&
                 role != "Worker")
             {
@@ -172,10 +164,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // -------------------------
-            // Worker profession
-            // -------------------------
-
             if (role == "Worker" &&
                 string.IsNullOrWhiteSpace(profession))
             {
@@ -185,10 +173,6 @@ namespace VehicleServiceManagement.Controllers
 
                 return View();
             }
-
-            // -------------------------
-            // Check existing email
-            // -------------------------
 
             var existingUser =
                 await _userManager.FindByEmailAsync(email);
@@ -201,10 +185,6 @@ namespace VehicleServiceManagement.Controllers
 
                 return View();
             }
-
-            // -------------------------
-            // Create Identity user
-            // -------------------------
 
             var user = new ApplicationUser
             {
@@ -230,10 +210,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // -------------------------
-            // Assign selected role
-            // -------------------------
-
             var roleResult =
                 await _userManager.AddToRoleAsync(
                     user,
@@ -248,16 +224,12 @@ namespace VehicleServiceManagement.Controllers
                         error.Description);
                 }
 
-                // Remove the user if role assignment fails
                 await _userManager.DeleteAsync(user);
 
                 return View();
             }
 
-            // -------------------------
-            // Create Worker record
-            // -------------------------
-
+            // CREATE WORKER PROFILE
             if (role == "Worker")
             {
                 var worker = new Worker
@@ -270,24 +242,50 @@ namespace VehicleServiceManagement.Controllers
                 _context.Workers.Add(worker);
 
                 await _context.SaveChangesAsync();
-            }
 
-            // -------------------------
-            // Login automatically
-            // -------------------------
+                // Create default weekly availability
+                string[] days =
+                {
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday"
+                };
+
+                foreach (var day in days)
+                {
+                    var availability =
+                        new WorkerAvailability
+                        {
+                            WorkerId = worker.WorkerId,
+                            DayOfWeek = day,
+                            IsAvailable = day != "Sunday",
+                            StartTime = day != "Sunday"
+                                ? new TimeSpan(9, 0, 0)
+                                : null,
+                            EndTime = day != "Sunday"
+                                ? new TimeSpan(18, 0, 0)
+                                : null
+                        };
+
+                    _context.WorkerAvailabilities.Add(
+                        availability);
+                }
+
+                await _context.SaveChangesAsync();
+            }
 
             await _signInManager.SignInAsync(
                 user,
                 isPersistent: false);
 
-            // -------------------------
-            // Redirect according to role
-            // -------------------------
-
             if (role == "Worker")
             {
                 return RedirectToAction(
-                    "Index",
+                    "Dashboard",
                     "Worker");
             }
 
