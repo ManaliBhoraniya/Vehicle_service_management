@@ -4,87 +4,93 @@
     ViewData["Title"] = "Worker Details";
 }
 
-<h2>Worker Details</h2>
+<div class="container mt-4">
 
-<div class="card shadow-sm">
+    <h2 class="mb-4">
+        Worker Details
+    </h2>
 
-    <div class="card-body">
+    <div class="card shadow-sm">
 
-        <dl class="row">
+        <div class="card-body">
 
-            <dt class="col-sm-3">
-                Worker ID
-            </dt>
+            <dl class="row">
 
-            <dd class="col-sm-9">
-                @Model.Id
-            </dd>
+                <dt class="col-sm-3">
+                    Worker ID
+                </dt>
 
-            <dt class="col-sm-3">
-                Name
-            </dt>
+                <dd class="col-sm-9">
+                    @Model.Id
+                </dd>
 
-            <dd class="col-sm-9">
-                @Model.ApplicationUser?.Name
-            </dd>
+                <dt class="col-sm-3">
+                    Name
+                </dt>
 
-            <dt class="col-sm-3">
-                Username
-            </dt>
+                <dd class="col-sm-9">
+                    @Model.ApplicationUser?.Name
+                </dd>
 
-            <dd class="col-sm-9">
-                @Model.ApplicationUser?.UserName
-            </dd>
+                <dt class="col-sm-3">
+                    Username
+                </dt>
 
-            <dt class="col-sm-3">
-                Email
-            </dt>
+                <dd class="col-sm-9">
+                    @Model.ApplicationUser?.UserName
+                </dd>
 
-            <dd class="col-sm-9">
-                @Model.ApplicationUser?.Email
-            </dd>
+                <dt class="col-sm-3">
+                    Email
+                </dt>
 
-            <dt class="col-sm-3">
-                Profession
-            </dt>
+                <dd class="col-sm-9">
+                    @Model.ApplicationUser?.Email
+                </dd>
 
-            <dd class="col-sm-9">
-                @Model.Profession
-            </dd>
+                <dt class="col-sm-3">
+                    Profession
+                </dt>
 
-            <dt class="col-sm-3">
-                Availability
-            </dt>
+                <dd class="col-sm-9">
+                    @Model.Profession
+                </dd>
 
-            <dd class="col-sm-9">
+                <dt class="col-sm-3">
+                    Availability
+                </dt>
 
-                @if (Model.IsAvailable)
-                {
-                    <span class="badge bg-success">
-                        Available
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-danger">
-                        Busy
-                    </span>
-                }
+                <dd class="col-sm-9">
 
-            </dd>
+                    @if (Model.IsAvailable)
+                    {
+                        <span class="badge bg-success">
+                            Available
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">
+                            Busy
+                        </span>
+                    }
 
-        </dl>
+                </dd>
 
-        <a asp-action="Edit"
-           asp-route-id="@Model.Id"
-           class="btn btn-primary">
-            Edit
-        </a>
+            </dl>
 
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Back
-        </a>
+            <a asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-primary">
+                Edit
+            </a>
+
+            <a asp-action="Manage"
+               class="btn btn-secondary">
+                Back
+            </a>
+
+        </div>
 
     </div>
 

@@ -1,50 +1,424 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VehicleServiceManagement</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - VehicleServiceManagement
+    </title>
+
     <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/VehicleServiceManagement.styles.css" asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/VehicleServiceManagement.styles.css"
+          asp-append-version="true" />
+
 </head>
+
+
 <body>
+
+    @{
+        var controllerName =
+            ViewContext.RouteData.Values["controller"]?.ToString();
+
+        var actionName =
+            ViewContext.RouteData.Values["action"]?.ToString();
+
+        bool isAccountPage =
+            controllerName == "Account" &&
+            (actionName == "Login" ||
+             actionName == "Register");
+
+        bool isAuthenticated =
+            User.Identity?.IsAuthenticated == true;
+    }
+
+
+    <!-- ================================================= -->
+    <!-- NAVBAR -->
+    <!-- ================================================= -->
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow">
+
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">VehicleServiceManagement</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+
+                <!-- WEBSITE NAME -->
+
+                @if (isAuthenticated && !isAccountPage)
+                {
+                    @if (User.IsInRole("Customer"))
+                    {
+                        <a class="navbar-brand"
+                           asp-controller="Customer"
+                           asp-action="Dashboard">
+
+                            VehicleServiceManagement
+
+                        </a>
+                    }
+                    else if (User.IsInRole("Worker"))
+                    {
+                        <a class="navbar-brand"
+                           asp-controller="Worker"
+                           asp-action="Dashboard">
+
+                            VehicleServiceManagement
+
+                        </a>
+                    }
+                    else if (User.IsInRole("Admin"))
+                    {
+                        <a class="navbar-brand"
+                           asp-controller="ServiceManager"
+                           asp-action="Index">
+
+                            VehicleServiceManagement
+
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="navbar-brand"
+                           asp-controller="Home"
+                           asp-action="Index">
+
+                            VehicleServiceManagement
+
+                        </a>
+                    }
+                }
+                else
+                {
+                    <a class="navbar-brand"
+                       asp-controller="Account"
+                       asp-action="Login">
+
+                        VehicleServiceManagement
+
+                    </a>
+                }
+
+
+                <!-- MOBILE MENU BUTTON -->
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+
                     <span class="navbar-toggler-icon"></span>
+
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+
+
+                <!-- RIGHT SIDE NAVIGATION -->
+
+                <div class="navbar-collapse collapse justify-content-end">
+
+                    <ul class="navbar-nav align-items-center">
+
+
+                        @if (isAuthenticated && !isAccountPage)
+                        {
+
+                            <!-- ================================= -->
+                            <!-- DASHBOARD -->
+                            <!-- ================================= -->
+
+                            <li class="nav-item">
+
+                                @if (User.IsInRole("Customer"))
+                                {
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Customer"
+                                       asp-action="Dashboard">
+
+                                        Dashboard
+
+                                    </a>
+                                }
+                                else if (User.IsInRole("Worker"))
+                                {
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Worker"
+                                       asp-action="Dashboard">
+
+                                        Dashboard
+
+                                    </a>
+                                }
+                                else if (User.IsInRole("Admin"))
+                                {
+                                    <a class="nav-link text-dark"
+                                       asp-controller="ServiceManager"
+                                       asp-action="Index">
+
+                                        Dashboard
+
+                                    </a>
+                                }
+
+                            </li>
+
+
+                            <!-- ================================= -->
+                            <!-- MY PROFILE -->
+                            <!-- ================================= -->
+
+                            @if (User.IsInRole("Customer"))
+                            {
+                                <li class="nav-item">
+
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Customer"
+                                       asp-action="Index">
+
+                                        My Profile
+
+                                    </a>
+
+                                </li>
+                            }
+                            else if (User.IsInRole("Worker"))
+                            {
+                                <li class="nav-item">
+
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Worker"
+                                       asp-action="Index">
+
+                                        My Profile
+
+                                    </a>
+
+                                </li>
+                            }
+
+
+                            <!-- ================================= -->
+                            <!-- ABOUT US -->
+                            <!-- ================================= -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-controller="Home"
+                                   asp-action="About">
+
+                                    About Us
+
+                                </a>
+
+                            </li>
+
+
+                            <!-- ================================= -->
+                            <!-- CONTACT US -->
+                            <!-- ================================= -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-controller="Home"
+                                   asp-action="Contact">
+
+                                    Contact Us
+
+                                </a>
+
+                            </li>
+
+                        }
+                        else
+                        {
+
+                            <!-- ================================= -->
+                            <!-- PUBLIC PAGES -->
+                            <!-- ================================= -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-controller="Home"
+                                   asp-action="About">
+
+                                    About Us
+
+                                </a>
+
+                            </li>
+
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-controller="Home"
+                                   asp-action="Contact">
+
+                                    Contact Us
+
+                                </a>
+
+                            </li>
+
+                        }
+
                     </ul>
+
                 </div>
+
             </div>
+
         </nav>
+
     </header>
+
+
+    <!-- ================================================= -->
+    <!-- BACK BUTTON -->
+    <!-- ================================================= -->
+
+    @if (isAuthenticated &&
+         !isAccountPage &&
+         ViewData["Title"]?.ToString() != "Customer Dashboard" &&
+         ViewData["Title"]?.ToString() != "Worker Dashboard")
+    {
+        <div class="container mt-3">
+
+            <button type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    onclick="goBack()">
+
+                Back
+
+            </button>
+
+        </div>
+    }
+
+
+    <!-- ================================================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ================================================= -->
+
     <div class="container">
-        <main role="main" class="pb-3">
+
+        <main role="main"
+              class="pb-3">
+
             @RenderBody()
+
         </main>
+
     </div>
 
+
+    <!-- ================================================= -->
+    <!-- FOOTER -->
+    <!-- ================================================= -->
+
     <footer class="border-top footer text-muted">
+
         <div class="container">
-            &copy; 2026 - VehicleServiceManagement - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+            &copy; 2026 - VehicleServiceManagement -
+
+            <a asp-controller="Home"
+               asp-action="Privacy">
+
+                Privacy
+
+            </a>
+
         </div>
+
     </footer>
+
+
+    <!-- ================================================= -->
+    <!-- SCRIPTS -->
+    <!-- ================================================= -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="~/js/site.js"
+            asp-append-version="true">
+    </script>
+
+
+    <script>
+
+        function goBack() {
+
+            if (document.referrer &&
+                document.referrer !== window.location.href) {
+
+                history.back();
+
+            }
+            else {
+
+                @if (User.IsInRole("Customer"))
+                {
+                    <text>
+                        window.location.href =
+                            '@Url.Action("Dashboard", "Customer")';
+                    </text>
+                }
+                else if (User.IsInRole("Worker"))
+                {
+                    <text>
+                        window.location.href =
+                            '@Url.Action("Dashboard", "Worker")';
+                    </text>
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    <text>
+                        window.location.href =
+                            '@Url.Action("Index", "ServiceManager")';
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        window.location.href =
+                            '@Url.Action("Index", "Home")';
+                    </text>
+                }
+
+            }
+
+        }
+
+    </script>
+
+
+    @await RenderSectionAsync(
+        "Scripts",
+        required: false)
+
 </body>
+
 </html>

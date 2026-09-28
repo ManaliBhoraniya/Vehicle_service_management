@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VehicleServiceManagement.Data;
 using VehicleServiceManagement.Models;
 
@@ -115,7 +117,10 @@ namespace VehicleServiceManagement.Controllers
                     "Customer");
             }
 
-            // No valid role
+            // =========================
+            // INVALID ROLE
+            // =========================
+
             await _signInManager.SignOutAsync();
 
             ModelState.AddModelError(
@@ -124,6 +129,7 @@ namespace VehicleServiceManagement.Controllers
 
             return View();
         }
+
 
         // =========================
         // REGISTER
@@ -342,6 +348,7 @@ namespace VehicleServiceManagement.Controllers
                 "Account");
         }
 
+
         // =========================
         // LOGOUT
         // =========================
@@ -356,6 +363,96 @@ namespace VehicleServiceManagement.Controllers
                 "Login",
                 "Account");
         }
+
+
+        // =========================
+        // DELETE ACCOUNT
+        // =========================
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var user =
+                await _userManager.GetUserAsync(User);
+
+            if (user == null)
+                return Challenge();
+
+
+            // =========================
+            // DELETE WORKER PROFILE
+            // =========================
+
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.ApplicationUserId == user.Id);
+
+            if (worker != null)
+            {
+                _context.Workers.Remove(worker);
+            }
+
+
+            // =========================
+            // DELETE CUSTOMER PROFILE
+            // =========================
+
+            var customer =
+                await _context.Customers
+                    .FirstOrDefaultAsync(
+                        c => c.ApplicationUserId == user.Id);
+
+            if (customer != null)
+            {
+                _context.Customers.Remove(customer);
+            }
+
+
+            // Save profile deletion first
+            await _context.SaveChangesAsync();
+
+
+            // =========================
+            // DELETE IDENTITY ACCOUNT
+            // =========================
+
+            var result =
+                await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        error.Description);
+                }
+
+                return RedirectToAction(
+                    "AccessDenied",
+                    "Account");
+            }
+
+
+            // =========================
+            // SIGN OUT
+            // =========================
+
+            await _signInManager.SignOutAsync();
+
+
+            // =========================
+            // GO TO LOGIN
+            // =========================
+
+            return RedirectToAction(
+                "Login",
+                "Account");
+        }
+
 
         // =========================
         // ACCESS DENIED

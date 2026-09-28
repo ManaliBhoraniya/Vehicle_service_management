@@ -28,95 +28,86 @@ namespace VehicleServiceManagement.Controllers
         // DASHBOARD
         // ====================================================
 
+        [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var worker =
-                await _context.Workers
-                    .Include(w => w.ApplicationUser)
-                    .Include(w => w.Availabilities)
-                    .Include(w => w.ServiceAssignments)
-                        .ThenInclude(sa =>
-                            sa.ServiceRequest)
-                    .FirstOrDefaultAsync(w =>
-                        w.ApplicationUserId == user.Id);
+            var worker = await _context.Workers
+                .Include(w => w.ApplicationUser)
+                .Include(w => w.Availabilities)
+                .Include(w => w.ServiceAssignments)
+                    .ThenInclude(sa => sa.ServiceRequest)
+                .FirstOrDefaultAsync(w =>
+                    w.ApplicationUserId == user.Id);
 
             if (worker == null)
             {
-                return NotFound(
-                    "Worker profile was not found.");
+                return NotFound("Worker profile was not found.");
             }
 
             return View(worker);
         }
 
         // ====================================================
-        // PROFILE
-        // ====================================================
-
-        public async Task<IActionResult> Profile()
-        {
-            var user =
-                await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
-            }
-
-            var worker =
-                await _context.Workers
-                    .Include(w => w.ApplicationUser)
-                    .Include(w => w.Availabilities)
-                    .FirstOrDefaultAsync(w =>
-                        w.ApplicationUserId == user.Id);
-
-            if (worker == null)
-            {
-                return NotFound(
-                    "Worker profile was not found.");
-            }
-
-            return View(worker);
-        }
-
-        // ====================================================
-        // EDIT PROFILE
+        // MY PROFILE
+        // Index = Worker My Profile
         // ====================================================
 
         [HttpGet]
-        public async Task<IActionResult> EditProfile()
+        public async Task<IActionResult> Index()
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var worker =
-                await _context.Workers
-                    .Include(w => w.ApplicationUser)
-                    .FirstOrDefaultAsync(w =>
-                        w.ApplicationUserId == user.Id);
+            var worker = await _context.Workers
+                .Include(w => w.ApplicationUser)
+                .Include(w => w.Availabilities)
+                .Include(w => w.ServiceAssignments)
+                    .ThenInclude(sa => sa.ServiceRequest)
+                .FirstOrDefaultAsync(w =>
+                    w.ApplicationUserId == user.Id);
 
             if (worker == null)
             {
-                return NotFound();
+                return NotFound("Worker profile was not found.");
+            }
+
+            return View(worker);
+        }
+
+        // ====================================================
+        // EDIT MY PROFILE
+        // Edit = Worker Edit Profile
+        // ====================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Edit()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var worker = await _context.Workers
+                .Include(w => w.ApplicationUser)
+                .FirstOrDefaultAsync(w =>
+                    w.ApplicationUserId == user.Id);
+
+            if (worker == null)
+            {
+                return NotFound("Worker profile was not found.");
             }
 
             return View(worker);
@@ -124,28 +115,24 @@ namespace VehicleServiceManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProfile(
+        public async Task<IActionResult> Edit(
             int workerId,
             string name,
             string? phone,
             string profession)
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var worker =
-                await _context.Workers
-                    .Include(w => w.ApplicationUser)
-                    .FirstOrDefaultAsync(w =>
-                        w.WorkerId == workerId &&
-                        w.ApplicationUserId == user.Id);
+            var worker = await _context.Workers
+                .Include(w => w.ApplicationUser)
+                .FirstOrDefaultAsync(w =>
+                    w.WorkerId == workerId &&
+                    w.ApplicationUserId == user.Id);
 
             if (worker == null)
             {
@@ -171,42 +158,36 @@ namespace VehicleServiceManagement.Controllers
                 return View(worker);
             }
 
-            worker.ApplicationUser!.Name = name;
-
-            worker.ApplicationUser.PhoneNumber = phone;
-
-            worker.Profession = profession;
+            worker.ApplicationUser!.Name = name.Trim();
+            worker.ApplicationUser.PhoneNumber = phone?.Trim();
+            worker.Profession = profession.Trim();
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Profile updated successfully.";
 
-            return RedirectToAction(
-                nameof(Profile));
+            return RedirectToAction(nameof(Index));
         }
 
         // ====================================================
         // AVAILABILITY
         // ====================================================
 
+        [HttpGet]
         public async Task<IActionResult> Availability()
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var worker =
-                await _context.Workers
-                    .Include(w => w.Availabilities)
-                    .FirstOrDefaultAsync(w =>
-                        w.ApplicationUserId == user.Id);
+            var worker = await _context.Workers
+                .Include(w => w.Availabilities)
+                .FirstOrDefaultAsync(w =>
+                    w.ApplicationUserId == user.Id);
 
             if (worker == null)
             {
@@ -222,23 +203,19 @@ namespace VehicleServiceManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            UpdateAvailability(bool isAvailable)
+        public async Task<IActionResult> UpdateAvailability(
+            bool isAvailable)
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var worker =
-                await _context.Workers
-                    .FirstOrDefaultAsync(w =>
-                        w.ApplicationUserId == user.Id);
+            var worker = await _context.Workers
+                .FirstOrDefaultAsync(w =>
+                    w.ApplicationUserId == user.Id);
 
             if (worker == null)
             {
@@ -249,13 +226,11 @@ namespace VehicleServiceManagement.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] =
-                isAvailable
+            TempData["Success"] = isAvailable
                 ? "You are now available for work."
                 : "You are now unavailable for work.";
 
-            return RedirectToAction(
-                nameof(Availability));
+            return RedirectToAction(nameof(Availability));
         }
 
         // ====================================================
@@ -264,39 +239,31 @@ namespace VehicleServiceManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            UpdateWeeklyAvailability(
-                int availabilityId,
-                bool isAvailable,
-                TimeSpan? startTime,
-                TimeSpan? endTime)
+        public async Task<IActionResult> UpdateWeeklyAvailability(
+            int availabilityId,
+            bool isAvailable,
+            TimeSpan? startTime,
+            TimeSpan? endTime)
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var availability =
-                await _context.WorkerAvailabilities
-                    .Include(a => a.Worker)
-                    .FirstOrDefaultAsync(a =>
-                        a.WorkerAvailabilityId ==
-                            availabilityId &&
-                        a.Worker!.ApplicationUserId ==
-                            user.Id);
+            var availability = await _context.WorkerAvailabilities
+                .Include(a => a.Worker)
+                .FirstOrDefaultAsync(a =>
+                    a.WorkerAvailabilityId == availabilityId &&
+                    a.Worker!.ApplicationUserId == user.Id);
 
             if (availability == null)
             {
                 return NotFound();
             }
 
-            availability.IsAvailable =
-                isAvailable;
+            availability.IsAvailable = isAvailable;
 
             if (isAvailable)
             {
@@ -314,8 +281,7 @@ namespace VehicleServiceManagement.Controllers
             TempData["Success"] =
                 $"{availability.DayOfWeek} availability updated.";
 
-            return RedirectToAction(
-                nameof(Availability));
+            return RedirectToAction(nameof(Availability));
         }
 
         // ====================================================
@@ -324,77 +290,64 @@ namespace VehicleServiceManagement.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            UploadResume(IFormFile resume)
+        public async Task<IActionResult> UploadResume(
+            IFormFile resume)
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var worker =
-                await _context.Workers
-                    .FirstOrDefaultAsync(w =>
-                        w.ApplicationUserId == user.Id);
+            var worker = await _context.Workers
+                .FirstOrDefaultAsync(w =>
+                    w.ApplicationUserId == user.Id);
 
             if (worker == null)
             {
                 return NotFound();
             }
 
-            if (resume == null ||
-                resume.Length == 0)
+            if (resume == null || resume.Length == 0)
             {
                 TempData["Error"] =
                     "Please select a resume.";
 
-                return RedirectToAction(
-                    nameof(Profile));
+                return RedirectToAction(nameof(Index));
             }
 
-            var extension =
-                Path.GetExtension(
-                    resume.FileName)
-                    .ToLowerInvariant();
+            var extension = Path
+                .GetExtension(resume.FileName)
+                .ToLowerInvariant();
 
-            var allowedExtensions =
-                new[]
-                {
-                    ".pdf",
-                    ".doc",
-                    ".docx"
-                };
+            var allowedExtensions = new[]
+            {
+                ".pdf",
+                ".doc",
+                ".docx"
+            };
 
-            if (!allowedExtensions.Contains(
-                    extension))
+            if (!allowedExtensions.Contains(extension))
             {
                 TempData["Error"] =
                     "Only PDF, DOC and DOCX files are allowed.";
 
-                return RedirectToAction(
-                    nameof(Profile));
+                return RedirectToAction(nameof(Index));
             }
 
-            if (resume.Length >
-                5 * 1024 * 1024)
+            if (resume.Length > 5 * 1024 * 1024)
             {
                 TempData["Error"] =
                     "Resume must be less than 5 MB.";
 
-                return RedirectToAction(
-                    nameof(Profile));
+                return RedirectToAction(nameof(Index));
             }
 
-            var folder =
-                Path.Combine(
-                    _environment.WebRootPath,
-                    "uploads",
-                    "resumes");
+            var folder = Path.Combine(
+                _environment.WebRootPath,
+                "uploads",
+                "resumes");
 
             if (!Directory.Exists(folder))
             {
@@ -402,19 +355,16 @@ namespace VehicleServiceManagement.Controllers
             }
 
             var fileName =
-                Guid.NewGuid()
-                    .ToString() +
+                Guid.NewGuid().ToString() +
                 extension;
 
-            var filePath =
-                Path.Combine(
-                    folder,
-                    fileName);
+            var filePath = Path.Combine(
+                folder,
+                fileName);
 
-            using (var stream =
-                new FileStream(
-                    filePath,
-                    FileMode.Create))
+            using (var stream = new FileStream(
+                filePath,
+                FileMode.Create))
             {
                 await resume.CopyToAsync(stream);
             }
@@ -423,149 +373,125 @@ namespace VehicleServiceManagement.Controllers
                 resume.FileName;
 
             worker.ResumeFilePath =
-                "/uploads/resumes/" +
-                fileName;
+                "/uploads/resumes/" + fileName;
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Resume uploaded successfully.";
 
-            return RedirectToAction(
-                nameof(Profile));
+            return RedirectToAction(nameof(Index));
         }
 
         // ====================================================
         // MY SERVICES
         // ====================================================
 
+        [HttpGet]
         public async Task<IActionResult> MyServices()
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
-            var worker =
-                await _context.Workers
-                    .FirstOrDefaultAsync(w =>
-                        w.ApplicationUserId == user.Id);
+            var worker = await _context.Workers
+                .FirstOrDefaultAsync(w =>
+                    w.ApplicationUserId == user.Id);
 
             if (worker == null)
             {
                 return NotFound();
             }
 
-            var assignments =
-                await _context.ServiceAssignments
-                    .Include(sa =>
-                        sa.ServiceRequest)
-                    .Where(sa =>
-                        sa.WorkerId ==
-                        worker.WorkerId)
-                    .OrderByDescending(sa =>
-                        sa.AssignedDate)
-                    .ToListAsync();
+            var assignments = await _context.ServiceAssignments
+                .Include(sa => sa.ServiceRequest)
+                .Where(sa =>
+                    sa.WorkerId == worker.WorkerId)
+                .OrderByDescending(sa =>
+                    sa.AssignedDate)
+                .ToListAsync();
 
             return View(assignments);
         }
 
         // ====================================================
-        // MARK SERVICE AS IN PROGRESS
+        // START SERVICE
         // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            StartService(int assignmentId)
+        public async Task<IActionResult> StartService(
+            int assignmentId)
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
             var assignment =
                 await _context.ServiceAssignments
                     .Include(sa => sa.Worker)
                     .FirstOrDefaultAsync(sa =>
-                        sa.ServiceAssignmentId ==
-                            assignmentId &&
-                        sa.Worker!.ApplicationUserId ==
-                            user.Id);
+                        sa.ServiceAssignmentId == assignmentId &&
+                        sa.Worker!.ApplicationUserId == user.Id);
 
             if (assignment == null)
             {
                 return NotFound();
             }
 
-            assignment.Status =
-                "In Progress";
+            assignment.Status = "In Progress";
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Service started successfully.";
 
-            return RedirectToAction(
-                nameof(MyServices));
+            return RedirectToAction(nameof(MyServices));
         }
 
         // ====================================================
-        // MARK SERVICE AS COMPLETED
+        // COMPLETE SERVICE
         // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            CompleteService(int assignmentId)
+        public async Task<IActionResult> CompleteService(
+            int assignmentId)
         {
-            var user =
-                await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction(
-                    "Login",
-                    "Account");
+                return RedirectToAction("Login", "Account");
             }
 
             var assignment =
                 await _context.ServiceAssignments
                     .Include(sa => sa.Worker)
                     .FirstOrDefaultAsync(sa =>
-                        sa.ServiceAssignmentId ==
-                            assignmentId &&
-                        sa.Worker!.ApplicationUserId ==
-                            user.Id);
+                        sa.ServiceAssignmentId == assignmentId &&
+                        sa.Worker!.ApplicationUserId == user.Id);
 
             if (assignment == null)
             {
                 return NotFound();
             }
 
-            assignment.Status =
-                "Completed";
-
-            assignment.CompletedDate =
-                DateTime.Now;
+            assignment.Status = "Completed";
+            assignment.CompletedDate = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Service marked as completed.";
 
-            return RedirectToAction(
-                nameof(MyServices));
+            return RedirectToAction(nameof(MyServices));
         }
     }
 }

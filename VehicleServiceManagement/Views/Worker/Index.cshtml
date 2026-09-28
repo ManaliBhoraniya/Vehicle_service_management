@@ -1,123 +1,155 @@
-﻿@model IEnumerable<VehicleServiceManagement.Models.Worker>
+﻿@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "Workers";
+    ViewData["Title"] = "My Profile";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container mt-4">
 
-    <h2>Workers</h2>
+    <h2 class="mb-4">
+        My Profile
+    </h2>
 
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Create"
-           class="btn btn-success">
-            Add Worker
-        </a>
-    }
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                Worker Information
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Name:</strong>
+                        @(Model.ApplicationUser?.Name ?? "Not provided")
+                    </p>
+
+                    <p>
+                        <strong>Username:</strong>
+                        @(Model.ApplicationUser?.UserName ?? "Not provided")
+                    </p>
+
+                    <p>
+                        <strong>Email:</strong>
+                        @(Model.ApplicationUser?.Email ?? "Not provided")
+                    </p>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <p>
+                        <strong>Phone:</strong>
+                        @(Model.ApplicationUser?.PhoneNumber ?? "Not provided")
+                    </p>
+
+                    <p>
+                        <strong>Profession:</strong>
+                        @(Model.Profession ?? "Not provided")
+                    </p>
+
+                    <p>
+                        <strong>Availability:</strong>
+
+                        @if (Model.IsAvailable)
+                        {
+                            <span class="badge bg-success">
+                                Available
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">
+                                Busy
+                            </span>
+                        }
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h5>
+                Resume
+            </h5>
+
+            @if (!string.IsNullOrEmpty(Model.ResumeFilePath))
+            {
+                <p>
+                    <strong>
+                        @Model.ResumeFileName
+                    </strong>
+                </p>
+
+                <a href="@Model.ResumeFilePath"
+                   target="_blank"
+                   class="btn btn-outline-primary">
+                    View Resume
+                </a>
+            }
+            else
+            {
+                <p class="text-muted">
+                    No resume uploaded.
+                </p>
+            }
+
+            <hr />
+
+            <div class="mb-3">
+
+                <a asp-action="Edit"
+                   class="btn btn-primary">
+                    Edit Profile
+                </a>
+
+            </div>
+
+            <div class="border-top pt-3">
+
+                <div class="d-flex gap-2">
+
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-secondary">
+                            Logout
+                        </button>
+
+                    </form>
+
+                    <form asp-controller="Account"
+                          asp-action="DeleteAccount"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-danger">
+                            Delete Account
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        No workers found.
-    </div>
-}
-else
-{
-    <div class="table-responsive">
-
-        <table class="table table-bordered table-hover">
-
-            <thead class="table-dark">
-
-                <tr>
-                    <th>Worker ID</th>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Profession</th>
-                    <th>Availability</th>
-                    <th>Actions</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                @foreach (var worker in Model)
-                {
-                    <tr>
-
-                        <td>
-                            @worker.Id
-                        </td>
-
-                        <td>
-                            @worker.ApplicationUser?.Name
-                        </td>
-
-                        <td>
-                            @worker.ApplicationUser?.UserName
-                        </td>
-
-                        <td>
-                            @worker.ApplicationUser?.Email
-                        </td>
-
-                        <td>
-                            @worker.Profession
-                        </td>
-
-                        <td>
-
-                            @if (worker.IsAvailable)
-                            {
-                                <span class="badge bg-success">
-                                    Available
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">
-                                    Busy
-                                </span>
-                            }
-
-                        </td>
-
-                        <td>
-
-                            <a asp-action="Details"
-                               asp-route-id="@worker.Id"
-                               class="btn btn-sm btn-info">
-                                Details
-                            </a>
-
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <a asp-action="Edit"
-                                   asp-route-id="@worker.Id"
-                                   class="btn btn-sm btn-primary">
-                                    Edit
-                                </a>
-
-                                <a asp-action="Delete"
-                                   asp-route-id="@worker.Id"
-                                   class="btn btn-sm btn-danger">
-                                    Delete
-                                </a>
-                            }
-
-                        </td>
-
-                    </tr>
-                }
-
-            </tbody>
-
-        </table>
-
-    </div>
-}
