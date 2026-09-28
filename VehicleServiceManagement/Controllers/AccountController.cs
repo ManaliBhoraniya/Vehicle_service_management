@@ -76,33 +76,46 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
+            // =========================
             // ADMIN
+            // =========================
+
             if (await _userManager.IsInRoleAsync(
-                user, "Admin"))
+                user,
+                "Admin"))
             {
                 return RedirectToAction(
                     "Index",
                     "ServiceManager");
             }
 
+            // =========================
             // WORKER
+            // =========================
+
             if (await _userManager.IsInRoleAsync(
-                user, "Worker"))
+                user,
+                "Worker"))
             {
                 return RedirectToAction(
                     "Dashboard",
                     "Worker");
             }
 
+            // =========================
             // CUSTOMER
+            // =========================
+
             if (await _userManager.IsInRoleAsync(
-                user, "Customer"))
+                user,
+                "Customer"))
             {
                 return RedirectToAction(
-                    "Index",
+                    "Dashboard",
                     "Customer");
             }
 
+            // No valid role
             await _signInManager.SignOutAsync();
 
             ModelState.AddModelError(
@@ -154,6 +167,7 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
+            // Only Customer and Worker can register
             if (role != "Customer" &&
                 role != "Worker")
             {
@@ -164,6 +178,7 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
+            // Worker must provide profession
             if (role == "Worker" &&
                 string.IsNullOrWhiteSpace(profession))
             {
@@ -185,6 +200,10 @@ namespace VehicleServiceManagement.Controllers
 
                 return View();
             }
+
+            // =========================
+            // CREATE USER
+            // =========================
 
             var user = new ApplicationUser
             {
@@ -210,6 +229,10 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
+            // =========================
+            // ASSIGN ROLE
+            // =========================
+
             var roleResult =
                 await _userManager.AddToRoleAsync(
                     user,
@@ -229,7 +252,10 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
+            // =========================
             // CREATE WORKER PROFILE
+            // =========================
+
             if (role == "Worker")
             {
                 var worker = new Worker
@@ -243,7 +269,7 @@ namespace VehicleServiceManagement.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Create default weekly availability
+                // Default weekly availability
                 string[] days =
                 {
                     "Monday",
@@ -261,14 +287,21 @@ namespace VehicleServiceManagement.Controllers
                         new WorkerAvailability
                         {
                             WorkerId = worker.WorkerId,
+
                             DayOfWeek = day,
-                            IsAvailable = day != "Sunday",
-                            StartTime = day != "Sunday"
-                                ? new TimeSpan(9, 0, 0)
-                                : null,
-                            EndTime = day != "Sunday"
-                                ? new TimeSpan(18, 0, 0)
-                                : null
+
+                            IsAvailable =
+                                day != "Sunday",
+
+                            StartTime =
+                                day != "Sunday"
+                                    ? new TimeSpan(9, 0, 0)
+                                    : null,
+
+                            EndTime =
+                                day != "Sunday"
+                                    ? new TimeSpan(18, 0, 0)
+                                    : null
                         };
 
                     _context.WorkerAvailabilities.Add(
@@ -278,9 +311,17 @@ namespace VehicleServiceManagement.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // =========================
+            // SIGN IN USER
+            // =========================
+
             await _signInManager.SignInAsync(
                 user,
                 isPersistent: false);
+
+            // =========================
+            // REDIRECT BY ROLE
+            // =========================
 
             if (role == "Worker")
             {
@@ -289,9 +330,16 @@ namespace VehicleServiceManagement.Controllers
                     "Worker");
             }
 
+            if (role == "Customer")
+            {
+                return RedirectToAction(
+                    "Dashboard",
+                    "Customer");
+            }
+
             return RedirectToAction(
-                "Index",
-                "Customer");
+                "Login",
+                "Account");
         }
 
         // =========================
