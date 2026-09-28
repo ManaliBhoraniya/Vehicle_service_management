@@ -29,17 +29,17 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager =
-        scope.ServiceProvider
-            .GetRequiredService<RoleManager<IdentityRole<int>>>();
+    var roleManager = scope.ServiceProvider
+        .GetRequiredService<RoleManager<IdentityRole<int>>>();
 
     string[] roles =
     {
-        "Admin",
+        "Customer",
         "Worker",
-        "Customer"
+        "Manager"
     };
 
     foreach (var role in roles)
@@ -51,6 +51,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
+
 
 if (!app.Environment.IsDevelopment())
 {
