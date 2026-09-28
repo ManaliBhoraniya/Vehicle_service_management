@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VehicleServiceManagement.Data;
 
@@ -11,9 +12,11 @@ using VehicleServiceManagement.Data;
 namespace VehicleServiceManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260928112902_SyncExistingDatabase")]
+    partial class SyncExistingDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,7 +258,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.ServiceAssignment", b =>
@@ -291,7 +294,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("ServiceAssignments", (string)null);
+                    b.ToTable("ServiceAssignments");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.ServiceRequest", b =>
@@ -331,7 +334,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("ServiceRequests", (string)null);
+                    b.ToTable("ServiceRequests");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.Vehicle", b =>
@@ -361,7 +364,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Vehicles", (string)null);
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.Worker", b =>
@@ -394,7 +397,7 @@ namespace VehicleServiceManagement.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("Workers", (string)null);
+                    b.ToTable("Workers");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.WorkerAvailability", b =>
@@ -425,7 +428,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("WorkerAvailabilities", (string)null);
+                    b.ToTable("WorkerAvailabilities");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
