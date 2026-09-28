@@ -21,16 +21,25 @@ namespace VehicleServiceManagement.Controllers
             _userManager = userManager;
         }
 
+        // ====================================================
+        // INDEX
+        // ====================================================
+
         // GET: /ServiceRequest
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user =
+                await _userManager.GetUserAsync(User);
 
             if (user == null)
                 return Challenge();
 
-            // Admin and Worker can see all service requests
+            // =================================================
+            // ADMIN AND WORKER
+            // Can see all service requests
+            // =================================================
+
             if (User.IsInRole("Admin") ||
                 User.IsInRole("Worker"))
             {
@@ -39,12 +48,18 @@ namespace VehicleServiceManagement.Controllers
                         .Include(s => s.Vehicle)
                             .ThenInclude(v => v.Customer)
                                 .ThenInclude(c => c.ApplicationUser)
+                        .OrderByDescending(
+                            s => s.RequestDate)
                         .ToListAsync();
 
                 return View(allRequests);
             }
 
-            // Customer can see only their own requests
+            // =================================================
+            // CUSTOMER
+            // Can see only their own service requests
+            // =================================================
+
             var customer =
                 await _context.Customers
                     .FirstOrDefaultAsync(
@@ -63,16 +78,24 @@ namespace VehicleServiceManagement.Controllers
                     .Where(s =>
                         s.Vehicle != null &&
                         s.Vehicle.CustomerId == customer.Id)
+                    .OrderByDescending(
+                        s => s.RequestDate)
                     .ToListAsync();
 
             return View(requests);
         }
 
+
+        // ====================================================
+        // CREATE SERVICE REQUEST - GET
+        // ====================================================
+
         // GET: /ServiceRequest/Create
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user =
+                await _userManager.GetUserAsync(User);
 
             if (user == null)
                 return Challenge();
@@ -82,6 +105,7 @@ namespace VehicleServiceManagement.Controllers
                     .FirstOrDefaultAsync(
                         c => c.ApplicationUserId == user.Id);
 
+            // Customer profile must exist first
             if (customer == null)
             {
                 return RedirectToAction(
@@ -89,13 +113,21 @@ namespace VehicleServiceManagement.Controllers
                     "Customer");
             }
 
+            // Load only the logged-in customer's vehicles
             ViewBag.Vehicles =
                 await _context.Vehicles
-                    .Where(v => v.CustomerId == customer.Id)
+                    .Where(v =>
+                        v.CustomerId == customer.Id)
+                    .OrderBy(v => v.VehicleNumber)
                     .ToListAsync();
 
             return View();
         }
+
+
+        // ====================================================
+        // CREATE SERVICE REQUEST - POST
+        // ====================================================
 
         // POST: /ServiceRequest/Create
         [HttpPost]
@@ -103,10 +135,15 @@ namespace VehicleServiceManagement.Controllers
         public async Task<IActionResult> Create(
             ServiceRequest serviceRequest)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user =
+                await _userManager.GetUserAsync(User);
 
             if (user == null)
                 return Challenge();
+
+            // =================================================
+            // FIND CUSTOMER
+            // =================================================
 
             var customer =
                 await _context.Customers
@@ -119,6 +156,10 @@ namespace VehicleServiceManagement.Controllers
                     "Create",
                     "Customer");
             }
+
+            // =================================================
+            // CHECK SELECTED VEHICLE
+            // =================================================
 
             var vehicle =
                 await _context.Vehicles
@@ -131,41 +172,66 @@ namespace VehicleServiceManagement.Controllers
                 ModelState.AddModelError(
                     "VehicleId",
                     "Please select a valid vehicle.");
-
-                ViewBag.Vehicles =
-                    await _context.Vehicles
-                        .Where(v =>
-                            v.CustomerId == customer.Id)
-                        .ToListAsync();
-
-                return View(serviceRequest);
             }
+
+            // =================================================
+            // VALIDATE SERVICE REQUEST
+            // =================================================
 
             if (!ModelState.IsValid)
             {
+                // Reload vehicles because the form
+                // is being displayed again.
+
                 ViewBag.Vehicles =
                     await _context.Vehicles
                         .Where(v =>
                             v.CustomerId == customer.Id)
+                        .OrderBy(v => v.VehicleNumber)
                         .ToListAsync();
 
                 return View(serviceRequest);
             }
 
-            serviceRequest.CustomerId = customer.Id;
-            serviceRequest.RequestDate = DateTime.Now;
-            serviceRequest.Status = "Pending";
+            // =================================================
+            // SET SYSTEM VALUES
+            // =================================================
 
-            _context.ServiceRequests.Add(serviceRequest);
+            serviceRequest.CustomerId =
+                customer.Id;
+
+            serviceRequest.RequestDate =
+                DateTime.Now;
+
+            serviceRequest.Status =
+                "Pending";
+
+            // =================================================
+            // SAVE REQUEST
+            // =================================================
+
+            _context.ServiceRequests.Add(
+                serviceRequest);
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            // =================================================
+            // REDIRECT TO REQUEST LIST
+            // =================================================
+
+            return RedirectToAction(
+                nameof(Index));
         }
+
+
+        // ====================================================
+        // DETAILS
+        // ====================================================
 
         // GET: /ServiceRequest/Details/5
         [HttpGet]
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(
+            int id)
         {
             var request =
                 await _context.ServiceRequests
@@ -180,6 +246,11 @@ namespace VehicleServiceManagement.Controllers
 
             return View(request);
         }
+
+
+        // ====================================================
+        // UPDATE STATUS
+        // ====================================================
 
         // POST: /ServiceRequest/UpdateStatus
         [HttpPost]
@@ -197,17 +268,25 @@ namespace VehicleServiceManagement.Controllers
             if (request == null)
                 return NotFound();
 
-            request.Status = status;
+            request.Status =
+                status;
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(
+                nameof(Index));
         }
+
+
+        // ====================================================
+        // CANCEL SERVICE REQUEST
+        // ====================================================
 
         // POST: /ServiceRequest/Cancel
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cancel(int id)
+        public async Task<IActionResult> Cancel(
+            int id)
         {
             var request =
                 await _context.ServiceRequests
@@ -218,28 +297,38 @@ namespace VehicleServiceManagement.Controllers
             if (request == null)
                 return NotFound();
 
-            var user = await _userManager.GetUserAsync(User);
+            var user =
+                await _userManager.GetUserAsync(User);
 
             if (user == null)
                 return Challenge();
 
-            // Admin and Worker can cancel
+            // =================================================
+            // ADMIN AND WORKER
+            // =================================================
+
             if (User.IsInRole("Admin") ||
                 User.IsInRole("Worker"))
             {
-                request.Status = "Cancelled";
+                request.Status =
+                    "Cancelled";
 
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(
+                    nameof(Index));
             }
 
-            // Customer can cancel only their own request
+            // =================================================
+            // CUSTOMER
+            // =================================================
+
             var customer =
                 await _context.Customers
                     .FirstOrDefaultAsync(
                         c => c.ApplicationUserId == user.Id);
 
+            // Customer can cancel only their own request
             if (customer == null ||
                 request.Vehicle == null ||
                 request.Vehicle.CustomerId != customer.Id)
@@ -247,11 +336,13 @@ namespace VehicleServiceManagement.Controllers
                 return Forbid();
             }
 
-            request.Status = "Cancelled";
+            request.Status =
+                "Cancelled";
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(
+                nameof(Index));
         }
     }
 }

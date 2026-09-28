@@ -1,0 +1,652 @@
+﻿@model VehicleServiceManagement.Models.Customer?
+
+@{
+    ViewData["Title"] = "Customer Dashboard";
+
+    var customerName =
+        ViewBag.CustomerName as string ?? "Customer";
+
+    int vehicleCount =
+        ViewBag.VehicleCount ?? 0;
+
+    int totalRequests =
+        ViewBag.TotalRequests ?? 0;
+
+    int pendingCount =
+        ViewBag.PendingCount ?? 0;
+
+    int inProgressCount =
+        ViewBag.InProgressCount ?? 0;
+
+    int completedCount =
+        ViewBag.CompletedCount ?? 0;
+}
+
+<div class="container mt-4">
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="mb-4">
+
+        <h1>
+            Customer Dashboard
+        </h1>
+
+        <p class="text-muted">
+            Welcome,
+            <strong>
+                @customerName
+            </strong>
+        </p>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- SUCCESS MESSAGE -->
+    <!-- ================================================= -->
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- ================================================= -->
+    <!-- PROFILE WARNING -->
+    <!-- ================================================= -->
+
+    @if (Model == null)
+    {
+        <div class="alert alert-warning">
+
+            <h5 class="alert-heading">
+                Complete Your Customer Profile
+            </h5>
+
+            <p>
+                Your account has been created successfully,
+                but your customer profile has not been created yet.
+            </p>
+
+            <p class="mb-3">
+                Create your profile before adding vehicles
+                or requesting a vehicle service.
+            </p>
+
+            <a asp-controller="Customer"
+               asp-action="Create"
+               class="btn btn-warning">
+
+                Create My Profile
+
+            </a>
+
+        </div>
+    }
+
+
+    <!-- ================================================= -->
+    <!-- STATISTICS -->
+    <!-- ================================================= -->
+
+    <div class="row g-4 mb-4">
+
+
+        <!-- MY VEHICLES -->
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <h2 class="text-primary">
+                        @vehicleCount
+                    </h2>
+
+                    <h5>
+                        My Vehicles
+                    </h5>
+
+                    <a asp-controller="Vehicle"
+                       asp-action="Index"
+                       class="btn btn-primary mt-2">
+
+                        View Vehicles
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL REQUESTS -->
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <h2 class="text-info">
+                        @totalRequests
+                    </h2>
+
+                    <h5>
+                        Total Requests
+                    </h5>
+
+                    <a asp-controller="ServiceRequest"
+                       asp-action="Index"
+                       class="btn btn-info mt-2">
+
+                        View Requests
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PENDING -->
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <h2 class="text-warning">
+                        @pendingCount
+                    </h2>
+
+                    <h5>
+                        Pending
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPLETED -->
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    <h2 class="text-success">
+                        @completedCount
+                    </h2>
+
+                    <h5>
+                        Completed
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- SERVICE STATUS + QUICK ACTIONS -->
+    <!-- ================================================= -->
+
+    <div class="row g-4 mb-4">
+
+
+        <!-- SERVICE STATUS -->
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header">
+
+                    <h4 class="mb-0">
+                        Service Status
+                    </h4>
+
+                </div>
+
+                <div class="card-body">
+
+
+                    <!-- PENDING -->
+
+                    <div class="d-flex justify-content-between
+                                align-items-center mb-3">
+
+                        <span>
+                            Pending
+                        </span>
+
+                        <span class="badge bg-warning text-dark">
+                            @pendingCount
+                        </span>
+
+                    </div>
+
+
+                    <!-- IN PROGRESS -->
+
+                    <div class="d-flex justify-content-between
+                                align-items-center mb-3">
+
+                        <span>
+                            In Progress / Assigned
+                        </span>
+
+                        <span class="badge bg-primary">
+                            @inProgressCount
+                        </span>
+
+                    </div>
+
+
+                    <!-- COMPLETED -->
+
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+
+                        <span>
+                            Completed
+                        </span>
+
+                        <span class="badge bg-success">
+                            @completedCount
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header">
+
+                    <h4 class="mb-0">
+                        Quick Actions
+                    </h4>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="d-grid gap-2">
+
+
+                        <!-- MY PROFILE -->
+
+                        <a asp-controller="Customer"
+                           asp-action="Index"
+                           class="btn btn-primary">
+
+                            My Profile
+
+                        </a>
+
+
+                        <!-- MY VEHICLES -->
+
+                        <a asp-controller="Vehicle"
+                           asp-action="Index"
+                           class="btn btn-info">
+
+                            My Vehicles
+
+                        </a>
+
+
+                        <!-- ADD VEHICLE -->
+
+                        <a asp-controller="Vehicle"
+                           asp-action="Create"
+                           class="btn btn-success">
+
+                            Add Vehicle
+
+                        </a>
+
+
+                        <!-- NEW SERVICE REQUEST -->
+
+                        <a asp-controller="ServiceRequest"
+                           asp-action="Create"
+                           class="btn btn-warning">
+
+                            New Service Request
+
+                        </a>
+
+
+                        <!-- MY SERVICE REQUESTS -->
+
+                        <a asp-controller="ServiceRequest"
+                           asp-action="Index"
+                           class="btn btn-secondary">
+
+                            My Service Requests
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- PROFILE INFORMATION -->
+    <!-- ================================================= -->
+
+    @if (Model != null)
+    {
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header">
+
+                <div class="d-flex justify-content-between
+                            align-items-center">
+
+                    <h4 class="mb-0">
+                        My Profile
+                    </h4>
+
+                    <a asp-controller="Customer"
+                       asp-action="Edit"
+                       class="btn btn-sm btn-primary">
+
+                        Edit Profile
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+
+                    <!-- NAME -->
+
+                    <div class="col-md-4">
+
+                        <p>
+
+                            <strong>
+                                Name:
+                            </strong>
+
+                            @Model.Name
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="col-md-4">
+
+                        <p>
+
+                            <strong>
+                                Email:
+                            </strong>
+
+                            @(Model.ApplicationUser?.Email ?? "-")
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="col-md-4">
+
+                        <p>
+
+                            <strong>
+                                Phone:
+                            </strong>
+
+                            @Model.Phone
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ADDRESS -->
+
+                <div class="row">
+
+                    <div class="col-md-12">
+
+                        <p class="mb-0">
+
+                            <strong>
+                                Address:
+                            </strong>
+
+                            @Model.Address
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- MY VEHICLES -->
+        <!-- ================================================= -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header">
+
+                <div class="d-flex justify-content-between
+                            align-items-center">
+
+                    <h4 class="mb-0">
+                        My Vehicles
+                    </h4>
+
+                    <a asp-controller="Vehicle"
+                       asp-action="Create"
+                       class="btn btn-sm btn-success">
+
+                        Add Vehicle
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                @if (Model.Vehicles != null &&
+                     Model.Vehicles.Any())
+                {
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered
+                                      table-hover">
+
+                            <thead class="table-dark">
+
+                                <tr>
+
+                                    <th>
+                                        Vehicle Number
+                                    </th>
+
+                                    <th>
+                                        Vehicle Model
+                                    </th>
+
+                                    <th>
+                                        Vehicle Type
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var vehicle
+                                    in Model.Vehicles)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @vehicle.VehicleNumber
+                                        </td>
+
+                                        <td>
+                                            @vehicle.VehicleModel
+                                        </td>
+
+                                        <td>
+                                            @vehicle.VehicleType
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info mb-0">
+
+                        You have not added any vehicles yet.
+
+                        <a asp-controller="Vehicle"
+                           asp-action="Create">
+
+                            Add your first vehicle
+
+                        </a>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    }
+
+
+    <!-- ================================================= -->
+    <!-- SERVICE REQUEST -->
+    <!-- ================================================= -->
+
+    @if (Model != null)
+    {
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body text-center">
+
+                <h4>
+                    Need Vehicle Service?
+                </h4>
+
+                <p class="text-muted">
+
+                    Create a service request for one
+                    of your registered vehicles.
+
+                </p>
+
+                @if (vehicleCount > 0)
+                {
+                    <a asp-controller="ServiceRequest"
+                       asp-action="Create"
+                       class="btn btn-success">
+
+                        Create Service Request
+
+                    </a>
+                }
+                else
+                {
+                    <p class="text-warning">
+
+                        Please add a vehicle first.
+
+                    </p>
+
+                    <a asp-controller="Vehicle"
+                       asp-action="Create"
+                       class="btn btn-primary">
+
+                        Add Vehicle
+
+                    </a>
+                }
+
+            </div>
+
+        </div>
+    }
+
+</div>

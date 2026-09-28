@@ -6,25 +6,18 @@
 
 <div class="container mt-4">
 
-    <div class="d-flex justify-content-between">
-
-        <h1>My Work</h1>
-
-        <a asp-action="Dashboard"
-           class="btn btn-secondary">
-            Dashboard
-        </a>
-
-    </div>
+    <h2 class="mb-4">
+        My Work
+    </h2>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success mt-3">
+        <div class="alert alert-success">
             @TempData["Success"]
         </div>
     }
 
-    <div class="card shadow-sm mt-3">
+    <div class="card shadow-sm">
 
         <div class="card-body">
 
@@ -66,30 +59,24 @@
 
                                     <td>
                                         @item.AssignedDate
-                                        .ToString(
-                                        "dd-MM-yyyy")
+                                        .ToString("dd-MM-yyyy")
                                     </td>
 
                                     <td>
 
-                                        @if (item.Status
-                                            == "Pending")
+                                        @if (item.Status == "Pending")
                                         {
                                             <span class="badge bg-warning text-dark">
                                                 Pending
                                             </span>
                                         }
-                                        else if (
-                                            item.Status
-                                            == "In Progress")
+                                        else if (item.Status == "In Progress")
                                         {
                                             <span class="badge bg-primary">
                                                 In Progress
                                             </span>
                                         }
-                                        else if (
-                                            item.Status
-                                            == "Completed")
+                                        else if (item.Status == "Completed")
                                         {
                                             <span class="badge bg-success">
                                                 Completed
@@ -106,8 +93,7 @@
 
                                     <td>
 
-                                        @if (item.Status
-                                            == "Pending")
+                                        @if (item.Status == "Pending")
                                         {
                                             <form asp-action="StartService"
                                                   method="post">
@@ -125,9 +111,7 @@
 
                                             </form>
                                         }
-                                        else if (
-                                            item.Status
-                                            == "In Progress")
+                                        else if (item.Status == "In Progress")
                                         {
                                             <form asp-action="CompleteService"
                                                   method="post">

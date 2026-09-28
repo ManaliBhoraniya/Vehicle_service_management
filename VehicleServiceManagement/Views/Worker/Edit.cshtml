@@ -1,79 +1,120 @@
 ﻿@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "Edit Worker";
+    ViewData["Title"] = "Edit Profile";
 }
 
-<h2>Edit Worker</h2>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
 
-<form asp-action="Edit"
-      asp-route-id="@Model.Id"
-      method="post">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Profile</h3>
+                </div>
 
-    @Html.AntiForgeryToken()
+                <div class="card-body">
 
-    <input type="hidden"
-           asp-for="Id" />
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["Success"]
+                        </div>
+                    }
 
-    <input type="hidden"
-           asp-for="ApplicationUserId" />
+                    <form asp-action="Edit"
+                          asp-controller="Worker"
+                          method="post">
 
-    <div asp-validation-summary="ModelOnly"
-         class="text-danger mb-3">
+                        @Html.AntiForgeryToken()
+
+                        <!-- IMPORTANT: send WorkerId using the exact
+                             parameter name expected by the controller -->
+                        <input type="hidden"
+                               name="workerId"
+                               value="@Model.WorkerId" />
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Username / Email
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="@Model.ApplicationUser?.UserName"
+                                   readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                Full Name
+                            </label>
+
+                            <input type="text"
+                                   id="name"
+                                   name="name"
+                                   class="form-control"
+                                   value="@Model.ApplicationUser?.Name"
+                                   required />
+
+                            <span class="text-danger">
+                                @Html.ValidationMessage("Name")
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">
+                                Phone Number
+                            </label>
+
+                            <input type="text"
+                                   id="phone"
+                                   name="phone"
+                                   class="form-control"
+                                   value="@Model.ApplicationUser?.PhoneNumber" />
+
+                            <span class="text-danger">
+                                @Html.ValidationMessage("Phone")
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="profession" class="form-label">
+                                Profession
+                            </label>
+
+                            <input type="text"
+                                   id="profession"
+                                   name="profession"
+                                   class="form-control"
+                                   value="@Model.Profession"
+                                   required />
+
+                            <span class="text-danger">
+                                @Html.ValidationMessage("Profession")
+                            </span>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Save Changes
+                            </button>
+
+                            <a asp-controller="Worker"
+                               asp-action="Index"
+                               class="btn btn-secondary">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
     </div>
-
-    <div class="mb-3">
-
-        <label class="form-label">
-            Application User
-        </label>
-
-        <input class="form-control"
-               value="@Model.ApplicationUser?.UserName"
-               readonly />
-
-    </div>
-
-    <div class="mb-3">
-
-        <label asp-for="Profession"
-               class="form-label">
-            Profession
-        </label>
-
-        <input asp-for="Profession"
-               class="form-control" />
-
-        <span asp-validation-for="Profession"
-              class="text-danger">
-        </span>
-
-    </div>
-
-    <div class="mb-3 form-check">
-
-        <input asp-for="IsAvailable"
-               class="form-check-input" />
-
-        <label asp-for="IsAvailable"
-               class="form-check-label">
-            Is Available
-        </label>
-
-    </div>
-
-    <button type="submit"
-            class="btn btn-primary">
-        Save Changes
-    </button>
-
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Cancel
-    </a>
-
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+</div>

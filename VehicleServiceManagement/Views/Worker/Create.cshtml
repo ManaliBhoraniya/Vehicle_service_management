@@ -4,71 +4,94 @@
     ViewData["Title"] = "Add Worker";
 }
 
-<h2>Add Worker</h2>
+<div class="container mt-4">
 
-<div class="row">
-    <div class="col-md-6">
+    <h2 class="mb-4">
+        Add Worker
+    </h2>
 
-        <form asp-action="Create" method="post">
+    <div class="row">
 
-            @Html.AntiForgeryToken()
+        <div class="col-md-6">
 
-            <div asp-validation-summary="ModelOnly"
-                 class="text-danger mb-3">
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <form asp-action="Create"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="ApplicationUserId"
+                                   class="form-label">
+                                Application User ID
+                            </label>
+
+                            <input asp-for="ApplicationUserId"
+                                   class="form-control" />
+
+                            <span asp-validation-for="ApplicationUserId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="Profession"
+                                   class="form-label">
+                                Profession
+                            </label>
+
+                            <input asp-for="Profession"
+                                   class="form-control"
+                                   placeholder="e.g. Mechanic" />
+
+                            <span asp-validation-for="Profession"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-3 form-check">
+
+                            <input asp-for="IsAvailable"
+                                   class="form-check-input" />
+
+                            <label asp-for="IsAvailable"
+                                   class="form-check-label">
+                                Is Available
+                            </label>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success">
+                            Add Worker
+                        </button>
+
+                        <a asp-action="Manage"
+                           class="btn btn-secondary">
+                            Cancel
+                        </a>
+
+                    </form>
+
+                </div>
+
             </div>
 
-            <div class="mb-3">
-                <label asp-for="ApplicationUserId"
-                       class="form-label">
-                    Application User ID
-                </label>
-
-                <input asp-for="ApplicationUserId"
-                       class="form-control" />
-
-                <span asp-validation-for="ApplicationUserId"
-                      class="text-danger">
-                </span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Profession"
-                       class="form-label">
-                    Profession
-                </label>
-
-                <input asp-for="Profession"
-                       class="form-control"
-                       placeholder="e.g. Mechanic" />
-
-                <span asp-validation-for="Profession"
-                      class="text-danger">
-                </span>
-            </div>
-
-            <div class="mb-3 form-check">
-                <input asp-for="IsAvailable"
-                       class="form-check-input" />
-
-                <label asp-for="IsAvailable"
-                       class="form-check-label">
-                    Is Available
-                </label>
-            </div>
-
-            <button type="submit"
-                    class="btn btn-success">
-                Add Worker
-            </button>
-
-            <a asp-action="Index"
-               class="btn btn-secondary">
-                Cancel
-            </a>
-
-        </form>
+        </div>
 
     </div>
+
 </div>
 
 @section Scripts {

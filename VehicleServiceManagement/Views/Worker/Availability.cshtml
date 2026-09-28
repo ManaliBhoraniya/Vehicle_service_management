@@ -6,7 +6,9 @@
 
 <div class="container mt-4">
 
-    <h1>My Availability</h1>
+    <h2 class="mb-4">
+        My Availability
+    </h2>
 
     @if (TempData["Success"] != null)
     {
@@ -15,12 +17,12 @@
         </div>
     }
 
-    <!-- GENERAL AVAILABILITY -->
-
     <div class="card shadow-sm mb-4">
 
         <div class="card-header">
-            <h4>Current Status</h4>
+            <h5 class="mb-0">
+                Current Status
+            </h5>
         </div>
 
         <div class="card-body">
@@ -41,7 +43,8 @@
                            name="isAvailable"
                            value="false" />
 
-                    <button class="btn btn-danger">
+                    <button type="submit"
+                            class="btn btn-danger">
                         Mark Unavailable
                     </button>
 
@@ -63,7 +66,8 @@
                            name="isAvailable"
                            value="true" />
 
-                    <button class="btn btn-success">
+                    <button type="submit"
+                            class="btn btn-success">
                         Mark Available
                     </button>
 
@@ -74,22 +78,20 @@
 
     </div>
 
-
-    <!-- WEEKLY SCHEDULE -->
-
     <div class="card shadow-sm">
 
         <div class="card-header">
-            <h4>Weekly Working Hours</h4>
+            <h5 class="mb-0">
+                Weekly Working Hours
+            </h5>
         </div>
 
         <div class="card-body">
 
             @if (Model.Availabilities.Any())
             {
-                @foreach (var item in
-                    Model.Availabilities
-                        .OrderBy(x => x.WorkerAvailabilityId))
+                @foreach (var item in Model.Availabilities
+                    .OrderBy(x => x.WorkerAvailabilityId))
                 {
                     <form asp-action="UpdateWeeklyAvailability"
                           method="post"
@@ -111,10 +113,9 @@
 
                             </div>
 
-
                             <div class="col-md-2">
 
-                                <label>
+                                <label class="form-label">
                                     Available
                                 </label>
 
@@ -123,8 +124,7 @@
 
                                     @if (item.IsAvailable)
                                     {
-                                        <option value="true"
-                                                selected>
+                                        <option value="true" selected>
                                             Yes
                                         </option>
 
@@ -138,8 +138,7 @@
                                             Yes
                                         </option>
 
-                                        <option value="false"
-                                                selected>
+                                        <option value="false" selected>
                                             No
                                         </option>
                                     }
@@ -148,44 +147,35 @@
 
                             </div>
 
-
                             <div class="col-md-3">
 
-                                <label>
+                                <label class="form-label">
                                     Start Time
                                 </label>
 
                                 <input type="time"
                                        name="startTime"
                                        class="form-control"
-                                       value="@(
-                                       item.StartTime.HasValue
-                                       ? item.StartTime.Value
-                                           .ToString(@"hh\:mm")
-                                                                       : ""
-                                                                   )" />
+                                       value="@(item.StartTime.HasValue
+                                                                           ? item.StartTime.Value.ToString(@"hh\:mm")
+                                                                       : "")" />
 
                             </div>
 
-
                             <div class="col-md-3">
 
-                                <label>
+                                <label class="form-label">
                                     End Time
                                 </label>
 
                                 <input type="time"
                                        name="endTime"
                                        class="form-control"
-                                       value="@(
-                                       item.EndTime.HasValue
-                                       ? item.EndTime.Value
-                                           .ToString(@"hh\:mm")
-                                                                       : ""
-                                                                   )" />
+                                       value="@(item.EndTime.HasValue
+                                                                           ? item.EndTime.Value.ToString(@"hh\:mm")
+                                                                       : "")" />
 
                             </div>
-
 
                             <div class="col-md-2">
 
@@ -211,10 +201,5 @@
         </div>
 
     </div>
-
-    <a asp-action="Dashboard"
-       class="btn btn-secondary mt-3">
-        Back to Dashboard
-    </a>
 
 </div>

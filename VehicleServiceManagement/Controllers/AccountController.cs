@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VehicleServiceManagement.Data;
 using VehicleServiceManagement.Models;
 
@@ -48,8 +50,7 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            var user =
-                await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
@@ -60,12 +61,11 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            var result =
-                await _signInManager.PasswordSignInAsync(
-                    user.UserName!,
-                    password,
-                    rememberMe,
-                    lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(
+                user.UserName!,
+                password,
+                rememberMe,
+                lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
@@ -80,9 +80,7 @@ namespace VehicleServiceManagement.Controllers
             // MANAGER
             // =========================
 
-            if (await _userManager.IsInRoleAsync(
-                user,
-                "Manager"))
+            if (await _userManager.IsInRoleAsync(user, "Manager"))
             {
                 return RedirectToAction(
                     "Index",
@@ -93,9 +91,7 @@ namespace VehicleServiceManagement.Controllers
             // ADMIN
             // =========================
 
-            if (await _userManager.IsInRoleAsync(
-                user,
-                "Admin"))
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
             {
                 return RedirectToAction(
                     "Index",
@@ -106,9 +102,7 @@ namespace VehicleServiceManagement.Controllers
             // WORKER
             // =========================
 
-            if (await _userManager.IsInRoleAsync(
-                user,
-                "Worker"))
+            if (await _userManager.IsInRoleAsync(user, "Worker"))
             {
                 return RedirectToAction(
                     "Dashboard",
@@ -119,14 +113,16 @@ namespace VehicleServiceManagement.Controllers
             // CUSTOMER
             // =========================
 
-            if (await _userManager.IsInRoleAsync(
-                user,
-                "Customer"))
+            if (await _userManager.IsInRoleAsync(user, "Customer"))
             {
                 return RedirectToAction(
-                    "Index",
+                    "Dashboard",
                     "Customer");
             }
+
+            // =========================
+            // INVALID ROLE
+            // =========================
 
             await _signInManager.SignOutAsync();
 
@@ -169,6 +165,10 @@ namespace VehicleServiceManagement.Controllers
 
                 return View();
             }
+
+            // =========================
+            // PASSWORD CONFIRMATION
+            // =========================
 
             if (password != confirmPassword)
             {
@@ -235,10 +235,9 @@ namespace VehicleServiceManagement.Controllers
                 Name = name
             };
 
-            var result =
-                await _userManager.CreateAsync(
-                    user,
-                    password);
+            var result = await _userManager.CreateAsync(
+                user,
+                password);
 
             if (!result.Succeeded)
             {
@@ -270,6 +269,7 @@ namespace VehicleServiceManagement.Controllers
                         error.Description);
                 }
 
+                // Delete the user if role assignment failed
                 await _userManager.DeleteAsync(user);
 
                 return View();
@@ -292,7 +292,9 @@ namespace VehicleServiceManagement.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Default weekly availability
+                // =========================
+                // DEFAULT WEEKLY AVAILABILITY
+                // =========================
 
                 string[] days =
                 {
@@ -336,7 +338,7 @@ namespace VehicleServiceManagement.Controllers
             }
 
             // =========================
-            // LOGIN AFTER REGISTRATION
+            // SIGN IN AFTER REGISTRATION
             // =========================
 
             await _signInManager.SignInAsync(
@@ -348,6 +350,17 @@ namespace VehicleServiceManagement.Controllers
             // =========================
 
             if (role == "Manager")
+            {
+                return RedirectToAction(
+                    "Index",
+                    "ServiceManager");
+            }
+
+            // =========================
+            // ADMIN
+            // =========================
+
+            if (role == "Admin")
             {
                 return RedirectToAction(
                     "Index",
@@ -369,9 +382,19 @@ namespace VehicleServiceManagement.Controllers
             // CUSTOMER
             // =========================
 
+            if (role == "Customer")
+            {
+                return RedirectToAction(
+                    "Dashboard",
+                    "Customer");
+            }
+
+            // Fallback
+            await _signInManager.SignOutAsync();
+
             return RedirectToAction(
-                "Index",
-                "Customer");
+                "Login",
+                "Account");
         }
 
         // =========================
@@ -383,6 +406,93 @@ namespace VehicleServiceManagement.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+
+            return RedirectToAction(
+                "Login",
+                "Account");
+        }
+
+        // =========================
+        // DELETE ACCOUNT
+        // =========================
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var user =
+                await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            // =========================
+            // DELETE WORKER PROFILE
+            // =========================
+
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.ApplicationUserId == user.Id);
+
+            if (worker != null)
+            {
+                _context.Workers.Remove(worker);
+            }
+
+            // =========================
+            // DELETE CUSTOMER PROFILE
+            // =========================
+
+            var customer =
+                await _context.Customers
+                    .FirstOrDefaultAsync(
+                        c => c.ApplicationUserId == user.Id);
+
+            if (customer != null)
+            {
+                _context.Customers.Remove(customer);
+            }
+
+            // =========================
+            // SAVE PROFILE DELETION
+            // =========================
+
+            await _context.SaveChangesAsync();
+
+            // =========================
+            // DELETE IDENTITY ACCOUNT
+            // =========================
+
+            var result =
+                await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        error.Description);
+                }
+
+                return RedirectToAction(
+                    "AccessDenied",
+                    "Account");
+            }
+
+            // =========================
+            // SIGN OUT
+            // =========================
+
+            await _signInManager.SignOutAsync();
+
+            // =========================
+            // GO TO LOGIN
+            // =========================
 
             return RedirectToAction(
                 "Login",
