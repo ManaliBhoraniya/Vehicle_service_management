@@ -6,6 +6,7 @@ namespace VehicleServiceManagement.Models
     public class Worker
     {
         [Key]
+        [Column("Id")]
         public int WorkerId { get; set; }
 
         // Compatibility for existing views/controllers
