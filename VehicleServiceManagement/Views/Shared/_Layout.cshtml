@@ -31,6 +31,7 @@
 <body>
 
     @{
+
         var controllerName =
             ViewContext.RouteData.Values["controller"]?.ToString();
 
@@ -44,6 +45,7 @@
 
         bool isAuthenticated =
             User.Identity?.IsAuthenticated == true;
+
     }
 
 
@@ -59,7 +61,6 @@
 
 
                 <!-- WEBSITE NAME -->
-
                 @if (isAuthenticated && !isAccountPage)
                 {
                     @if (User.IsInRole("Customer"))
@@ -183,7 +184,6 @@
                             <!-- ================================= -->
                             <!-- MY PROFILE -->
                             <!-- ================================= -->
-
                             @if (User.IsInRole("Customer"))
                             {
                                 <li class="nav-item">
@@ -247,6 +247,31 @@
 
                             </li>
 
+
+                            <!-- ================================= -->
+                            <!-- LOGOUT -->
+                            <!-- ================================= -->
+
+                            <li class="nav-item">
+
+                                <form asp-controller="Account"
+                                      asp-action="Logout"
+                                      method="post"
+                                      class="d-inline">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-danger ms-2">
+
+                                        Logout
+
+                                    </button>
+
+                                </form>
+
+                            </li>
+
                         }
                         else
                         {
@@ -296,11 +321,10 @@
     <!-- ================================================= -->
     <!-- BACK BUTTON -->
     <!-- ================================================= -->
-
     @if (isAuthenticated &&
-         !isAccountPage &&
-         ViewData["Title"]?.ToString() != "Customer Dashboard" &&
-         ViewData["Title"]?.ToString() != "Worker Dashboard")
+             !isAccountPage &&
+             ViewData["Title"]?.ToString() != "Customer Dashboard" &&
+             ViewData["Title"]?.ToString() != "Worker Dashboard")
     {
         <div class="container mt-3">
 
@@ -369,48 +393,48 @@
 
     <script>
 
-        function goBack() {
+            function goBack() {
 
-            if (document.referrer &&
-                document.referrer !== window.location.href) {
+                if (document.referrer &&
+                    document.referrer !== window.location.href) {
 
-                history.back();
+                    history.back();
+
+                }
+                else {
+
+                    @if (User.IsInRole("Customer"))
+                        {
+                            <text>
+                                    window.location.href =
+                                    '@Url.Action("Dashboard", "Customer")';
+                            </text>
+                    }
+                            else if (User.IsInRole("Worker"))
+                        {
+                            <text>
+                                    window.location.href =
+                                    '@Url.Action("Dashboard", "Worker")';
+                            </text>
+                    }
+                            else if (User.IsInRole("Admin"))
+                        {
+                            <text>
+                                    window.location.href =
+                                    '@Url.Action("Index", "ServiceManager")';
+                            </text>
+                    }
+                        else
+                        {
+                            <text>
+                                    window.location.href =
+                                    '@Url.Action("Index", "Home")';
+                            </text>
+                    }
+
+                        }
 
             }
-            else {
-
-                @if (User.IsInRole("Customer"))
-                {
-                    <text>
-                        window.location.href =
-                            '@Url.Action("Dashboard", "Customer")';
-                    </text>
-                }
-                else if (User.IsInRole("Worker"))
-                {
-                    <text>
-                        window.location.href =
-                            '@Url.Action("Dashboard", "Worker")';
-                    </text>
-                }
-                else if (User.IsInRole("Admin"))
-                {
-                    <text>
-                        window.location.href =
-                            '@Url.Action("Index", "ServiceManager")';
-                    </text>
-                }
-                else
-                {
-                    <text>
-                        window.location.href =
-                            '@Url.Action("Index", "Home")';
-                    </text>
-                }
-
-            }
-
-        }
 
     </script>
 
@@ -422,3 +446,4 @@
 </body>
 
 </html>
+

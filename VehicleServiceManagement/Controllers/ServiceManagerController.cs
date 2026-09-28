@@ -5,7 +5,7 @@ using VehicleServiceManagement.Data;
 
 namespace VehicleServiceManagement.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Manager")]
     public class ServiceManagerController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -66,12 +66,13 @@ namespace VehicleServiceManagement.Controllers
             int id,
             string status)
         {
-            var request =
-                await _context.ServiceRequests
-                    .FirstOrDefaultAsync(s => s.Id == id);
+            var request = await _context.ServiceRequests
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if (request == null)
+            {
                 return NotFound();
+            }
 
             request.Status = status;
 
@@ -86,6 +87,7 @@ namespace VehicleServiceManagement.Controllers
         {
             var customers = await _context.Customers
                 .Include(c => c.ApplicationUser)
+                .Include(c => c.Vehicles)
                 .ToListAsync();
 
             return View(customers);
@@ -120,6 +122,7 @@ namespace VehicleServiceManagement.Controllers
         {
             var assignments = await _context.ServiceAssignments
                 .Include(a => a.ServiceRequest)
+                    .ThenInclude(s => s.Vehicle)
                 .Include(a => a.Worker)
                     .ThenInclude(w => w.ApplicationUser)
                 .ToListAsync();
@@ -128,3 +131,4 @@ namespace VehicleServiceManagement.Controllers
         }
     }
 }
+

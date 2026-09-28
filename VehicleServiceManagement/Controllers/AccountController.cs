@@ -50,8 +50,7 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            var user =
-                await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
@@ -62,12 +61,11 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            var result =
-                await _signInManager.PasswordSignInAsync(
-                    user.UserName!,
-                    password,
-                    rememberMe,
-                    lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(
+                user.UserName!,
+                password,
+                rememberMe,
+                lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
@@ -79,12 +77,21 @@ namespace VehicleServiceManagement.Controllers
             }
 
             // =========================
+            // MANAGER
+            // =========================
+
+            if (await _userManager.IsInRoleAsync(user, "Manager"))
+            {
+                return RedirectToAction(
+                    "Index",
+                    "ServiceManager");
+            }
+
+            // =========================
             // ADMIN
             // =========================
 
-            if (await _userManager.IsInRoleAsync(
-                user,
-                "Admin"))
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
             {
                 return RedirectToAction(
                     "Index",
@@ -95,9 +102,7 @@ namespace VehicleServiceManagement.Controllers
             // WORKER
             // =========================
 
-            if (await _userManager.IsInRoleAsync(
-                user,
-                "Worker"))
+            if (await _userManager.IsInRoleAsync(user, "Worker"))
             {
                 return RedirectToAction(
                     "Dashboard",
@@ -108,9 +113,7 @@ namespace VehicleServiceManagement.Controllers
             // CUSTOMER
             // =========================
 
-            if (await _userManager.IsInRoleAsync(
-                user,
-                "Customer"))
+            if (await _userManager.IsInRoleAsync(user, "Customer"))
             {
                 return RedirectToAction(
                     "Dashboard",
@@ -129,7 +132,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View();
         }
-
 
         // =========================
         // REGISTER
@@ -164,6 +166,10 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
+            // =========================
+            // PASSWORD CONFIRMATION
+            // =========================
+
             if (password != confirmPassword)
             {
                 ModelState.AddModelError(
@@ -173,9 +179,13 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // Only Customer and Worker can register
+            // =========================
+            // ALLOWED ROLES
+            // =========================
+
             if (role != "Customer" &&
-                role != "Worker")
+                role != "Worker" &&
+                role != "Manager")
             {
                 ModelState.AddModelError(
                     "Role",
@@ -184,7 +194,10 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // Worker must provide profession
+            // =========================
+            // WORKER PROFESSION
+            // =========================
+
             if (role == "Worker" &&
                 string.IsNullOrWhiteSpace(profession))
             {
@@ -194,6 +207,10 @@ namespace VehicleServiceManagement.Controllers
 
                 return View();
             }
+
+            // =========================
+            // CHECK EXISTING USER
+            // =========================
 
             var existingUser =
                 await _userManager.FindByEmailAsync(email);
@@ -218,10 +235,9 @@ namespace VehicleServiceManagement.Controllers
                 Name = name
             };
 
-            var result =
-                await _userManager.CreateAsync(
-                    user,
-                    password);
+            var result = await _userManager.CreateAsync(
+                user,
+                password);
 
             if (!result.Succeeded)
             {
@@ -253,6 +269,7 @@ namespace VehicleServiceManagement.Controllers
                         error.Description);
                 }
 
+                // Delete the user if role assignment failed
                 await _userManager.DeleteAsync(user);
 
                 return View();
@@ -275,7 +292,10 @@ namespace VehicleServiceManagement.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Default weekly availability
+                // =========================
+                // DEFAULT WEEKLY AVAILABILITY
+                // =========================
+
                 string[] days =
                 {
                     "Monday",
@@ -318,7 +338,7 @@ namespace VehicleServiceManagement.Controllers
             }
 
             // =========================
-            // SIGN IN USER
+            // SIGN IN AFTER REGISTRATION
             // =========================
 
             await _signInManager.SignInAsync(
@@ -326,7 +346,29 @@ namespace VehicleServiceManagement.Controllers
                 isPersistent: false);
 
             // =========================
-            // REDIRECT BY ROLE
+            // MANAGER
+            // =========================
+
+            if (role == "Manager")
+            {
+                return RedirectToAction(
+                    "Index",
+                    "ServiceManager");
+            }
+
+            // =========================
+            // ADMIN
+            // =========================
+
+            if (role == "Admin")
+            {
+                return RedirectToAction(
+                    "Index",
+                    "ServiceManager");
+            }
+
+            // =========================
+            // WORKER
             // =========================
 
             if (role == "Worker")
@@ -336,6 +378,10 @@ namespace VehicleServiceManagement.Controllers
                     "Worker");
             }
 
+            // =========================
+            // CUSTOMER
+            // =========================
+
             if (role == "Customer")
             {
                 return RedirectToAction(
@@ -343,11 +389,13 @@ namespace VehicleServiceManagement.Controllers
                     "Customer");
             }
 
+            // Fallback
+            await _signInManager.SignOutAsync();
+
             return RedirectToAction(
                 "Login",
                 "Account");
         }
-
 
         // =========================
         // LOGOUT
@@ -364,7 +412,6 @@ namespace VehicleServiceManagement.Controllers
                 "Account");
         }
 
-
         // =========================
         // DELETE ACCOUNT
         // =========================
@@ -378,8 +425,9 @@ namespace VehicleServiceManagement.Controllers
                 await _userManager.GetUserAsync(User);
 
             if (user == null)
+            {
                 return Challenge();
-
+            }
 
             // =========================
             // DELETE WORKER PROFILE
@@ -395,7 +443,6 @@ namespace VehicleServiceManagement.Controllers
                 _context.Workers.Remove(worker);
             }
 
-
             // =========================
             // DELETE CUSTOMER PROFILE
             // =========================
@@ -410,10 +457,11 @@ namespace VehicleServiceManagement.Controllers
                 _context.Customers.Remove(customer);
             }
 
+            // =========================
+            // SAVE PROFILE DELETION
+            // =========================
 
-            // Save profile deletion first
             await _context.SaveChangesAsync();
-
 
             // =========================
             // DELETE IDENTITY ACCOUNT
@@ -436,13 +484,11 @@ namespace VehicleServiceManagement.Controllers
                     "Account");
             }
 
-
             // =========================
             // SIGN OUT
             // =========================
 
             await _signInManager.SignOutAsync();
-
 
             // =========================
             // GO TO LOGIN
@@ -452,7 +498,6 @@ namespace VehicleServiceManagement.Controllers
                 "Login",
                 "Account");
         }
-
 
         // =========================
         // ACCESS DENIED
@@ -465,3 +510,4 @@ namespace VehicleServiceManagement.Controllers
         }
     }
 }
+
