@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,8 +46,8 @@ namespace VehicleServiceManagement.Controllers
                 var allRequests =
                     await _context.ServiceRequests
                         .Include(s => s.Vehicle)
-                            .ThenInclude(v => v.Customer)
-                                .ThenInclude(c => c.ApplicationUser)
+                            .ThenInclude(v => v!.Customer)
+                                .ThenInclude(c => c!.ApplicationUser)
                         .OrderByDescending(
                             s => s.RequestDate)
                         .ToListAsync();
@@ -235,9 +235,11 @@ namespace VehicleServiceManagement.Controllers
         {
             var request =
                 await _context.ServiceRequests
+                    .Include(s => s.Customer)
+                        .ThenInclude(c => c!.ApplicationUser)
                     .Include(s => s.Vehicle)
-                        .ThenInclude(v => v.Customer)
-                            .ThenInclude(c => c.ApplicationUser)
+                        .ThenInclude(v => v!.Customer)
+                            .ThenInclude(c => c!.ApplicationUser)
                     .FirstOrDefaultAsync(
                         s => s.Id == id);
 
@@ -343,6 +345,47 @@ namespace VehicleServiceManagement.Controllers
 
             return RedirectToAction(
                 nameof(Index));
+        }
+
+
+        // ====================================================
+        // DELETE SERVICE REQUEST
+        // ====================================================
+
+        // POST: /ServiceRequest/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var request = await _context.ServiceRequests
+                .Include(s => s.ServiceAssignments)
+                .FirstOrDefaultAsync(s => s.ServiceRequestId == id);
+
+            if (request == null)
+            {
+                TempData["Error"] = "Service request not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                if (request.ServiceAssignments != null && request.ServiceAssignments.Any())
+                {
+                    _context.ServiceAssignments.RemoveRange(request.ServiceAssignments);
+                }
+
+                _context.ServiceRequests.Remove(request);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Service request deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unable to delete request: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

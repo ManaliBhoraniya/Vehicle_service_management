@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +36,7 @@ namespace VehicleServiceManagement.Controllers
                 var allVehicles =
                     await _context.Vehicles
                         .Include(v => v.Customer)
-                            .ThenInclude(c => c.ApplicationUser)
+                            .ThenInclude(c => c!.ApplicationUser)
                         .ToListAsync();
 
                 return View(allVehicles);
@@ -112,7 +112,7 @@ namespace VehicleServiceManagement.Controllers
             var vehicle =
                 await _context.Vehicles
                     .Include(v => v.Customer)
-                        .ThenInclude(c => c.ApplicationUser)
+                        .ThenInclude(c => c!.ApplicationUser)
                     .FirstOrDefaultAsync(
                         v => v.Id == id);
 

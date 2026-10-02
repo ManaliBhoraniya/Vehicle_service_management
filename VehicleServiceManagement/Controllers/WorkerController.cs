@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -252,7 +252,8 @@ namespace VehicleServiceManagement.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAvailability(
-            bool isAvailable)
+            bool isAvailable,
+            string? returnUrl = null)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -275,8 +276,13 @@ namespace VehicleServiceManagement.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = isAvailable
-                ? "You are now available for work."
-                : "You are now unavailable for work.";
+                ? "You are now marked as Available for new work."
+                : "You are now marked as Unavailable.";
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
 
             return RedirectToAction(nameof(Availability));
         }
@@ -468,10 +474,14 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
+            ViewBag.IsAvailable = worker.IsAvailable;
+            ViewBag.WorkerId = worker.WorkerId;
+
             var assignments =
                 await _context.ServiceAssignments
                     .Include(sa => sa.ServiceRequest)
-                        .ThenInclude(sr => sr.Vehicle)
+                        .ThenInclude(sr => sr!.Vehicle)
+                            .ThenInclude(v => v!.Customer)
                     .Where(sa =>
                         sa.WorkerId ==
                         worker.WorkerId)
@@ -541,12 +551,13 @@ namespace VehicleServiceManagement.Controllers
                     "Assigned";
             }
 
+            // Worker accepts -> mark unavailable!
             worker.IsAvailable = false;
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Task accepted successfully.";
+                "Work request accepted successfully. Your status is now marked as Unavailable.";
 
             return RedirectToAction(
                 nameof(MyServices));
@@ -608,18 +619,20 @@ namespace VehicleServiceManagement.Controllers
             assignment.Notes =
                 "Worker rejected this task.";
 
+            // Mark service request status as Rejected so manager sees it
             if (assignment.ServiceRequest != null)
             {
                 assignment.ServiceRequest.Status =
-                    "Pending";
+                    "Rejected";
             }
 
+            // Worker remains / becomes available
             worker.IsAvailable = true;
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Task rejected. The Manager can assign it to another worker.";
+                "Task rejected. The Manager has been notified and can assign another worker.";
 
             return RedirectToAction(
                 nameof(MyServices));
@@ -647,29 +660,45 @@ namespace VehicleServiceManagement.Controllers
             var assignment =
                 await _context.ServiceAssignments
                     .Include(sa => sa.Worker)
+                    .Include(sa => sa.ServiceRequest)
                     .FirstOrDefaultAsync(sa =>
                         sa.ServiceAssignmentId ==
                             assignmentId &&
                         sa.Worker!.ApplicationUserId ==
                             user.Id &&
-                        sa.Status == "Accepted");
+                        (sa.Status == "Accepted" || sa.Status == "Pending"));
 
             if (assignment == null)
             {
                 return NotFound();
             }
 
-            // Keep status as Accepted.
-            // The new workflow uses:
-            // Pending -> Accepted -> Completed.
+            assignment.Status = "Accepted";
+            assignment.Notes = "Service started by worker.";
 
-            assignment.Notes =
-                "Service started by worker.";
+            if (assignment.ServiceRequest != null)
+            {
+                assignment.ServiceRequest.Status = "Assigned";
+            }
+
+            // Worker accepts/starts -> mark unavailable!
+            if (assignment.Worker != null)
+            {
+                assignment.Worker.IsAvailable = false;
+            }
+            else
+            {
+                var w = await _context.Workers.FirstOrDefaultAsync(x => x.WorkerId == assignment.WorkerId);
+                if (w != null)
+                {
+                    w.IsAvailable = false;
+                }
+            }
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Service started successfully.";
+                "Service started successfully. Your status is now marked as Unavailable.";
 
             return RedirectToAction(
                 nameof(MyServices));
@@ -704,7 +733,7 @@ namespace VehicleServiceManagement.Controllers
                             assignmentId &&
                         sa.Worker!.ApplicationUserId ==
                             user.Id &&
-                        sa.Status == "Accepted");
+                        (sa.Status == "Accepted" || sa.Status == "In Progress" || sa.Status == "Pending"));
 
             if (assignment == null)
             {
@@ -729,10 +758,8 @@ namespace VehicleServiceManagement.Controllers
                     "Completed";
             }
 
-            // Worker becomes available again
-        workerAvailability:
-            ;
-
+            // Note: Per requirements, the worker remains unavailable until they manually
+            // mark themselves as available (which then appears to manager for new assignment).
             var worker =
                 await _context.Workers
                     .FirstOrDefaultAsync(w =>
@@ -741,13 +768,13 @@ namespace VehicleServiceManagement.Controllers
 
             if (worker != null)
             {
-                worker.IsAvailable = true;
+                worker.IsAvailable = false;
             }
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Service marked as completed.";
+                "Service marked as completed successfully. Please manually mark yourself as 'Available' when you are ready to receive new service assignments.";
 
             return RedirectToAction(
                 nameof(MyServices));

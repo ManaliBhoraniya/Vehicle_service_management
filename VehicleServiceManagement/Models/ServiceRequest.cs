@@ -37,5 +37,8 @@ namespace VehicleServiceManagement.Models
 
         // Existing project property
         public string? CustomerName { get; set; }
+
+        public ICollection<ServiceAssignment> ServiceAssignments { get; set; }
+            = new List<ServiceAssignment>();
     }
 }

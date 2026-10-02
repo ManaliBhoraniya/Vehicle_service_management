@@ -1,4 +1,4 @@
-﻿@model VehicleServiceManagement.Models.ServiceRequest
+@model VehicleServiceManagement.Models.ServiceRequest
 
 @{
     ViewData["Title"] = "Assign Worker";
@@ -6,6 +6,8 @@
     var workers =
         ViewBag.Workers
         as IEnumerable<VehicleServiceManagement.Models.Worker>;
+    var cleanServiceType = (Model.ServiceType ?? "").Replace("&amp;", "&");
+    var rejectedAssignments = Model.ServiceAssignments?.Where(a => a.Status == "Rejected").ToList();
 }
 
 <div class="container mt-4">
@@ -21,6 +23,23 @@
 
     </div>
 
+    <!-- REJECTION NOTICE IF PREVIOUSLY REJECTED -->
+    @if (rejectedAssignments != null && rejectedAssignments.Any())
+    {
+        <div class="alert alert-warning border border-warning shadow-sm mb-4">
+            <h6 class="alert-heading fw-bold mb-1">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                Worker Reassignment Needed
+            </h6>
+            <div>
+                This request was previously rejected by:
+                <strong>
+                    @string.Join(", ", rejectedAssignments.Select(a => a.Worker?.ApplicationUser?.Name ?? $"Worker #{a.WorkerId}"))
+                </strong>.
+                Please choose another matching available worker below.
+            </div>
+        </div>
+    }
 
     <!-- SUCCESS / ERROR -->
 
@@ -68,7 +87,7 @@
                     <strong>Service Required</strong>
 
                     <div>
-                        @Model.ServiceType
+                        @cleanServiceType
                     </div>
 
                 </div>
@@ -89,6 +108,12 @@
                         {
                             <span class="badge bg-primary">
                                 Assigned
+                            </span>
+                        }
+                        else if (Model.Status == "Rejected")
+                        {
+                            <span class="badge bg-danger">
+                                Worker Rejected
                             </span>
                         }
                         else if (Model.Status == "Completed")
@@ -127,38 +152,43 @@
             </p>
 
 
-            @if (Model.Vehicle != null)
-            {
-                <hr />
+            <hr />
 
-                <div class="row">
+            <div class="row">
 
-                    <div class="col-md-6">
+                <div class="col-md-6 mb-2">
 
-                        <strong>Vehicle Number</strong>
+                    <strong>Vehicle Number</strong>
 
-                        <div>
-                            @Model.Vehicle.VehicleNumber
-                        </div>
-
+                    <div>
+                        @(Model.Vehicle?.VehicleNumber ?? "N/A")
                     </div>
 
-                    @if (Model.Vehicle.Customer != null)
-                    {
-                        <div class="col-md-6">
+                </div>
 
-                            <strong>Customer</strong>
+                <div class="col-md-6 mb-2">
 
-                            <div>
-                                @Model.Vehicle.Customer
-                                    .ApplicationUser?.Name
-                            </div>
+                    <strong>Customer</strong>
 
-                        </div>
-                    }
+                    <div>
+                        @{
+                            var cust = Model.Vehicle?.Customer ?? Model.Customer;
+                            var customerDisplayName = cust?.Name;
+                            if (string.IsNullOrWhiteSpace(customerDisplayName))
+                            {
+                                customerDisplayName = cust?.ApplicationUser?.Name;
+                            }
+                            if (string.IsNullOrWhiteSpace(customerDisplayName))
+                            {
+                                customerDisplayName = Model.CustomerName;
+                            }
+                        }
+                        @(string.IsNullOrWhiteSpace(customerDisplayName) ? "N/A" : customerDisplayName)
+                    </div>
 
                 </div>
-            }
+
+            </div>
 
         </div>
 
@@ -192,7 +222,7 @@
                     <li>
                         Qualified for
                         <strong>
-                            @Model.ServiceType
+                            @cleanServiceType
                         </strong>
                     </li>
 
@@ -215,7 +245,7 @@
                         available worker who has
 
                         <strong>
-                            @Model.ServiceType
+                            @cleanServiceType
                         </strong>
 
                         as one of their specialities.
@@ -257,7 +287,7 @@
                                 <option value="@worker.WorkerId">
 
                                     @(worker.ApplicationUser?.Name
-                                        ?? "Worker")
+                                        ?? "Worker #" + worker.WorkerId)
 
                                     -
                                     @string.Join(

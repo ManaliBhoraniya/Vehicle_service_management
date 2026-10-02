@@ -1,4 +1,4 @@
-﻿@model VehicleServiceManagement.Models.ServiceRequest
+@model VehicleServiceManagement.Models.ServiceRequest
 
 @{
     ViewData["Title"] = "Service Request Details";
@@ -27,11 +27,47 @@
             </dd>
 
             <dt class="col-sm-4">
+                Customer
+            </dt>
+
+            <dd class="col-sm-8">
+                @{
+                    var cust = Model.Vehicle?.Customer ?? Model.Customer;
+                    var custDisplayName = cust?.Name;
+                    if (string.IsNullOrWhiteSpace(custDisplayName))
+                    {
+                        custDisplayName = cust?.ApplicationUser?.Name;
+                    }
+                    if (string.IsNullOrWhiteSpace(custDisplayName))
+                    {
+                        custDisplayName = Model.CustomerName;
+                    }
+                }
+                @(string.IsNullOrWhiteSpace(custDisplayName) ? "N/A" : custDisplayName)
+            </dd>
+
+            <dt class="col-sm-4">
+                Service Required
+            </dt>
+
+            <dd class="col-sm-8">
+                <strong>@Model.ServiceType</strong>
+            </dd>
+
+            <dt class="col-sm-4">
+                Description
+            </dt>
+
+            <dd class="col-sm-8">
+                @(string.IsNullOrWhiteSpace(Model.Description) ? "No description provided." : Model.Description)
+            </dd>
+
+            <dt class="col-sm-4">
                 Vehicle Number
             </dt>
 
             <dd class="col-sm-8">
-                @Model.Vehicle?.VehicleNumber
+                @(Model.Vehicle?.VehicleNumber ?? "N/A")
             </dd>
 
             <dt class="col-sm-4">
@@ -39,7 +75,7 @@
             </dt>
 
             <dd class="col-sm-8">
-                @Model.Vehicle?.VehicleModel
+                @(Model.Vehicle?.VehicleModel ?? "N/A")
             </dd>
 
             <dt class="col-sm-4">
@@ -47,7 +83,7 @@
             </dt>
 
             <dd class="col-sm-8">
-                @Model.Vehicle?.VehicleType
+                @(Model.Vehicle?.VehicleType ?? "N/A")
             </dd>
 
             <dt class="col-sm-4">

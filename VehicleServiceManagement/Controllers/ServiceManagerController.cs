@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VehicleServiceManagement.Data;
@@ -63,6 +63,77 @@ namespace VehicleServiceManagement.Controllers
 
 
         // =====================================================
+        // HELPER: Map Service Type to Matching Specialities
+        // =====================================================
+        public static List<string> GetMatchingSpecialities(string? serviceType)
+        {
+            if (string.IsNullOrWhiteSpace(serviceType))
+            {
+                return new List<string>();
+            }
+
+            var st = serviceType.Trim();
+            var list = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { st };
+
+            // Brake / Break
+            if (st.Contains("brake", StringComparison.OrdinalIgnoreCase) ||
+                st.Contains("break", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("Brake Repair");
+                list.Add("Brake Problem");
+                list.Add("Break Repair");
+                list.Add("Break Problem");
+            }
+            // Engine
+            else if (st.Contains("engine", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("Engine Repair");
+                list.Add("Engine Problem");
+            }
+            // AC
+            else if (st.Contains("ac", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("AC Repair");
+                list.Add("AC Problem");
+            }
+            // Electrical / Battery
+            else if (st.Contains("electric", StringComparison.OrdinalIgnoreCase) ||
+                     st.Contains("battery", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("Electrical Repair");
+                list.Add("Electrical Problem");
+                list.Add("Battery Problem");
+            }
+            // Tyre / Tire / Wheel
+            else if (st.Contains("tyre", StringComparison.OrdinalIgnoreCase) ||
+                     st.Contains("tire", StringComparison.OrdinalIgnoreCase) ||
+                     st.Contains("wheel", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("Tire & Wheel Service");
+                list.Add("Tyre Problem");
+                list.Add("Tire Problem");
+            }
+            // Transmission
+            else if (st.Contains("transmission", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("Transmission Repair");
+                list.Add("Transmission Problem");
+            }
+            // Oil Change
+            else if (st.Contains("oil", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("Oil Change");
+            }
+            // General Service
+            else if (st.Contains("general", StringComparison.OrdinalIgnoreCase))
+            {
+                list.Add("General Service");
+            }
+
+            return list.ToList();
+        }
+
+        // =====================================================
         // SERVICE REQUESTS
         // GET: /ServiceManager/ServiceRequests
         // =====================================================
@@ -72,8 +143,14 @@ namespace VehicleServiceManagement.Controllers
         {
             var requests =
                 await _context.ServiceRequests
+                    .Include(s => s.Customer)
+                        .ThenInclude(c => c!.ApplicationUser)
                     .Include(s => s.Vehicle)
-                        .ThenInclude(v => v.Customer)
+                        .ThenInclude(v => v!.Customer)
+                            .ThenInclude(c => c!.ApplicationUser)
+                    .Include(s => s.ServiceAssignments)
+                        .ThenInclude(sa => sa.Worker)
+                            .ThenInclude(w => w!.ApplicationUser)
                     .OrderByDescending(
                         s => s.RequestDate)
                     .ToListAsync();
@@ -112,6 +189,61 @@ namespace VehicleServiceManagement.Controllers
 
 
         // =====================================================
+        // DELETE SERVICE REQUEST
+        // =====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteRequest(int id)
+        {
+            var request = await _context.ServiceRequests
+                .Include(s => s.ServiceAssignments)
+                .FirstOrDefaultAsync(s => s.ServiceRequestId == id);
+
+            if (request == null)
+            {
+                TempData["Error"] = "Service request not found.";
+                return RedirectToAction(nameof(ServiceRequests));
+            }
+
+            try
+            {
+                // Free up any worker who was assigned/in progress with this request
+                if (request.ServiceAssignments != null && request.ServiceAssignments.Any())
+                {
+                    var assignedWorkerIds = request.ServiceAssignments
+                        .Where(a => a.Status == "Accepted" || a.Status == "In Progress")
+                        .Select(a => a.WorkerId)
+                        .Distinct()
+                        .ToList();
+
+                    foreach (var workerId in assignedWorkerIds)
+                    {
+                        var worker = await _context.Workers.FindAsync(workerId);
+                        if (worker != null)
+                        {
+                            worker.IsAvailable = true;
+                        }
+                    }
+
+                    _context.ServiceAssignments.RemoveRange(request.ServiceAssignments);
+                }
+
+                _context.ServiceRequests.Remove(request);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"Service Request #{id} has been deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unable to delete service request: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(ServiceRequests));
+        }
+
+
+        // =====================================================
         // ASSIGN WORKER - GET
         // Shows only accepted + available workers
         // whose speciality matches the service request
@@ -123,8 +255,14 @@ namespace VehicleServiceManagement.Controllers
         {
             var request =
                 await _context.ServiceRequests
+                    .Include(s => s.Customer)
+                        .ThenInclude(c => c!.ApplicationUser)
                     .Include(s => s.Vehicle)
-                        .ThenInclude(v => v.Customer)
+                        .ThenInclude(v => v!.Customer)
+                            .ThenInclude(c => c!.ApplicationUser)
+                    .Include(s => s.ServiceAssignments)
+                        .ThenInclude(sa => sa.Worker)
+                            .ThenInclude(w => w!.ApplicationUser)
                     .FirstOrDefaultAsync(
                         s => s.ServiceRequestId == id);
 
@@ -133,12 +271,23 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
+            // Find worker IDs who rejected this request previously
+            var rejectedWorkerIds = request.ServiceAssignments
+                .Where(a => a.Status == "Rejected")
+                .Select(a => a.WorkerId)
+                .Distinct()
+                .ToList();
+
+            ViewBag.RejectedWorkerIds = rejectedWorkerIds;
+
             // -------------------------------------------------
             // Find workers whose speciality matches
             // the requested service type.
             // -------------------------------------------------
 
-            var workers =
+            var matchingSpecialities = GetMatchingSpecialities(request.ServiceType);
+
+            var allMatchingWorkers =
                 await _context.Workers
                     .Include(w => w.ApplicationUser)
                     .Include(w => w.Specialities)
@@ -146,13 +295,17 @@ namespace VehicleServiceManagement.Controllers
                         w.Status == "Accepted" &&
                         w.IsAvailable &&
                         w.Specialities.Any(
-                            s => s.Speciality ==
-                                 request.ServiceType))
+                            s => matchingSpecialities.Contains(s.Speciality)))
                     .OrderBy(w =>
                         w.ApplicationUser!.Name)
                     .ToListAsync();
 
-            ViewBag.Workers = workers;
+            // If there are other matching workers available, exclude the rejected worker(s)
+            var eligibleWorkers = allMatchingWorkers
+                .Where(w => !rejectedWorkerIds.Contains(w.WorkerId))
+                .ToList();
+
+            ViewBag.Workers = eligibleWorkers.Any() ? eligibleWorkers : allMatchingWorkers;
 
             return View(request);
         }
@@ -190,6 +343,8 @@ namespace VehicleServiceManagement.Controllers
             // 4. Has matching speciality
             // -------------------------------------------------
 
+            var matchingSpecialities = GetMatchingSpecialities(request.ServiceType);
+
             var worker =
                 await _context.Workers
                     .Include(w => w.Specialities)
@@ -199,8 +354,7 @@ namespace VehicleServiceManagement.Controllers
                             w.Status == "Accepted" &&
                             w.IsAvailable &&
                             w.Specialities.Any(
-                                s => s.Speciality ==
-                                     request.ServiceType));
+                                s => matchingSpecialities.Contains(s.Speciality)));
 
             if (worker == null)
             {
@@ -222,7 +376,8 @@ namespace VehicleServiceManagement.Controllers
                             a.ServiceRequestId ==
                                 serviceRequestId &&
                             (a.Status == "Pending" ||
-                             a.Status == "Accepted"));
+                             a.Status == "Accepted" ||
+                             a.Status == "In Progress"));
 
             if (existingAssignment)
             {
@@ -234,7 +389,7 @@ namespace VehicleServiceManagement.Controllers
             }
 
             // -------------------------------------------------
-            // Create assignment
+            // Create assignment (Status: Pending)
             // -------------------------------------------------
 
             var assignment =
@@ -258,14 +413,16 @@ namespace VehicleServiceManagement.Controllers
             _context.ServiceAssignments.Add(
                 assignment);
 
-            // IMPORTANT:
-            // Request remains Pending until worker accepts.
-            request.Status = "Pending";
+            // Update service request status to Assigned
+            request.Status = "Assigned";
+
+            // Note: Per user requirement, worker remains available until they accept the request.
+            // worker.IsAvailable is NOT set to false here.
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Task assigned successfully. The worker must accept or reject the task.";
+                "Task assigned successfully. The worker has received the work request and must accept or reject it.";
 
             return RedirectToAction(
                 nameof(ServiceRequests));
@@ -284,7 +441,7 @@ namespace VehicleServiceManagement.Controllers
                 await _context.ServiceAssignments
                     .Include(a => a.ServiceRequest)
                     .Include(a => a.Worker)
-                        .ThenInclude(w => w.ApplicationUser)
+                        .ThenInclude(w => w!.ApplicationUser)
                     .FirstOrDefaultAsync(
                         a =>
                             a.ServiceAssignmentId == id &&
@@ -315,6 +472,8 @@ namespace VehicleServiceManagement.Controllers
             // with the required speciality.
             // -------------------------------------------------
 
+            var matchingSpecialities = GetMatchingSpecialities(serviceType);
+
             var workers =
                 await _context.Workers
                     .Include(w => w.ApplicationUser)
@@ -324,7 +483,7 @@ namespace VehicleServiceManagement.Controllers
                         w.IsAvailable &&
                         w.WorkerId != rejectedWorkerId &&
                         w.Specialities.Any(
-                            s => s.Speciality == serviceType))
+                            s => matchingSpecialities.Contains(s.Speciality)))
                     .OrderBy(w =>
                         w.ApplicationUser!.Name)
                     .ToListAsync();
@@ -373,6 +532,8 @@ namespace VehicleServiceManagement.Controllers
             // Find another matching worker
             // -------------------------------------------------
 
+            var matchingSpecialities = GetMatchingSpecialities(request.ServiceType);
+
             var worker =
                 await _context.Workers
                     .Include(w => w.Specialities)
@@ -384,8 +545,7 @@ namespace VehicleServiceManagement.Controllers
                             w.WorkerId !=
                                 oldAssignment.WorkerId &&
                             w.Specialities.Any(
-                                s => s.Speciality ==
-                                     request.ServiceType));
+                                s => matchingSpecialities.Contains(s.Speciality)));
 
             if (worker == null)
             {
@@ -421,14 +581,14 @@ namespace VehicleServiceManagement.Controllers
             _context.ServiceAssignments.Add(
                 newAssignment);
 
-            // Service request is again waiting for
-            // the new worker's response.
-            request.Status = "Pending";
+            // Update request status to Assigned
+            request.Status = "Assigned";
 
+            // Worker remains available until they accept
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Task has been reassigned to another suitable worker.";
+                "Task has been reassigned. Waiting for the worker to accept or reject the task.";
 
             return RedirectToAction(
                 nameof(ServiceRequests));
@@ -482,7 +642,7 @@ namespace VehicleServiceManagement.Controllers
                 await _context.Vehicles
                     .Include(v => v.Customer)
                         .ThenInclude(c =>
-                            c.ApplicationUser)
+                            c!.ApplicationUser)
                     .ToListAsync();
 
             return View(vehicles);
@@ -499,10 +659,10 @@ namespace VehicleServiceManagement.Controllers
             var assignments =
                 await _context.ServiceAssignments
                     .Include(a => a.ServiceRequest)
-                        .ThenInclude(s => s.Vehicle)
+                        .ThenInclude(s => s!.Vehicle)
                     .Include(a => a.Worker)
                         .ThenInclude(w =>
-                            w.ApplicationUser)
+                            w!.ApplicationUser)
                     .OrderByDescending(
                         a => a.AssignedDate)
                     .ToListAsync();

@@ -1,36 +1,94 @@
-﻿@model IEnumerable<VehicleServiceManagement.Models.ServiceAssignment>
+@model IEnumerable<VehicleServiceManagement.Models.ServiceAssignment>
 
 @{
     ViewData["Title"] = "My Work";
+    var isAvailable = (bool)(ViewBag.IsAvailable ?? false);
 }
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">
-        My Work
-    </h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Work</h2>
+        <a asp-action="Dashboard" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="card shadow-sm">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
+    <!-- AVAILABILITY STATUS CARD -->
+    <div class="card shadow-sm mb-4 border-0 @(isAvailable ? "border-start border-success border-4" : "border-start border-danger border-4")">
+        <div class="card-body d-flex flex-wrap justify-content-between align-items-center py-3">
+            <div class="mb-2 mb-md-0">
+                <span class="fw-bold">My Availability Status:</span>
+                @if (isAvailable)
+                {
+                    <span class="badge bg-success ms-2 fs-6">Available for Work</span>
+                    <span class="text-muted ms-2 small">(Manager can assign new services to you)</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger ms-2 fs-6">Unavailable</span>
+                    <span class="text-muted ms-2 small">(Mark yourself Available when ready to receive new services)</span>
+                }
+            </div>
+            <div>
+                @if (isAvailable)
+                {
+                    <form asp-action="UpdateAvailability" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="isAvailable" value="false" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            Mark Unavailable
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="UpdateAvailability" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="isAvailable" value="true" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Mark Available for Work
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ASSIGNED WORK TABLE -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Assigned Services</h5>
+        </div>
         <div class="card-body">
 
             @if (Model.Any())
             {
                 <div class="table-responsive">
 
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover align-middle">
 
-                        <thead class="table-dark">
+                        <thead class="table-light">
 
                             <tr>
                                 <th>Service</th>
+                                <th>Vehicle / Customer</th>
                                 <th>Description</th>
                                 <th>Assigned Date</th>
                                 <th>Status</th>
@@ -46,20 +104,32 @@
                                 <tr>
 
                                     <td>
-                                        @(item.ServiceRequest
-                                            ?.ServiceType
-                                            ?? "Service")
+                                        <strong>
+                                            @(item.ServiceRequest?.ServiceType ?? "Service")
+                                        </strong>
                                     </td>
 
                                     <td>
-                                        @(item.ServiceRequest
-                                            ?.Description
-                                            ?? "-")
+                                        <div>
+                                            @(item.ServiceRequest?.Vehicle?.VehicleNumber ?? "-")
+                                        </div>
+                                        @if (item.ServiceRequest?.Vehicle?.Customer != null || item.ServiceRequest?.Customer != null)
+                                        {
+                                            var cust = item.ServiceRequest?.Vehicle?.Customer ?? item.ServiceRequest?.Customer;
+                                            var custName = cust?.Name ?? cust?.ApplicationUser?.Name ?? item.ServiceRequest?.CustomerName;
+                                            if (!string.IsNullOrWhiteSpace(custName))
+                                            {
+                                                <small class="text-muted">Customer: @custName</small>
+                                            }
+                                        }
                                     </td>
 
                                     <td>
-                                        @item.AssignedDate
-                                        .ToString("dd-MM-yyyy")
+                                        @(item.ServiceRequest?.Description ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @item.AssignedDate.ToString("dd-MM-yyyy HH:mm")
                                     </td>
 
                                     <td>
@@ -70,7 +140,7 @@
                                                 Pending
                                             </span>
                                         }
-                                        else if (item.Status == "In Progress")
+                                        else if (item.Status == "Accepted" || item.Status == "In Progress")
                                         {
                                             <span class="badge bg-primary">
                                                 In Progress
@@ -80,6 +150,12 @@
                                         {
                                             <span class="badge bg-success">
                                                 Completed
+                                            </span>
+                                        }
+                                        else if (item.Status == "Rejected")
+                                        {
+                                            <span class="badge bg-danger">
+                                                Rejected
                                             </span>
                                         }
                                         else
@@ -95,44 +171,44 @@
 
                                         @if (item.Status == "Pending")
                                         {
-                                            <form asp-action="StartService"
-                                                  method="post">
+                                            <div class="d-flex gap-1">
+                                                <form asp-action="StartService" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="assignmentId" value="@item.ServiceAssignmentId" />
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        Start Work
+                                                    </button>
+                                                </form>
 
-                                                @Html.AntiForgeryToken()
-
-                                                <input type="hidden"
-                                                       name="assignmentId"
-                                                       value="@item.ServiceAssignmentId" />
-
-                                                <button type="submit"
-                                                        class="btn btn-primary btn-sm">
-                                                    Start Work
-                                                </button>
-
-                                            </form>
+                                                <form asp-action="RejectTask" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="assignmentId" value="@item.ServiceAssignmentId" />
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to reject this task?');">
+                                                        Reject
+                                                    </button>
+                                                </form>
+                                            </div>
                                         }
-                                        else if (item.Status == "In Progress")
+                                        else if (item.Status == "Accepted" || item.Status == "In Progress")
                                         {
-                                            <form asp-action="CompleteService"
-                                                  method="post">
-
+                                            <form asp-action="CompleteService" method="post" class="d-inline">
                                                 @Html.AntiForgeryToken()
-
-                                                <input type="hidden"
-                                                       name="assignmentId"
-                                                       value="@item.ServiceAssignmentId" />
-
-                                                <button type="submit"
-                                                        class="btn btn-success btn-sm">
-                                                    Complete
+                                                <input type="hidden" name="assignmentId" value="@item.ServiceAssignmentId" />
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    Complete Service
                                                 </button>
-
                                             </form>
                                         }
-                                        else
+                                        else if (item.Status == "Completed")
+                                        {
+                                            <span class="text-success fw-bold">
+                                                Finished
+                                            </span>
+                                        }
+                                        else if (item.Status == "Rejected")
                                         {
                                             <span class="text-muted">
-                                                Completed
+                                                Rejected
                                             </span>
                                         }
 
@@ -149,7 +225,7 @@
             }
             else
             {
-                <div class="alert alert-info">
+                <div class="alert alert-info mb-0">
                     No work has been assigned to you yet.
                 </div>
             }

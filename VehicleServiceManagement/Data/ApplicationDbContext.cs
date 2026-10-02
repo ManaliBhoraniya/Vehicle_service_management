@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VehicleServiceManagement.Models;
@@ -109,7 +109,7 @@ namespace VehicleServiceManagement.Data
 
             builder.Entity<ServiceAssignment>()
                 .HasOne(sa => sa.ServiceRequest)
-                .WithMany()
+                .WithMany(sr => sr.ServiceAssignments)
                 .HasForeignKey(sa => sa.ServiceRequestId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<VehicleServiceManagement.Models.ServiceRequest>
+@model IEnumerable<VehicleServiceManagement.Models.ServiceRequest>
 
 @{
     ViewData["Title"] = "Service Requests";
@@ -92,6 +92,21 @@ else
                                class="btn btn-sm btn-info">
                                 Details
                             </a>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <form asp-action="Delete"
+                                      asp-route-id="@request.Id"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Are you sure you want to delete this request?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </button>
+                                </form>
+                            }
 
                             @if (User.IsInRole("Customer") &&
                                  request.Status != "Completed" &&

@@ -1,13 +1,65 @@
-﻿@model IEnumerable<VehicleServiceManagement.Models.ServiceRequest>
+@model IEnumerable<VehicleServiceManagement.Models.ServiceRequest>
 
 @{
     ViewData["Title"] = "Manage Service Requests";
 }
 
+@functions {
+    string GetRequestCategory(VehicleServiceManagement.Models.ServiceRequest req)
+    {
+        if (req.Status == "Completed")
+            return "Completed";
+
+        if (req.Status == "Cancelled")
+            return "Cancelled";
+
+        if (req.Status == "Rejected")
+            return "Worker Rejected";
+
+        var activeAssignment = req.ServiceAssignments?
+            .OrderByDescending(a => a.AssignedDate)
+            .FirstOrDefault(a => a.Status == "Accepted" || a.Status == "Pending" || a.Status == "In Progress" || a.Status == "Rejected");
+
+        if (req.Status == "Assigned")
+        {
+            if (activeAssignment?.Status == "Pending")
+                return "Waiting for Worker Response";
+
+            if (activeAssignment?.Status == "Rejected")
+                return "Worker Rejected";
+
+            return "In Progress";
+        }
+
+        if (req.Status == "In Progress")
+            return "In Progress";
+
+        if (req.Status == "Pending")
+            return "Pending";
+
+        return req.Status ?? "Pending";
+    }
+}
+
+@{
+    var allRequests = (Model ?? Enumerable.Empty<VehicleServiceManagement.Models.ServiceRequest>()).ToList();
+    var pendingRequests = allRequests.Where(r => GetRequestCategory(r) == "Pending").ToList();
+    var waitingRequests = allRequests.Where(r => GetRequestCategory(r) == "Waiting for Worker Response").ToList();
+    var inProgressRequests = allRequests.Where(r => GetRequestCategory(r) == "In Progress").ToList();
+    var rejectedRequests = allRequests.Where(r => GetRequestCategory(r) == "Worker Rejected").ToList();
+    var completedRequests = allRequests.Where(r => GetRequestCategory(r) == "Completed").ToList();
+}
+
 <div class="container mt-4">
 
+    <div class="mb-3">
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back();">
+            &larr; Back
+        </button>
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Manage Service Requests</h2>
+        <h2 class="mb-0">Manage Service Requests</h2>
 
         <a asp-action="Index"
            class="btn btn-secondary">
@@ -17,154 +69,109 @@
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">
-            No service requests found.
+    <!-- STATUS TABS -->
+    <ul class="nav nav-pills mb-4 flex-wrap gap-2" id="requestStatusTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="all-tab" data-bs-toggle="pill" data-bs-target="#tab-all" type="button" role="tab" aria-controls="tab-all" aria-selected="true">
+                All Requests
+                <span class="badge bg-secondary ms-1">@allRequests.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pending-tab" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="tab-pending" aria-selected="false">
+                Pending
+                <span class="badge bg-warning text-dark ms-1">@pendingRequests.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="waiting-tab" data-bs-toggle="pill" data-bs-target="#tab-waiting" type="button" role="tab" aria-controls="tab-waiting" aria-selected="false">
+                Waiting for Worker Response
+                <span class="badge bg-info text-dark ms-1">@waitingRequests.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="inprogress-tab" data-bs-toggle="pill" data-bs-target="#tab-inprogress" type="button" role="tab" aria-controls="tab-inprogress" aria-selected="false">
+                In Progress
+                <span class="badge bg-primary ms-1">@inProgressRequests.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold text-danger" id="rejected-tab" data-bs-toggle="pill" data-bs-target="#tab-rejected" type="button" role="tab" aria-controls="tab-rejected" aria-selected="false">
+                Worker Rejected
+                <span class="badge bg-danger ms-1">@rejectedRequests.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="completed-tab" data-bs-toggle="pill" data-bs-target="#tab-completed" type="button" role="tab" aria-controls="tab-completed" aria-selected="false">
+                Completed
+                <span class="badge bg-success ms-1">@completedRequests.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- TAB CONTENTS -->
+    <div class="tab-content" id="requestStatusTabsContent">
+        <div class="tab-pane fade show active" id="tab-all" role="tabpanel" aria-labelledby="all-tab">
+            @await Html.PartialAsync("_ServiceRequestTable", allRequests)
         </div>
-    }
-    else
-    {
-        <div class="table-responsive">
 
-            <table class="table table-bordered table-hover align-middle">
-
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Vehicle</th>
-                        <th>Service Required</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Worker Task</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    @foreach (var request in Model)
-                    {
-                        <tr>
-
-                            <td>
-                                @request.ServiceRequestId
-                            </td>
-
-                            <td>
-                                @request.Vehicle?.Customer?.Name
-                            </td>
-
-                            <td>
-                                @request.Vehicle?.VehicleNumber
-                            </td>
-
-                            <td>
-                                <strong>
-                                    @request.ServiceType
-                                </strong>
-
-                                @if (!string.IsNullOrWhiteSpace(request.Description))
-                                {
-                                    <br />
-
-                                    <small class="text-muted">
-                                        @request.Description
-                                    </small>
-                                }
-                            </td>
-
-                            <td>
-                                @request.RequestDate.ToString("dd-MM-yyyy HH:mm")
-                            </td>
-
-                            <td>
-
-                                @if (request.Status == "Pending")
-                                {
-                                    <span class="badge bg-warning text-dark">
-                                        Pending
-                                    </span>
-                                }
-                                else if (request.Status == "Assigned")
-                                {
-                                    <span class="badge bg-primary">
-                                        Assigned
-                                    </span>
-                                }
-                                else if (request.Status == "Completed")
-                                {
-                                    <span class="badge bg-success">
-                                        Completed
-                                    </span>
-                                }
-                                else if (request.Status == "Cancelled")
-                                {
-                                    <span class="badge bg-danger">
-                                        Cancelled
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        @request.Status
-                                    </span>
-                                }
-
-                            </td>
-
-                            <td>
-
-                                @if (request.Status == "Pending")
-                                {
-                                    <a asp-controller="ServiceManager"
-                                       asp-action="AssignWorker"
-                                       asp-route-id="@request.ServiceRequestId"
-                                       class="btn btn-success btn-sm">
-                                        Assign Worker
-                                    </a>
-                                }
-                                else if (request.Status == "Assigned")
-                                {
-                                    <span class="badge bg-primary">
-                                        Worker Accepted
-                                    </span>
-                                }
-                                else if (request.Status == "Completed")
-                                {
-                                    <span class="badge bg-success">
-                                        Task Completed
-                                    </span>
-                                }
-                                else if (request.Status == "Cancelled")
-                                {
-                                    <span class="text-muted">
-                                        Cancelled
-                                    </span>
-                                }
-
-                            </td>
-
-                        </tr>
-                    }
-
-                </tbody>
-
-            </table>
-
+        <div class="tab-pane fade" id="tab-pending" role="tabpanel" aria-labelledby="pending-tab">
+            @await Html.PartialAsync("_ServiceRequestTable", pendingRequests)
         </div>
-    }
+
+        <div class="tab-pane fade" id="tab-waiting" role="tabpanel" aria-labelledby="waiting-tab">
+            @await Html.PartialAsync("_ServiceRequestTable", waitingRequests)
+        </div>
+
+        <div class="tab-pane fade" id="tab-inprogress" role="tabpanel" aria-labelledby="inprogress-tab">
+            @await Html.PartialAsync("_ServiceRequestTable", inProgressRequests)
+        </div>
+
+        <div class="tab-pane fade" id="tab-rejected" role="tabpanel" aria-labelledby="rejected-tab">
+            @await Html.PartialAsync("_ServiceRequestTable", rejectedRequests)
+        </div>
+
+        <div class="tab-pane fade" id="tab-completed" role="tabpanel" aria-labelledby="completed-tab">
+            @await Html.PartialAsync("_ServiceRequestTable", completedRequests)
+        </div>
+    </div>
 
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const storageKey = 'serviceRequests_activeTab';
+            const tabButtons = document.querySelectorAll('#requestStatusTabs button[data-bs-toggle="pill"]');
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener('shown.bs.tab', function (e) {
+                    localStorage.setItem(storageKey, e.target.getAttribute('data-bs-target'));
+                });
+            });
+
+            const savedTab = localStorage.getItem(storageKey);
+            if (savedTab) {
+                const targetBtn = document.querySelector(`#requestStatusTabs button[data-bs-target="${savedTab}"]`);
+                if (targetBtn) {
+                    const tabInstance = new bootstrap.Tab(targetBtn);
+                    tabInstance.show();
+                }
+            }
+        });
+    </script>
+}

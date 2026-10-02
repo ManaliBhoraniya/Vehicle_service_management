@@ -1,4 +1,4 @@
-﻿@model VehicleServiceManagement.Models.Worker
+@model VehicleServiceManagement.Models.Worker
 
 @{
     ViewData["Title"] = "Worker Dashboard";
@@ -46,7 +46,7 @@
         else
         {
             <span class="badge bg-danger fs-6">
-                ● Not Available
+                ● Unavailable
             </span>
         }
 
@@ -354,6 +354,10 @@
                            name="isAvailable"
                            value="false" />
 
+                    <input type="hidden"
+                           name="returnUrl"
+                           value="@Context.Request.Path" />
+
                     <button class="btn btn-danger"
                             type="submit">
                         Mark Unavailable
@@ -375,6 +379,10 @@
                     <input type="hidden"
                            name="isAvailable"
                            value="true" />
+
+                    <input type="hidden"
+                           name="returnUrl"
+                           value="@Context.Request.Path" />
 
                     <button class="btn btn-success"
                             type="submit">
