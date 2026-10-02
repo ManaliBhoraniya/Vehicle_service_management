@@ -11,8 +11,13 @@
             <div class="card shadow-sm">
 
                 <div class="card-header text-center">
-                    <h2>Create Account</h2>
+
+                    <h2>
+                        Create Account
+                    </h2>
+
                 </div>
+
 
                 <div class="card-body">
 
@@ -23,11 +28,18 @@
 
                         @Html.AntiForgeryToken()
 
+
+                        <!-- VALIDATION -->
+
                         <div asp-validation-summary="All"
                              class="text-danger mb-3">
                         </div>
 
+
+                        <!-- ================================================= -->
                         <!-- NAME -->
+                        <!-- ================================================= -->
+
                         <div class="mb-3">
 
                             <label class="form-label">
@@ -42,7 +54,11 @@
 
                         </div>
 
+
+                        <!-- ================================================= -->
                         <!-- EMAIL -->
+                        <!-- ================================================= -->
+
                         <div class="mb-3">
 
                             <label class="form-label">
@@ -57,7 +73,11 @@
 
                         </div>
 
+
+                        <!-- ================================================= -->
                         <!-- ROLE -->
+                        <!-- ================================================= -->
+
                         <div class="mb-3">
 
                             <label class="form-label">
@@ -81,19 +101,27 @@
                                     Worker
                                 </option>
 
-                                <option value="Manager">
-                                    Manager
-                                </option>
-
                             </select>
+
+                            <small class="text-muted">
+                                Manager accounts are created by the system.
+                            </small>
 
                         </div>
 
+
+                        <!-- ================================================= -->
                         <!-- WORKER ONLY FIELDS -->
+                        <!-- ================================================= -->
+
                         <div id="workerFields"
                              style="display:none;">
 
+
+                            <!-- ================================================= -->
                             <!-- SPECIALITIES -->
+                            <!-- ================================================= -->
+
                             <div class="mb-3">
 
                                 <label class="form-label fw-bold">
@@ -105,10 +133,13 @@
                                     qualified to perform.
                                 </p>
 
+
                                 <div id="specialityContainer"
                                      class="border rounded p-3">
 
+
                                     <!-- ENGINE REPAIR -->
+
                                     <div class="form-check mb-2">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -119,12 +150,16 @@
 
                                         <label class="form-check-label"
                                                for="engineRepair">
+
                                             Engine Repair
+
                                         </label>
 
                                     </div>
 
+
                                     <!-- BRAKE REPAIR -->
+
                                     <div class="form-check mb-2">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -135,12 +170,16 @@
 
                                         <label class="form-check-label"
                                                for="brakeRepair">
+
                                             Brake Repair
+
                                         </label>
 
                                     </div>
 
+
                                     <!-- OIL CHANGE -->
+
                                     <div class="form-check mb-2">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -151,12 +190,16 @@
 
                                         <label class="form-check-label"
                                                for="oilChange">
+
                                             Oil Change
+
                                         </label>
 
                                     </div>
 
+
                                     <!-- AC REPAIR -->
+
                                     <div class="form-check mb-2">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -167,12 +210,16 @@
 
                                         <label class="form-check-label"
                                                for="acRepair">
+
                                             AC Repair
+
                                         </label>
 
                                     </div>
 
+
                                     <!-- ELECTRICAL REPAIR -->
+
                                     <div class="form-check mb-2">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -183,12 +230,16 @@
 
                                         <label class="form-check-label"
                                                for="electricalRepair">
+
                                             Electrical Repair
+
                                         </label>
 
                                     </div>
 
+
                                     <!-- TIRE & WHEEL SERVICE -->
+
                                     <div class="form-check mb-2">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -199,12 +250,16 @@
 
                                         <label class="form-check-label"
                                                for="tireWheelService">
+
                                             Tire &amp; Wheel Service
+
                                         </label>
 
                                     </div>
 
+
                                     <!-- TRANSMISSION REPAIR -->
+
                                     <div class="form-check mb-2">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -215,12 +270,16 @@
 
                                         <label class="form-check-label"
                                                for="transmissionRepair">
+
                                             Transmission Repair
+
                                         </label>
 
                                     </div>
 
+
                                     <!-- GENERAL SERVICE -->
+
                                     <div class="form-check">
 
                                         <input class="form-check-input speciality-checkbox"
@@ -231,22 +290,31 @@
 
                                         <label class="form-check-label"
                                                for="generalService">
+
                                             General Service
+
                                         </label>
 
                                     </div>
 
                                 </div>
 
+
                                 <div id="specialityError"
                                      class="text-danger mt-2"
                                      style="display:none;">
+
                                     Please select at least one speciality.
+
                                 </div>
 
                             </div>
 
+
+                            <!-- ================================================= -->
                             <!-- RESUME -->
+                            <!-- ================================================= -->
+
                             <div class="mb-3">
 
                                 <label class="form-label">
@@ -267,7 +335,11 @@
 
                         </div>
 
+
+                        <!-- ================================================= -->
                         <!-- PASSWORD -->
+                        <!-- ================================================= -->
+
                         <div class="mb-3">
 
                             <label class="form-label">
@@ -281,13 +353,19 @@
                                    required />
 
                             <small class="text-muted">
+
                                 Minimum 6 characters with uppercase,
                                 lowercase, number and special character.
+
                             </small>
 
                         </div>
 
+
+                        <!-- ================================================= -->
                         <!-- CONFIRM PASSWORD -->
+                        <!-- ================================================= -->
+
                         <div class="mb-3">
 
                             <label class="form-label">
@@ -302,13 +380,24 @@
 
                         </div>
 
+
+                        <!-- ================================================= -->
                         <!-- REGISTER -->
+                        <!-- ================================================= -->
+
                         <button type="submit"
                                 class="btn btn-success w-100">
+
                             Register
+
                         </button>
 
                     </form>
+
+
+                    <!-- ================================================= -->
+                    <!-- LOGIN -->
+                    <!-- ================================================= -->
 
                     <div class="text-center mt-4">
 
@@ -316,7 +405,9 @@
 
                         <a asp-controller="Account"
                            asp-action="Login">
+
                             Login
+
                         </a>
 
                     </div>
@@ -331,9 +422,11 @@
 
 </div>
 
+
 @section Scripts {
 
     <partial name="_ValidationScriptsPartial" />
+
 
     <script>
 
@@ -342,95 +435,142 @@
             const role =
                 document.getElementById("role").value;
 
+
             const workerFields =
-                document.getElementById("workerFields");
+                document.getElementById(
+                    "workerFields"
+                );
+
 
             const resume =
-                document.getElementById("resume");
+                document.getElementById(
+                    "resume"
+                );
+
 
             const specialityCheckboxes =
                 document.querySelectorAll(
                     ".speciality-checkbox"
                 );
 
+
             if (role === "Worker") {
 
                 // Show worker fields
-                workerFields.style.display = "block";
+
+                workerFields.style.display =
+                    "block";
+
 
                 // Resume required
-                resume.required = true;
+
+                resume.required =
+                    true;
 
             }
             else {
 
                 // Hide worker fields
-                workerFields.style.display = "none";
+
+                workerFields.style.display =
+                    "none";
+
 
                 // Resume not required
-                resume.required = false;
+
+                resume.required =
+                    false;
+
 
                 // Clear resume
-                resume.value = "";
+
+                resume.value =
+                    "";
+
 
                 // Clear speciality selections
+
                 specialityCheckboxes.forEach(
                     checkbox => {
-                        checkbox.checked = false;
+
+                        checkbox.checked =
+                            false;
+
                     }
                 );
 
+
                 document.getElementById(
                     "specialityError"
-                ).style.display = "none";
+                ).style.display =
+                    "none";
             }
         }
 
 
-        // Validate speciality selection
-        document.querySelector("form").addEventListener(
-            "submit",
-            function (event) {
+        // =====================================================
+        // VALIDATE SPECIALITY
+        // =====================================================
 
-                const role =
-                    document.getElementById("role").value;
+        document.querySelector("form")
+            .addEventListener(
+                "submit",
+                function (event) {
 
-                if (role !== "Worker") {
-                    return;
+                    const role =
+                        document.getElementById(
+                            "role"
+                        ).value;
+
+
+                    if (role !== "Worker") {
+
+                        return;
+                    }
+
+
+                    const checkboxes =
+                        document.querySelectorAll(
+                            ".speciality-checkbox:checked"
+                        );
+
+
+                    const error =
+                        document.getElementById(
+                            "specialityError"
+                        );
+
+
+                    if (checkboxes.length === 0) {
+
+                        event.preventDefault();
+
+
+                        error.style.display =
+                            "block";
+
+
+                        error.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+
+                    }
+                    else {
+
+                        error.style.display =
+                            "none";
+
+                    }
+
                 }
-
-                const checkboxes =
-                    document.querySelectorAll(
-                        ".speciality-checkbox:checked"
-                    );
-
-                const error =
-                    document.getElementById(
-                        "specialityError"
-                    );
-
-                if (checkboxes.length === 0) {
-
-                    event.preventDefault();
-
-                    error.style.display = "block";
-
-                    error.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center"
-                    });
-
-                }
-                else {
-
-                    error.style.display = "none";
-
-                }
-            }
-        );
+            );
 
 
-        // Update fields when role changes
+        // =====================================================
+        // ROLE CHANGE
+        // =====================================================
+
         document.getElementById("role")
             .addEventListener(
                 "change",
@@ -438,7 +578,10 @@
             );
 
 
-        // Run once when page loads
+        // =====================================================
+        // INITIAL PAGE LOAD
+        // =====================================================
+
         updateWorkerFields();
 
     </script>

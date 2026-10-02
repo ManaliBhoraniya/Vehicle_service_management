@@ -70,16 +70,21 @@ namespace VehicleServiceManagement.Controllers
             // CHECK WORKER JOB REQUEST STATUS
             // =================================================
 
-            if (await _userManager.IsInRoleAsync(user, "Worker"))
+            if (await _userManager.IsInRoleAsync(
+                    user,
+                    "Worker"))
             {
                 var worker =
                     await _context.Workers
                         .FirstOrDefaultAsync(
-                            w => w.ApplicationUserId == user.Id);
+                            w =>
+                                w.ApplicationUserId ==
+                                user.Id);
 
                 if (worker != null)
                 {
                     // Worker is waiting for manager approval
+
                     if (worker.Status == "Pending")
                     {
                         ModelState.AddModelError(
@@ -90,6 +95,7 @@ namespace VehicleServiceManagement.Controllers
                     }
 
                     // Worker was rejected
+
                     if (worker.Status == "Rejected")
                     {
                         ModelState.AddModelError(
@@ -100,6 +106,7 @@ namespace VehicleServiceManagement.Controllers
                     }
 
                     // Worker must be accepted
+
                     if (worker.Status != "Accepted")
                     {
                         ModelState.AddModelError(
@@ -136,8 +143,8 @@ namespace VehicleServiceManagement.Controllers
             // =================================================
 
             if (await _userManager.IsInRoleAsync(
-                user,
-                "Manager"))
+                    user,
+                    "Manager"))
             {
                 return RedirectToAction(
                     "Index",
@@ -149,8 +156,8 @@ namespace VehicleServiceManagement.Controllers
             // =================================================
 
             if (await _userManager.IsInRoleAsync(
-                user,
-                "Admin"))
+                    user,
+                    "Admin"))
             {
                 return RedirectToAction(
                     "Index",
@@ -162,8 +169,8 @@ namespace VehicleServiceManagement.Controllers
             // =================================================
 
             if (await _userManager.IsInRoleAsync(
-                user,
-                "Worker"))
+                    user,
+                    "Worker"))
             {
                 return RedirectToAction(
                     "Dashboard",
@@ -175,11 +182,12 @@ namespace VehicleServiceManagement.Controllers
             // =================================================
 
             if (await _userManager.IsInRoleAsync(
-                user,
-                "Customer"))
+                    user,
+                    "Customer"))
             {
+                // Customer goes to Dashboard after login
                 return RedirectToAction(
-                    "Index",
+                    "Dashboard",
                     "Customer");
             }
 
@@ -250,14 +258,17 @@ namespace VehicleServiceManagement.Controllers
             // =================================================
             // ALLOWED REGISTRATION ROLES
             // =================================================
+            //
+            // Manager is NOT allowed to register.
+            // Only Customer and Worker can register.
+            // =================================================
 
             if (role != "Customer" &&
-                role != "Worker" &&
-                role != "Manager")
+                role != "Worker")
             {
                 ModelState.AddModelError(
                     "Role",
-                    "Invalid registration role.");
+                    "Only Customer and Worker accounts can be registered.");
 
                 return View();
             }
@@ -269,6 +280,7 @@ namespace VehicleServiceManagement.Controllers
             if (role == "Worker")
             {
                 // At least one speciality is required
+
                 if (specialities == null ||
                     specialities.Count == 0)
                 {
@@ -280,6 +292,7 @@ namespace VehicleServiceManagement.Controllers
                 }
 
                 // Resume is required
+
                 if (resume == null ||
                     resume.Length == 0)
                 {
@@ -291,7 +304,9 @@ namespace VehicleServiceManagement.Controllers
                 }
 
                 // Maximum 5 MB
-                if (resume.Length > 5 * 1024 * 1024)
+
+                if (resume.Length >
+                    5 * 1024 * 1024)
                 {
                     ModelState.AddModelError(
                         "Resume",
@@ -301,14 +316,22 @@ namespace VehicleServiceManagement.Controllers
                 }
 
                 // Allowed file extensions
+
                 var extension =
-                    Path.GetExtension(resume.FileName)
+                    Path.GetExtension(
+                        resume.FileName)
                         .ToLowerInvariant();
 
                 var allowedExtensions =
-                    new[] { ".pdf", ".doc", ".docx" };
+                    new[]
+                    {
+                        ".pdf",
+                        ".doc",
+                        ".docx"
+                    };
 
-                if (!allowedExtensions.Contains(extension))
+                if (!allowedExtensions.Contains(
+                        extension))
                 {
                     ModelState.AddModelError(
                         "Resume",
@@ -323,7 +346,8 @@ namespace VehicleServiceManagement.Controllers
             // =================================================
 
             var existingUser =
-                await _userManager.FindByEmailAsync(email);
+                await _userManager.FindByEmailAsync(
+                    email);
 
             if (existingUser != null)
             {
@@ -358,12 +382,13 @@ namespace VehicleServiceManagement.Controllers
             // CREATE IDENTITY USER
             // =================================================
 
-            var user = new ApplicationUser
-            {
-                UserName = email,
-                Email = email,
-                Name = name
-            };
+            var user =
+                new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    Name = name
+                };
 
             var result =
                 await _userManager.CreateAsync(
@@ -400,7 +425,8 @@ namespace VehicleServiceManagement.Controllers
                         error.Description);
                 }
 
-                await _userManager.DeleteAsync(user);
+                await _userManager.DeleteAsync(
+                    user);
 
                 return View();
             }
@@ -422,9 +448,11 @@ namespace VehicleServiceManagement.Controllers
                         "uploads",
                         "resumes");
 
-                if (!Directory.Exists(uploadsFolder))
+                if (!Directory.Exists(
+                        uploadsFolder))
                 {
-                    Directory.CreateDirectory(uploadsFolder);
+                    Directory.CreateDirectory(
+                        uploadsFolder);
                 }
 
                 // ---------------------------------------------
@@ -432,7 +460,8 @@ namespace VehicleServiceManagement.Controllers
                 // ---------------------------------------------
 
                 var extension =
-                    Path.GetExtension(resume!.FileName)
+                    Path.GetExtension(
+                        resume!.FileName)
                         .ToLowerInvariant();
 
                 // ---------------------------------------------
@@ -440,7 +469,8 @@ namespace VehicleServiceManagement.Controllers
                 // ---------------------------------------------
 
                 var uniqueFileName =
-                    Guid.NewGuid().ToString() + extension;
+                    Guid.NewGuid().ToString() +
+                    extension;
 
                 var filePath =
                     Path.Combine(
@@ -456,32 +486,39 @@ namespace VehicleServiceManagement.Controllers
                            filePath,
                            FileMode.Create))
                 {
-                    await resume.CopyToAsync(stream);
+                    await resume.CopyToAsync(
+                        stream);
                 }
 
                 // ---------------------------------------------
                 // CREATE WORKER
                 // ---------------------------------------------
 
-                var worker = new Worker
-                {
-                    ApplicationUserId = user.Id,
+                var worker =
+                    new Worker
+                    {
+                        ApplicationUserId =
+                            user.Id,
 
-                    IsAvailable = false,
+                        IsAvailable =
+                            false,
 
-                    ResumeFileName =
-                        resume.FileName,
+                        ResumeFileName =
+                            resume.FileName,
 
-                    ResumeFilePath =
-                        "/uploads/resumes/" +
-                        uniqueFileName,
+                        ResumeFilePath =
+                            "/uploads/resumes/" +
+                            uniqueFileName,
 
-                    Status = "Pending"
-                };
+                        Status =
+                            "Pending"
+                    };
 
-                _context.Workers.Add(worker);
+                _context.Workers.Add(
+                    worker);
 
                 // Save first so WorkerId is generated
+
                 await _context.SaveChangesAsync();
 
                 // ---------------------------------------------
@@ -490,13 +527,17 @@ namespace VehicleServiceManagement.Controllers
 
                 foreach (var speciality in specialities!)
                 {
-                    if (!string.IsNullOrWhiteSpace(speciality))
+                    if (!string.IsNullOrWhiteSpace(
+                            speciality))
                     {
                         _context.WorkerSpecialities.Add(
                             new WorkerSpeciality
                             {
-                                WorkerId = worker.WorkerId,
-                                Speciality = speciality
+                                WorkerId =
+                                    worker.WorkerId,
+
+                                Speciality =
+                                    speciality.Trim()
                             });
                     }
                 }
@@ -513,32 +554,44 @@ namespace VehicleServiceManagement.Controllers
             }
 
             // =================================================
-            // MANAGER
-            // =================================================
-
-            if (role == "Manager")
-            {
-                await _signInManager.SignInAsync(
-                    user,
-                    isPersistent: false);
-
-                return RedirectToAction(
-                    "Index",
-                    "ServiceManager");
-            }
-
-            // =================================================
             // CUSTOMER
             // =================================================
 
             if (role == "Customer")
             {
+                // ---------------------------------------------
+                // CREATE CUSTOMER PROFILE
+                // ---------------------------------------------
+
+                var customer =
+                    new Customer
+                    {
+                        ApplicationUserId =
+                            user.Id,
+
+                        Name =
+                            name
+                    };
+
+                _context.Customers.Add(
+                    customer);
+
+                await _context.SaveChangesAsync();
+
+                // ---------------------------------------------
+                // SIGN IN CUSTOMER
+                // ---------------------------------------------
+
                 await _signInManager.SignInAsync(
                     user,
                     isPersistent: false);
 
+                // ---------------------------------------------
+                // CUSTOMER DASHBOARD
+                // ---------------------------------------------
+
                 return RedirectToAction(
-                    "Index",
+                    "Dashboard",
                     "Customer");
             }
 
@@ -588,10 +641,13 @@ namespace VehicleServiceManagement.Controllers
         public async Task<IActionResult> DeleteAccount()
         {
             var user =
-                await _userManager.GetUserAsync(User);
+                await _userManager.GetUserAsync(
+                    User);
 
             if (user == null)
+            {
                 return Challenge();
+            }
 
             // ---------------------------------------------
             // REMOVE WORKER
@@ -601,18 +657,23 @@ namespace VehicleServiceManagement.Controllers
                 await _context.Workers
                     .Include(w => w.Specialities)
                     .FirstOrDefaultAsync(
-                        w => w.ApplicationUserId == user.Id);
+                        w =>
+                            w.ApplicationUserId ==
+                            user.Id);
 
             if (worker != null)
             {
                 // Remove worker specialities first
+
                 if (worker.Specialities != null)
                 {
-                    _context.WorkerSpecialities.RemoveRange(
-                        worker.Specialities);
+                    _context.WorkerSpecialities
+                        .RemoveRange(
+                            worker.Specialities);
                 }
 
-                _context.Workers.Remove(worker);
+                _context.Workers.Remove(
+                    worker);
             }
 
             // ---------------------------------------------
@@ -622,11 +683,14 @@ namespace VehicleServiceManagement.Controllers
             var customer =
                 await _context.Customers
                     .FirstOrDefaultAsync(
-                        c => c.ApplicationUserId == user.Id);
+                        c =>
+                            c.ApplicationUserId ==
+                            user.Id);
 
             if (customer != null)
             {
-                _context.Customers.Remove(customer);
+                _context.Customers.Remove(
+                    customer);
             }
 
             await _context.SaveChangesAsync();
@@ -636,7 +700,8 @@ namespace VehicleServiceManagement.Controllers
             // ---------------------------------------------
 
             var result =
-                await _userManager.DeleteAsync(user);
+                await _userManager.DeleteAsync(
+                    user);
 
             if (!result.Succeeded)
             {

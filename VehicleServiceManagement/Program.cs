@@ -39,12 +39,18 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var roleManager =
-        services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+        services.GetRequiredService<
+            RoleManager<IdentityRole<int>>>();
 
     var userManager =
-        services.GetRequiredService<UserManager<ApplicationUser>>();
+        services.GetRequiredService<
+            UserManager<ApplicationUser>>();
 
-    // Roles
+
+    // ==================================================
+    // CREATE ROLES
+    // ==================================================
+
     string[] roles =
     {
         "Customer",
@@ -56,46 +62,92 @@ using (var scope = app.Services.CreateScope())
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
-            await roleManager.CreateAsync(
-                new IdentityRole<int>(role));
+            var roleResult =
+                await roleManager.CreateAsync(
+                    new IdentityRole<int>(role));
+
+            if (!roleResult.Succeeded)
+            {
+                foreach (var error in roleResult.Errors)
+                {
+                    Console.WriteLine(
+                        $"Role creation error: {error.Description}");
+                }
+            }
         }
     }
+
 
     // ==================================================
     // DEFAULT MANAGER ACCOUNT
     // ==================================================
 
-    string managerEmail = "manager@vehicle.com";
-    string managerPassword = "Manager@123";
+    // This is the ONLY Manager account created by the system.
+    // Managers cannot register from the Register page.
+
+    string managerEmail =
+        "manager@vehicle.com";
+
+    string managerPassword =
+        "Manager@123";
+
 
     var managerUser =
-        await userManager.FindByEmailAsync(managerEmail);
+        await userManager.FindByEmailAsync(
+            managerEmail);
+
+
+    // ==================================================
+    // CREATE MANAGER IF IT DOES NOT EXIST
+    // ==================================================
 
     if (managerUser == null)
     {
         managerUser = new ApplicationUser
         {
             UserName = managerEmail,
+
             Email = managerEmail,
+
             Name = "Service Manager",
+
             EmailConfirmed = true
         };
+
 
         var createResult =
             await userManager.CreateAsync(
                 managerUser,
                 managerPassword);
 
+
         if (createResult.Succeeded)
         {
             await userManager.AddToRoleAsync(
                 managerUser,
                 "Manager");
+
+            Console.WriteLine(
+                "Default Manager account created.");
+        }
+        else
+        {
+            foreach (var error in createResult.Errors)
+            {
+                Console.WriteLine(
+                    $"Manager creation error: {error.Description}");
+            }
         }
     }
     else
     {
-        // Make sure the existing account has Manager role
+        // ==================================================
+        // EXISTING MANAGER
+        // ==================================================
+
+        // Make sure the existing account has
+        // the Manager role.
+
         if (!await userManager.IsInRoleAsync(
                 managerUser,
                 "Manager"))
@@ -103,6 +155,16 @@ using (var scope = app.Services.CreateScope())
             await userManager.AddToRoleAsync(
                 managerUser,
                 "Manager");
+        }
+
+        // Make sure Manager email is confirmed.
+
+        if (!managerUser.EmailConfirmed)
+        {
+            managerUser.EmailConfirmed = true;
+
+            await userManager.UpdateAsync(
+                managerUser);
         }
     }
 }
@@ -115,6 +177,7 @@ using (var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+
     app.UseHsts();
 }
 
