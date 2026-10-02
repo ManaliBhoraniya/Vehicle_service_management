@@ -2,166 +2,173 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="row justify-content-center">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
 
-    <div class="col-md-6">
+            <div class="card shadow-sm">
 
-        <div class="card shadow-sm mt-5">
-
-            <div class="card-header text-center">
-                <h3>Create Account</h3>
-            </div>
-
-            <div class="card-body">
-
-                <form asp-action="Register"
-                      method="post">
-
-                    @Html.AntiForgeryToken()
-
-                    <div asp-validation-summary="All"
-                         class="text-danger mb-3">
-                    </div>
-
-                    <!-- Name -->
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Name
-                        </label>
-
-                        <input type="text"
-                               name="name"
-                               class="form-control"
-                               placeholder="Enter your name"
-                               required />
-
-                    </div>
-
-                    <!-- Email -->
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Email
-                        </label>
-
-                        <input type="email"
-                               name="email"
-                               class="form-control"
-                               placeholder="Enter your email"
-                               required />
-
-                    </div>
-
-                    <!-- Role -->
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Register As
-                        </label>
-
-                        <select name="role"
-                                id="role"
-                                class="form-select"
-                                required>
-
-                            <option value="">
-                                -- Select Role --
-                            </option>
-
-                            <option value="Customer">
-                                Customer
-                            </option>
-
-                            <option value="Worker">
-                                Worker
-                            </option>
-
-                            <option value="Manager">
-                                Manager
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <!-- Profession -->
-                    <div class="mb-3"
-                         id="professionSection"
-                         style="display:none;">
-
-                        <label class="form-label">
-                            Profession
-                        </label>
-
-                        <input type="text"
-                               name="profession"
-                               id="profession"
-                               class="form-control"
-                               placeholder="e.g. Mechanic" />
-
-                    </div>
-
-                    <!-- Password -->
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Password
-                        </label>
-
-                        <input type="password"
-                               name="password"
-                               class="form-control"
-                               placeholder="Enter your password"
-                               required />
-
-                        <div class="form-text">
-                            Minimum 6 characters with uppercase,
-                            lowercase, number and special character.
-                        </div>
-
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Confirm Password
-                        </label>
-
-                        <input type="password"
-                               name="confirmPassword"
-                               class="form-control"
-                               placeholder="Confirm your password"
-                               required />
-
-                    </div>
-
-                    <button type="submit"
-                            class="btn btn-success w-100">
-                        Register
-                    </button>
-
-                </form>
-
-                <div class="text-center mt-3">
-
-                    <span>
-                        Already have an account?
-                    </span>
-
-                    <a asp-action="Login">
-                        Login
-                    </a>
-
+                <div class="card-header text-center">
+                    <h2>Create Account</h2>
                 </div>
 
+                <div class="card-body">
+
+                    <form asp-action="Register"
+                          asp-controller="Account"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="All"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <!-- NAME -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Name
+                            </label>
+
+                            <input type="text"
+                                   name="name"
+                                   class="form-control"
+                                   placeholder="Enter your name"
+                                   required />
+                        </div>
+
+                        <!-- EMAIL -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input type="email"
+                                   name="email"
+                                   class="form-control"
+                                   placeholder="Enter your email"
+                                   required />
+                        </div>
+
+                        <!-- ROLE -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Register As
+                            </label>
+
+                            <select name="role"
+                                    id="role"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    -- Select Role --
+                                </option>
+
+                                <option value="Customer">
+                                    Customer
+                                </option>
+
+                                <option value="Worker">
+                                    Worker
+                                </option>
+
+                                <option value="Manager">
+                                    Manager
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <!-- WORKER ONLY FIELDS -->
+                        <div id="workerFields"
+                             style="display:none;">
+
+                            <!-- PROFESSION -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Profession
+                                </label>
+
+                                <input type="text"
+                                       name="profession"
+                                       id="profession"
+                                       class="form-control"
+                                       placeholder="Enter your profession" />
+                            </div>
+
+                            <!-- RESUME -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Resume
+                                </label>
+
+                                <input type="file"
+                                       name="resume"
+                                       id="resume"
+                                       class="form-control"
+                                       accept=".pdf,.doc,.docx" />
+
+                                <small class="text-muted">
+                                    PDF, DOC or DOCX. Maximum 5 MB.
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <!-- PASSWORD -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Password
+                            </label>
+
+                            <input type="password"
+                                   name="password"
+                                   class="form-control"
+                                   placeholder="Enter your password"
+                                   required />
+
+                            <small class="text-muted">
+                                Minimum 6 characters with uppercase,
+                                lowercase, number and special character.
+                            </small>
+                        </div>
+
+                        <!-- CONFIRM PASSWORD -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Confirm Password
+                            </label>
+
+                            <input type="password"
+                                   name="confirmPassword"
+                                   class="form-control"
+                                   placeholder="Confirm your password"
+                                   required />
+                        </div>
+
+                        <!-- REGISTER -->
+                        <button type="submit"
+                                class="btn btn-success w-100">
+                            Register
+                        </button>
+
+                    </form>
+
+                    <div class="text-center mt-4">
+                        Already have an account?
+                        <a asp-controller="Account"
+                           asp-action="Login">
+                            Login
+                        </a>
+                    </div>
+
+                </div>
             </div>
 
         </div>
-
     </div>
-
 </div>
 
 @section Scripts {
@@ -170,30 +177,47 @@
 
     <script>
 
-        document.getElementById("role").addEventListener("change", function() {
+        function updateWorkerFields() {
 
-            var professionSection =
-                document.getElementById("professionSection");
+            const role =
+                document.getElementById("role").value;
 
-            var profession =
+            const workerFields =
+                document.getElementById("workerFields");
+
+            const profession =
                 document.getElementById("profession");
 
-            if (this.value === "Worker") {
+            const resume =
+                document.getElementById("resume");
 
-                professionSection.style.display = "block";
+            if (role === "Worker") {
+
+                workerFields.style.display = "block";
+
                 profession.required = true;
+                resume.required = true;
 
-            }
-            else {
+            } else {
 
-                professionSection.style.display = "none";
+                workerFields.style.display = "none";
+
                 profession.required = false;
+                resume.required = false;
+
                 profession.value = "";
-
+                resume.value = "";
             }
+        }
 
-        });
+        document
+            .getElementById("role")
+            .addEventListener(
+                "change",
+                updateWorkerFields
+            );
+
+        updateWorkerFields();
 
     </script>
 }
-

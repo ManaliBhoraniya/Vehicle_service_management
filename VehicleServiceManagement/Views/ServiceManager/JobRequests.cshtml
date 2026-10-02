@@ -1,0 +1,171 @@
+﻿@model IEnumerable<VehicleServiceManagement.Models.Worker>
+
+@{
+    ViewData["Title"] = "Worker Job Requests";
+}
+
+<h2 class="mb-4">
+    Worker Job Requests
+</h2>
+
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+
+        No pending worker job requests.
+
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-hover">
+
+            <thead class="table-dark">
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Name</th>
+
+                    <th>Email</th>
+
+                    <th>Profession</th>
+
+                    <th>Resume</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var worker in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @worker.WorkerId
+                        </td>
+
+                        <td>
+                            @worker.ApplicationUser?.Name
+                        </td>
+
+                        <td>
+                            @worker.ApplicationUser?.Email
+                        </td>
+
+                        <td>
+                            @worker.Profession
+                        </td>
+
+                        <td>
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                worker.ResumeFilePath))
+                            {
+                                <a href="@worker.ResumeFilePath"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info">
+
+                                    View Resume
+
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-danger">
+                                    No Resume
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            <div class="d-flex gap-2">
+
+                                <!-- ACCEPT -->
+
+                                <form asp-action="AcceptJobRequest"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@worker.WorkerId" />
+
+                                    <button type="submit"
+                                            class="btn btn-success btn-sm">
+
+                                        Accept
+
+                                    </button>
+
+                                </form>
+
+
+                                <!-- REJECT -->
+
+                                <form asp-action="RejectJobRequest"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@worker.WorkerId" />
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure you want to reject this job request?');">
+
+                                        Reject
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}
+
+
+<a asp-action="Index"
+   class="btn btn-secondary">
+
+    Back to Dashboard
+
+</a>

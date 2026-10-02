@@ -12,8 +12,8 @@ using VehicleServiceManagement.Data;
 namespace VehicleServiceManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260928112902_SyncExistingDatabase")]
-    partial class SyncExistingDatabase
+    [Migration("20261002051546_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -371,8 +371,7 @@ namespace VehicleServiceManagement.Migrations
                 {
                     b.Property<int>("WorkerId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkerId"));
 
@@ -390,6 +389,10 @@ namespace VehicleServiceManagement.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ResumeFilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("WorkerId");

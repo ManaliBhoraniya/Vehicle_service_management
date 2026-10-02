@@ -23,15 +23,19 @@ namespace VehicleServiceManagement.Controllers
             _context = context;
         }
 
-        // =========================
-        // LOGIN
-        // =========================
+        // =====================================================
+        // LOGIN - GET
+        // =====================================================
 
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
+
+        // =====================================================
+        // LOGIN - POST
+        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -50,7 +54,8 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            var user = await _userManager.FindByEmailAsync(email);
+            var user =
+                await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
@@ -61,11 +66,61 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            var result = await _signInManager.PasswordSignInAsync(
-                user.UserName!,
-                password,
-                rememberMe,
-                lockoutOnFailure: false);
+            // =================================================
+            // CHECK WORKER JOB REQUEST STATUS
+            // =================================================
+
+            if (await _userManager.IsInRoleAsync(user, "Worker"))
+            {
+                var worker =
+                    await _context.Workers
+                        .FirstOrDefaultAsync(
+                            w => w.ApplicationUserId == user.Id);
+
+                if (worker != null)
+                {
+                    // Worker is waiting for manager approval
+                    if (worker.Status == "Pending")
+                    {
+                        ModelState.AddModelError(
+                            "",
+                            "Your job request is still pending. Please wait for the Service Manager to review your application.");
+
+                        return View();
+                    }
+
+                    // Worker was rejected
+                    if (worker.Status == "Rejected")
+                    {
+                        ModelState.AddModelError(
+                            "",
+                            "Your job request has been rejected. You cannot log in with this account.");
+
+                        return View();
+                    }
+
+                    // Worker must be accepted
+                    if (worker.Status != "Accepted")
+                    {
+                        ModelState.AddModelError(
+                            "",
+                            "Your worker account is not active.");
+
+                        return View();
+                    }
+                }
+            }
+
+            // =================================================
+            // PASSWORD LOGIN
+            // =================================================
+
+            var result =
+                await _signInManager.PasswordSignInAsync(
+                    user.UserName!,
+                    password,
+                    rememberMe,
+                    lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
@@ -76,53 +131,61 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =========================
+            // =================================================
             // MANAGER
-            // =========================
+            // =================================================
 
-            if (await _userManager.IsInRoleAsync(user, "Manager"))
+            if (await _userManager.IsInRoleAsync(
+                user,
+                "Manager"))
             {
                 return RedirectToAction(
                     "Index",
                     "ServiceManager");
             }
 
-            // =========================
+            // =================================================
             // ADMIN
-            // =========================
+            // =================================================
 
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            if (await _userManager.IsInRoleAsync(
+                user,
+                "Admin"))
             {
                 return RedirectToAction(
                     "Index",
                     "ServiceManager");
             }
 
-            // =========================
+            // =================================================
             // WORKER
-            // =========================
+            // =================================================
 
-            if (await _userManager.IsInRoleAsync(user, "Worker"))
+            if (await _userManager.IsInRoleAsync(
+                user,
+                "Worker"))
             {
                 return RedirectToAction(
                     "Dashboard",
                     "Worker");
             }
 
-            // =========================
+            // =================================================
             // CUSTOMER
-            // =========================
+            // =================================================
 
-            if (await _userManager.IsInRoleAsync(user, "Customer"))
+            if (await _userManager.IsInRoleAsync(
+                user,
+                "Customer"))
             {
                 return RedirectToAction(
-                    "Dashboard",
+                    "Index",
                     "Customer");
             }
 
-            // =========================
+            // =================================================
             // INVALID ROLE
-            // =========================
+            // =================================================
 
             await _signInManager.SignOutAsync();
 
@@ -133,15 +196,19 @@ namespace VehicleServiceManagement.Controllers
             return View();
         }
 
-        // =========================
-        // REGISTER
-        // =========================
+        // =====================================================
+        // REGISTER - GET
+        // =====================================================
 
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
+
+        // =====================================================
+        // REGISTER - POST
+        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -151,8 +218,13 @@ namespace VehicleServiceManagement.Controllers
             string password,
             string confirmPassword,
             string role,
-            string profession)
+            string profession,
+            IFormFile? resume)
         {
+            // =================================================
+            // BASIC VALIDATION
+            // =================================================
+
             if (string.IsNullOrWhiteSpace(name) ||
                 string.IsNullOrWhiteSpace(email) ||
                 string.IsNullOrWhiteSpace(password) ||
@@ -166,10 +238,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =========================
-            // PASSWORD CONFIRMATION
-            // =========================
-
             if (password != confirmPassword)
             {
                 ModelState.AddModelError(
@@ -179,9 +247,9 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =========================
-            // ALLOWED ROLES
-            // =========================
+            // =================================================
+            // ALLOWED REGISTRATION ROLES
+            // =================================================
 
             if (role != "Customer" &&
                 role != "Worker" &&
@@ -194,29 +262,87 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =========================
-            // WORKER PROFESSION
-            // =========================
+            // =================================================
+            // WORKER VALIDATION
+            // =================================================
 
-            if (role == "Worker" &&
-                string.IsNullOrWhiteSpace(profession))
+            if (role == "Worker")
             {
-                ModelState.AddModelError(
-                    "Profession",
-                    "Profession is required for workers.");
+                if (string.IsNullOrWhiteSpace(profession))
+                {
+                    ModelState.AddModelError(
+                        "Profession",
+                        "Profession is required for workers.");
 
-                return View();
+                    return View();
+                }
+
+                if (resume == null || resume.Length == 0)
+                {
+                    ModelState.AddModelError(
+                        "Resume",
+                        "Resume is required for worker registration.");
+
+                    return View();
+                }
+
+                // Maximum 5 MB
+                if (resume.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        "Resume",
+                        "Resume file must be smaller than 5 MB.");
+
+                    return View();
+                }
+
+                // Allowed file extensions
+                var extension =
+                    Path.GetExtension(resume.FileName)
+                        .ToLowerInvariant();
+
+                var allowedExtensions =
+                    new[] { ".pdf", ".doc", ".docx" };
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(
+                        "Resume",
+                        "Only PDF, DOC and DOCX files are allowed.");
+
+                    return View();
+                }
             }
 
-            // =========================
+            // =================================================
             // CHECK EXISTING USER
-            // =========================
+            // =================================================
 
             var existingUser =
                 await _userManager.FindByEmailAsync(email);
 
             if (existingUser != null)
             {
+                // Check whether this email belongs to
+                // a rejected worker.
+
+                var rejectedWorker =
+                    await _context.Workers
+                        .FirstOrDefaultAsync(
+                            w =>
+                                w.ApplicationUserId ==
+                                existingUser.Id &&
+                                w.Status == "Rejected");
+
+                if (rejectedWorker != null)
+                {
+                    ModelState.AddModelError(
+                        "Email",
+                        "This email belongs to a rejected worker account and cannot be registered again.");
+
+                    return View();
+                }
+
                 ModelState.AddModelError(
                     "Email",
                     "An account with this email already exists.");
@@ -224,9 +350,9 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =========================
-            // CREATE USER
-            // =========================
+            // =================================================
+            // CREATE IDENTITY USER
+            // =================================================
 
             var user = new ApplicationUser
             {
@@ -235,9 +361,10 @@ namespace VehicleServiceManagement.Controllers
                 Name = name
             };
 
-            var result = await _userManager.CreateAsync(
-                user,
-                password);
+            var result =
+                await _userManager.CreateAsync(
+                    user,
+                    password);
 
             if (!result.Succeeded)
             {
@@ -251,9 +378,9 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =========================
+            // =================================================
             // ASSIGN ROLE
-            // =========================
+            // =================================================
 
             var roleResult =
                 await _userManager.AddToRoleAsync(
@@ -269,127 +396,108 @@ namespace VehicleServiceManagement.Controllers
                         error.Description);
                 }
 
-                // Delete the user if role assignment failed
                 await _userManager.DeleteAsync(user);
 
                 return View();
             }
 
-            // =========================
-            // CREATE WORKER PROFILE
-            // =========================
+            // =================================================
+            // WORKER JOB REQUEST
+            // =================================================
 
             if (role == "Worker")
             {
+                var uploadsFolder =
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        "uploads",
+                        "resumes");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var extension =
+                    Path.GetExtension(resume!.FileName)
+                        .ToLowerInvariant();
+
+                var uniqueFileName =
+                    Guid.NewGuid().ToString() + extension;
+
+                var filePath =
+                    Path.Combine(
+                        uploadsFolder,
+                        uniqueFileName);
+
+                using (var stream =
+                       new FileStream(
+                           filePath,
+                           FileMode.Create))
+                {
+                    await resume.CopyToAsync(stream);
+                }
+
                 var worker = new Worker
                 {
                     ApplicationUserId = user.Id,
                     Profession = profession,
-                    IsAvailable = true
+                    IsAvailable = false,
+
+                    ResumeFileName = resume.FileName,
+
+                    ResumeFilePath =
+                        "/uploads/resumes/" +
+                        uniqueFileName,
+
+                    Status = "Pending"
                 };
 
                 _context.Workers.Add(worker);
 
                 await _context.SaveChangesAsync();
 
-                // =========================
-                // DEFAULT WEEKLY AVAILABILITY
-                // =========================
-
-                string[] days =
-                {
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday",
-                    "Saturday",
-                    "Sunday"
-                };
-
-                foreach (var day in days)
-                {
-                    var availability =
-                        new WorkerAvailability
-                        {
-                            WorkerId = worker.WorkerId,
-
-                            DayOfWeek = day,
-
-                            IsAvailable =
-                                day != "Sunday",
-
-                            StartTime =
-                                day != "Sunday"
-                                    ? new TimeSpan(9, 0, 0)
-                                    : null,
-
-                            EndTime =
-                                day != "Sunday"
-                                    ? new TimeSpan(18, 0, 0)
-                                    : null
-                        };
-
-                    _context.WorkerAvailabilities.Add(
-                        availability);
-                }
-
-                await _context.SaveChangesAsync();
+                // Worker must wait for manager approval
+                return RedirectToAction(
+                    "JobRequestSubmitted",
+                    "Account");
             }
 
-            // =========================
-            // SIGN IN AFTER REGISTRATION
-            // =========================
-
-            await _signInManager.SignInAsync(
-                user,
-                isPersistent: false);
-
-            // =========================
+            // =================================================
             // MANAGER
-            // =========================
+            // =================================================
 
             if (role == "Manager")
             {
+                await _signInManager.SignInAsync(
+                    user,
+                    isPersistent: false);
+
                 return RedirectToAction(
                     "Index",
                     "ServiceManager");
             }
 
-            // =========================
-            // ADMIN
-            // =========================
-
-            if (role == "Admin")
-            {
-                return RedirectToAction(
-                    "Index",
-                    "ServiceManager");
-            }
-
-            // =========================
-            // WORKER
-            // =========================
-
-            if (role == "Worker")
-            {
-                return RedirectToAction(
-                    "Dashboard",
-                    "Worker");
-            }
-
-            // =========================
+            // =================================================
             // CUSTOMER
-            // =========================
+            // =================================================
 
             if (role == "Customer")
             {
+                await _signInManager.SignInAsync(
+                    user,
+                    isPersistent: false);
+
                 return RedirectToAction(
-                    "Dashboard",
+                    "Index",
                     "Customer");
             }
 
-            // Fallback
+            // =================================================
+            // FALLBACK
+            // =================================================
+
             await _signInManager.SignOutAsync();
 
             return RedirectToAction(
@@ -397,9 +505,19 @@ namespace VehicleServiceManagement.Controllers
                 "Account");
         }
 
-        // =========================
+        // =====================================================
+        // JOB REQUEST SUBMITTED
+        // =====================================================
+
+        [HttpGet]
+        public IActionResult JobRequestSubmitted()
+        {
+            return View();
+        }
+
+        // =====================================================
         // LOGOUT
-        // =========================
+        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -412,9 +530,9 @@ namespace VehicleServiceManagement.Controllers
                 "Account");
         }
 
-        // =========================
+        // =====================================================
         // DELETE ACCOUNT
-        // =========================
+        // =====================================================
 
         [HttpPost]
         [Authorize]
@@ -425,13 +543,7 @@ namespace VehicleServiceManagement.Controllers
                 await _userManager.GetUserAsync(User);
 
             if (user == null)
-            {
                 return Challenge();
-            }
-
-            // =========================
-            // DELETE WORKER PROFILE
-            // =========================
 
             var worker =
                 await _context.Workers
@@ -443,10 +555,6 @@ namespace VehicleServiceManagement.Controllers
                 _context.Workers.Remove(worker);
             }
 
-            // =========================
-            // DELETE CUSTOMER PROFILE
-            // =========================
-
             var customer =
                 await _context.Customers
                     .FirstOrDefaultAsync(
@@ -457,51 +565,28 @@ namespace VehicleServiceManagement.Controllers
                 _context.Customers.Remove(customer);
             }
 
-            // =========================
-            // SAVE PROFILE DELETION
-            // =========================
-
             await _context.SaveChangesAsync();
-
-            // =========================
-            // DELETE IDENTITY ACCOUNT
-            // =========================
 
             var result =
                 await _userManager.DeleteAsync(user);
 
             if (!result.Succeeded)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(
-                        "",
-                        error.Description);
-                }
-
                 return RedirectToAction(
                     "AccessDenied",
                     "Account");
             }
 
-            // =========================
-            // SIGN OUT
-            // =========================
-
             await _signInManager.SignOutAsync();
-
-            // =========================
-            // GO TO LOGIN
-            // =========================
 
             return RedirectToAction(
                 "Login",
                 "Account");
         }
 
-        // =========================
+        // =====================================================
         // ACCESS DENIED
-        // =========================
+        // =====================================================
 
         [HttpGet]
         public IActionResult AccessDenied()
@@ -510,4 +595,3 @@ namespace VehicleServiceManagement.Controllers
         }
     }
 }
-

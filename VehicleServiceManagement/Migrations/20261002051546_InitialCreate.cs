@@ -190,6 +190,7 @@ namespace VehicleServiceManagement.Migrations
                     ApplicationUserId = table.Column<int>(type: "int", nullable: false),
                     Profession = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ResumeFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResumeFilePath = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },

@@ -30,11 +30,21 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 
+// ======================================================
+// CREATE ROLES AND DEFAULT MANAGER ACCOUNT
+// ======================================================
+
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider
-        .GetRequiredService<RoleManager<IdentityRole<int>>>();
+    var services = scope.ServiceProvider;
 
+    var roleManager =
+        services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+
+    var userManager =
+        services.GetRequiredService<UserManager<ApplicationUser>>();
+
+    // Roles
     string[] roles =
     {
         "Customer",
@@ -50,8 +60,57 @@ using (var scope = app.Services.CreateScope())
                 new IdentityRole<int>(role));
         }
     }
+
+    // ==================================================
+    // DEFAULT MANAGER ACCOUNT
+    // ==================================================
+
+    string managerEmail = "manager@vehicle.com";
+    string managerPassword = "Manager@123";
+
+    var managerUser =
+        await userManager.FindByEmailAsync(managerEmail);
+
+    if (managerUser == null)
+    {
+        managerUser = new ApplicationUser
+        {
+            UserName = managerEmail,
+            Email = managerEmail,
+            Name = "Service Manager",
+            EmailConfirmed = true
+        };
+
+        var createResult =
+            await userManager.CreateAsync(
+                managerUser,
+                managerPassword);
+
+        if (createResult.Succeeded)
+        {
+            await userManager.AddToRoleAsync(
+                managerUser,
+                "Manager");
+        }
+    }
+    else
+    {
+        // Make sure the existing account has Manager role
+        if (!await userManager.IsInRoleAsync(
+                managerUser,
+                "Manager"))
+        {
+            await userManager.AddToRoleAsync(
+                managerUser,
+                "Manager");
+        }
+    }
 }
 
+
+// ======================================================
+// HTTP PIPELINE
+// ======================================================
 
 if (!app.Environment.IsDevelopment())
 {

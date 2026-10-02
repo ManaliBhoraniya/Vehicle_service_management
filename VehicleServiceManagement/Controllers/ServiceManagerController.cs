@@ -16,7 +16,11 @@ namespace VehicleServiceManagement.Controllers
             _context = context;
         }
 
+        // =====================================================
+        // MANAGER DASHBOARD
         // GET: /ServiceManager
+        // =====================================================
+
         public async Task<IActionResult> Index()
         {
             ViewBag.CustomerCount =
@@ -26,7 +30,8 @@ namespace VehicleServiceManagement.Controllers
                 await _context.Vehicles.CountAsync();
 
             ViewBag.WorkerCount =
-                await _context.Workers.CountAsync();
+                await _context.Workers
+                    .CountAsync(w => w.Status == "Accepted");
 
             ViewBag.ServiceRequestCount =
                 await _context.ServiceRequests.CountAsync();
@@ -43,10 +48,23 @@ namespace VehicleServiceManagement.Controllers
                 await _context.ServiceRequests
                     .CountAsync(s => s.Status == "Completed");
 
+            // =================================================
+            // PENDING WORKER JOB REQUESTS
+            // =================================================
+
+            ViewBag.PendingJobRequests =
+                await _context.Workers
+                    .CountAsync(w => w.Status == "Pending");
+
             return View();
         }
 
+
+        // =====================================================
+        // SERVICE REQUESTS
         // GET: /ServiceManager/ServiceRequests
+        // =====================================================
+
         [HttpGet]
         public async Task<IActionResult> ServiceRequests()
         {
@@ -59,15 +77,21 @@ namespace VehicleServiceManagement.Controllers
             return View(requests);
         }
 
+
+        // =====================================================
+        // UPDATE SERVICE REQUEST STATUS
         // POST: /ServiceManager/UpdateRequestStatus
+        // =====================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRequestStatus(
             int id,
             string status)
         {
-            var request = await _context.ServiceRequests
-                .FirstOrDefaultAsync(s => s.Id == id);
+            var request =
+                await _context.ServiceRequests
+                    .FirstOrDefaultAsync(s => s.Id == id);
 
             if (request == null)
             {
@@ -78,10 +102,16 @@ namespace VehicleServiceManagement.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(ServiceRequests));
+            return RedirectToAction(
+                nameof(ServiceRequests));
         }
 
+
+        // =====================================================
+        // CUSTOMERS
         // GET: /ServiceManager/Customers
+        // =====================================================
+
         [HttpGet]
         public async Task<IActionResult> Customers()
         {
@@ -93,18 +123,32 @@ namespace VehicleServiceManagement.Controllers
             return View(customers);
         }
 
+
+        // =====================================================
+        // WORKERS
         // GET: /ServiceManager/Workers
+        // =====================================================
+
         [HttpGet]
         public async Task<IActionResult> Workers()
         {
+            // Only accepted workers appear here.
+            // Pending workers appear under Job Requests.
+
             var workers = await _context.Workers
                 .Include(w => w.ApplicationUser)
+                .Where(w => w.Status == "Accepted")
                 .ToListAsync();
 
             return View(workers);
         }
 
+
+        // =====================================================
+        // VEHICLES
         // GET: /ServiceManager/Vehicles
+        // =====================================================
+
         [HttpGet]
         public async Task<IActionResult> Vehicles()
         {
@@ -116,7 +160,12 @@ namespace VehicleServiceManagement.Controllers
             return View(vehicles);
         }
 
+
+        // =====================================================
+        // ASSIGNMENTS
         // GET: /ServiceManager/Assignments
+        // =====================================================
+
         [HttpGet]
         public async Task<IActionResult> Assignments()
         {
@@ -129,6 +178,121 @@ namespace VehicleServiceManagement.Controllers
 
             return View(assignments);
         }
+
+
+        // =====================================================
+        // JOB REQUESTS
+        // GET: /ServiceManager/JobRequests
+        // =====================================================
+
+        [HttpGet]
+        public async Task<IActionResult> JobRequests()
+        {
+            var requests = await _context.Workers
+                .Include(w => w.ApplicationUser)
+                .Where(w => w.Status == "Pending")
+                .OrderBy(w => w.WorkerId)
+                .ToListAsync();
+
+            return View(requests);
+        }
+
+
+        // =====================================================
+        // ACCEPT JOB REQUEST
+        // POST: /ServiceManager/AcceptJobRequest
+        // =====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AcceptJobRequest(
+            int id)
+        {
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.WorkerId == id);
+
+            if (worker == null)
+            {
+                return NotFound();
+            }
+
+            // Only pending requests can be accepted.
+
+            if (worker.Status != "Pending")
+            {
+                TempData["Error"] =
+                    "This job request has already been processed.";
+
+                return RedirectToAction(
+                    nameof(JobRequests));
+            }
+
+            // =================================================
+            // ACCEPT WORKER
+            // =================================================
+
+            worker.Status = "Accepted";
+
+            worker.IsAvailable = true;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Worker job request accepted successfully.";
+
+            return RedirectToAction(
+                nameof(JobRequests));
+        }
+
+
+        // =====================================================
+        // REJECT JOB REQUEST
+        // POST: /ServiceManager/RejectJobRequest
+        // =====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectJobRequest(
+            int id)
+        {
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(
+                        w => w.WorkerId == id);
+
+            if (worker == null)
+            {
+                return NotFound();
+            }
+
+            // Only pending requests can be rejected.
+
+            if (worker.Status != "Pending")
+            {
+                TempData["Error"] =
+                    "This job request has already been processed.";
+
+                return RedirectToAction(
+                    nameof(JobRequests));
+            }
+
+            // =================================================
+            // REJECT WORKER
+            // =================================================
+
+            worker.Status = "Rejected";
+
+            worker.IsAvailable = false;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Worker job request rejected.";
+
+            return RedirectToAction(
+                nameof(JobRequests));
+        }
     }
 }
-

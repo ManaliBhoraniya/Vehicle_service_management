@@ -255,7 +255,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.ServiceAssignment", b =>
@@ -291,7 +291,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("ServiceAssignments", (string)null);
+                    b.ToTable("ServiceAssignments");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.ServiceRequest", b =>
@@ -331,7 +331,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("ServiceRequests", (string)null);
+                    b.ToTable("ServiceRequests");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.Vehicle", b =>
@@ -361,15 +361,14 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Vehicles", (string)null);
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.Worker", b =>
                 {
                     b.Property<int>("WorkerId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("Id");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkerId"));
 
@@ -389,12 +388,16 @@ namespace VehicleServiceManagement.Migrations
                     b.Property<string>("ResumeFilePath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("WorkerId");
 
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("Workers", (string)null);
+                    b.ToTable("Workers");
                 });
 
             modelBuilder.Entity("VehicleServiceManagement.Models.WorkerAvailability", b =>
@@ -425,7 +428,7 @@ namespace VehicleServiceManagement.Migrations
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("WorkerAvailabilities", (string)null);
+                    b.ToTable("WorkerAvailabilities");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

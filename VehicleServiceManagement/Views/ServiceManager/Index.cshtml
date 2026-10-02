@@ -6,6 +6,8 @@
 
 <div class="row g-4">
 
+    <!-- CUSTOMERS -->
+
     <div class="col-md-3">
         <div class="card shadow-sm">
             <div class="card-body text-center">
@@ -24,6 +26,9 @@
             </div>
         </div>
     </div>
+
+
+    <!-- VEHICLES -->
 
     <div class="col-md-3">
         <div class="card shadow-sm">
@@ -44,6 +49,9 @@
         </div>
     </div>
 
+
+    <!-- WORKERS -->
+
     <div class="col-md-3">
         <div class="card shadow-sm">
             <div class="card-body text-center">
@@ -62,6 +70,9 @@
             </div>
         </div>
     </div>
+
+
+    <!-- SERVICE REQUESTS -->
 
     <div class="col-md-3">
         <div class="card shadow-sm">
@@ -84,7 +95,14 @@
 
 </div>
 
+
+<!-- ================================================= -->
+<!-- SERVICE REQUEST STATUS -->
+<!-- ================================================= -->
+
 <div class="row g-4 mt-2">
+
+    <!-- PENDING -->
 
     <div class="col-md-4">
         <div class="card border-warning shadow-sm">
@@ -100,6 +118,9 @@
         </div>
     </div>
 
+
+    <!-- ASSIGNED -->
+
     <div class="col-md-4">
         <div class="card border-primary shadow-sm">
             <div class="card-body text-center">
@@ -113,6 +134,9 @@
             </div>
         </div>
     </div>
+
+
+    <!-- COMPLETED -->
 
     <div class="col-md-4">
         <div class="card border-success shadow-sm">
@@ -130,17 +154,78 @@
 
 </div>
 
+
+<!-- ================================================= -->
+<!-- WORKER JOB REQUESTS -->
+<!-- ================================================= -->
+
+<div class="row g-4 mt-2">
+
+    <div class="col-md-12">
+
+        <div class="card border-warning shadow-sm">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h5 class="mb-1">
+                            Worker Job Requests
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            New worker applications waiting for review.
+                        </p>
+
+                    </div>
+
+                    <div class="text-center">
+
+                        <h2 class="mb-2">
+                            @ViewBag.PendingJobRequests
+                        </h2>
+
+                        <a asp-action="JobRequests"
+                           class="btn btn-warning">
+
+                            View Job Requests
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- MANAGER ACTIONS -->
+<!-- ================================================= -->
+
 <div class="mt-4">
 
     <a asp-action="Assignments"
        class="btn btn-primary">
+
         Manage Assignments
+
     </a>
 
-    <a asp-controller="Worker"
-       asp-action="Create"
-       class="btn btn-success">
-        Add Worker
+
+    <a asp-action="JobRequests"
+       class="btn btn-warning">
+
+        Job Requests
+
     </a>
 
 </div>

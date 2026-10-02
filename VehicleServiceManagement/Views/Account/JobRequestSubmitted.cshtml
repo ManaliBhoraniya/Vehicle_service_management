@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Job Request Submitted";
+}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-7">
+
+        <div class="card shadow-sm mt-5">
+
+            <div class="card-body text-center p-5">
+
+                <h2 class="text-success mb-4">
+                    Job Request Submitted
+                </h2>
+
+                <p class="lead">
+                    Your worker registration has been submitted
+                    successfully.
+                </p>
+
+                <p>
+                    Your profile and resume will be reviewed
+                    by the Service Manager.
+                </p>
+
+                <p>
+                    You can log in only after your job request
+                    has been accepted.
+                </p>
+
+                <div class="mt-4">
+
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="btn btn-primary">
+
+                        Go to Login
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
