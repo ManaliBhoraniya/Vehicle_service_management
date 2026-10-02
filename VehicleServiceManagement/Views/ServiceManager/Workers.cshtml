@@ -40,8 +40,6 @@
 
                         <th>Name</th>
 
-                        <th>Username</th>
-
                         <th>Email</th>
 
                         <th>Specialities</th>
@@ -66,10 +64,6 @@
 
                             <td>
                                 @worker.ApplicationUser?.Name
-                            </td>
-
-                            <td>
-                                @worker.ApplicationUser?.UserName
                             </td>
 
                             <td>
@@ -122,10 +116,10 @@
 
                             <td>
 
-                                <a asp-controller="Worker"
-                                   asp-action="Details"
+                                <a asp-controller="ServiceManager"
+                                   asp-action="WorkerDetails"
                                    asp-route-id="@worker.WorkerId"
-                                   class="btn btn-sm btn-info">
+                                   class="btn btn-sm btn-info text-white">
 
                                     Details
 

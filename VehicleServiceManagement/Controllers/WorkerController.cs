@@ -7,7 +7,7 @@ using VehicleServiceManagement.Models;
 
 namespace VehicleServiceManagement.Controllers
 {
-    [Authorize(Roles = "Worker")]
+    [Authorize(Roles = "Worker,Manager,Admin")]
     public class WorkerController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -46,6 +46,34 @@ namespace VehicleServiceManagement.Controllers
                     .ThenInclude(sa => sa.ServiceRequest)
                 .FirstOrDefaultAsync(w =>
                     w.ApplicationUserId == user.Id);
+
+            if (worker == null)
+            {
+                return NotFound("Worker profile was not found.");
+            }
+
+            return View(worker);
+        }
+
+        // ====================================================
+        // WORKER DETAILS
+        // ====================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+            {
+                return RedirectToAction("WorkerDetails", "ServiceManager", new { id = id });
+            }
+
+            var worker = await _context.Workers
+                .Include(w => w.ApplicationUser)
+                .Include(w => w.Specialities)
+                .Include(w => w.Availabilities)
+                .Include(w => w.ServiceAssignments)
+                    .ThenInclude(sa => sa.ServiceRequest)
+                .FirstOrDefaultAsync(w => w.WorkerId == id);
 
             if (worker == null)
             {

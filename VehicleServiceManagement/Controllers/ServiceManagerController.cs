@@ -632,6 +632,37 @@ namespace VehicleServiceManagement.Controllers
 
 
         // =====================================================
+        // WORKER DETAILS
+        // GET: /ServiceManager/WorkerDetails/5
+        // =====================================================
+
+        [HttpGet]
+        public async Task<IActionResult> WorkerDetails(int id)
+        {
+            var worker = await _context.Workers
+                .Include(w => w.ApplicationUser)
+                .Include(w => w.Specialities)
+                .Include(w => w.Availabilities)
+                .Include(w => w.ServiceAssignments)
+                    .ThenInclude(sa => sa.ServiceRequest)
+                        .ThenInclude(sr => sr!.Vehicle)
+                .Include(w => w.ServiceAssignments)
+                    .ThenInclude(sa => sa.ServiceRequest)
+                        .ThenInclude(sr => sr!.Customer)
+                            .ThenInclude(c => c!.ApplicationUser)
+                .FirstOrDefaultAsync(w => w.WorkerId == id);
+
+            if (worker == null)
+            {
+                TempData["Error"] = "Worker not found.";
+                return RedirectToAction(nameof(Workers));
+            }
+
+            return View(worker);
+        }
+
+
+        // =====================================================
         // VEHICLES
         // =====================================================
 
