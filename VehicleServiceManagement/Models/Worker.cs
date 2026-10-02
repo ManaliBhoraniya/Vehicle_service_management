@@ -20,9 +20,6 @@ namespace VehicleServiceManagement.Models
 
         public ApplicationUser? ApplicationUser { get; set; }
 
-        [Required]
-        public string Profession { get; set; } = string.Empty;
-
         public bool IsAvailable { get; set; } = false;
 
         [Required]
@@ -37,5 +34,8 @@ namespace VehicleServiceManagement.Models
 
         public ICollection<WorkerAvailability> Availabilities { get; set; }
             = new List<WorkerAvailability>();
+
+        public ICollection<WorkerSpeciality> Specialities { get; set; }
+            = new List<WorkerSpeciality>();
     }
 }

@@ -6,96 +6,99 @@
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">
-        Delete Worker
-    </h2>
-
-    <div class="alert alert-danger">
-        Are you sure you want to delete this worker?
-    </div>
-
     <div class="card shadow-sm">
+
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Delete Worker</h3>
+        </div>
 
         <div class="card-body">
 
+            <div class="alert alert-warning">
+                Are you sure you want to delete this worker?
+                This action cannot be undone.
+            </div>
+
+
             <dl class="row">
 
-                <dt class="col-sm-4">
+                <dt class="col-sm-3">
                     Worker ID
                 </dt>
 
-                <dd class="col-sm-8">
-                    @Model.Id
+                <dd class="col-sm-9">
+                    @Model.WorkerId
                 </dd>
 
-                <dt class="col-sm-4">
+
+                <dt class="col-sm-3">
                     Name
                 </dt>
 
-                <dd class="col-sm-8">
-                    @Model.ApplicationUser?.Name
+                <dd class="col-sm-9">
+                    @(Model.ApplicationUser?.Name ?? "N/A")
                 </dd>
 
-                <dt class="col-sm-4">
-                    Username
-                </dt>
 
-                <dd class="col-sm-8">
-                    @Model.ApplicationUser?.UserName
-                </dd>
-
-                <dt class="col-sm-4">
+                <dt class="col-sm-3">
                     Email
                 </dt>
 
-                <dd class="col-sm-8">
-                    @Model.ApplicationUser?.Email
+                <dd class="col-sm-9">
+                    @(Model.ApplicationUser?.Email ?? "N/A")
                 </dd>
 
-                <dt class="col-sm-4">
-                    Profession
+
+                <dt class="col-sm-3">
+                    Specialities
                 </dt>
 
-                <dd class="col-sm-8">
-                    @Model.Profession
-                </dd>
+                <dd class="col-sm-9">
 
-                <dt class="col-sm-4">
-                    Availability
-                </dt>
-
-                <dd class="col-sm-8">
-
-                    @if (Model.IsAvailable)
+                    @if (Model.Specialities != null &&
+                         Model.Specialities.Any())
                     {
-                        <span class="badge bg-success">
-                            Available
-                        </span>
+                        foreach (var speciality in Model.Specialities)
+                        {
+                            <span class="badge bg-primary me-1 mb-1">
+                                @speciality.Speciality
+                            </span>
+                        }
                     }
                     else
                     {
-                        <span class="badge bg-danger">
-                            Busy
+                        <span class="text-muted">
+                            No specialities listed
                         </span>
                     }
 
+                </dd>
+
+
+                <dt class="col-sm-3">
+                    Status
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Status
                 </dd>
 
             </dl>
 
-            <form asp-action="Delete"
-                  asp-route-id="@Model.Id"
-                  method="post">
 
-                @Html.AntiForgeryToken()
+            <form asp-controller="Worker"
+                  asp-action="Delete"
+                  asp-route-id="@Model.WorkerId"
+                  method="post">
 
                 <button type="submit"
                         class="btn btn-danger">
-                    Yes, Delete
+                    Delete Worker
                 </button>
 
-                <a asp-action="Manage"
-                   class="btn btn-secondary">
+                <a asp-controller="ServiceManager"
+                   asp-action="Workers"
+                   class="btn btn-secondary ms-2">
                     Cancel
                 </a>
 

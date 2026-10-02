@@ -1,0 +1,332 @@
+﻿@model VehicleServiceManagement.Models.ServiceRequest
+
+@{
+    ViewData["Title"] = "Assign Worker";
+
+    var workers =
+        ViewBag.Workers
+        as IEnumerable<VehicleServiceManagement.Models.Worker>;
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>Assign Worker</h2>
+
+        <a asp-action="ServiceRequests"
+           class="btn btn-secondary">
+            Back to Service Requests
+        </a>
+
+    </div>
+
+
+    <!-- SUCCESS / ERROR -->
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+
+    <!-- SERVICE REQUEST -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                Service Request Details
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+
+                    <strong>Request ID</strong>
+
+                    <div>
+                        @Model.ServiceRequestId
+                    </div>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <strong>Service Required</strong>
+
+                    <div>
+                        @Model.ServiceType
+                    </div>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <strong>Status</strong>
+
+                    <div>
+
+                        @if (Model.Status == "Pending")
+                        {
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+                        }
+                        else if (Model.Status == "Assigned")
+                        {
+                            <span class="badge bg-primary">
+                                Assigned
+                            </span>
+                        }
+                        else if (Model.Status == "Completed")
+                        {
+                            <span class="badge bg-success">
+                                Completed
+                            </span>
+                        }
+                        else if (Model.Status == "Cancelled")
+                        {
+                            <span class="badge bg-danger">
+                                Cancelled
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">
+                                @Model.Status
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <strong>Description</strong>
+
+            <p class="mt-2">
+                @(string.IsNullOrWhiteSpace(Model.Description)
+                    ? "No description provided."
+                    : Model.Description)
+            </p>
+
+
+            @if (Model.Vehicle != null)
+            {
+                <hr />
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <strong>Vehicle Number</strong>
+
+                        <div>
+                            @Model.Vehicle.VehicleNumber
+                        </div>
+
+                    </div>
+
+                    @if (Model.Vehicle.Customer != null)
+                    {
+                        <div class="col-md-6">
+
+                            <strong>Customer</strong>
+
+                            <div>
+                                @Model.Vehicle.Customer
+                                    .ApplicationUser?.Name
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- MATCHING WORKERS -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                Matching Available Workers
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+
+                Only workers who are:
+
+                <ul class="mb-0 mt-2">
+
+                    <li>Accepted by the Manager</li>
+
+                    <li>Currently available</li>
+
+                    <li>
+                        Qualified for
+                        <strong>
+                            @Model.ServiceType
+                        </strong>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            @if (workers == null || !workers.Any())
+            {
+                <div class="alert alert-warning">
+
+                    <strong>
+                        No matching worker available.
+                    </strong>
+
+                    <p class="mb-0 mt-2">
+
+                        There is currently no accepted and
+                        available worker who has
+
+                        <strong>
+                            @Model.ServiceType
+                        </strong>
+
+                        as one of their specialities.
+
+                    </p>
+
+                </div>
+            }
+            else
+            {
+                <form asp-action="AssignWorker"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="serviceRequestId"
+                           value="@Model.ServiceRequestId" />
+
+
+                    <!-- WORKER -->
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-bold">
+                            Select Worker
+                        </label>
+
+                        <select name="workerId"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                -- Select Matching Worker --
+                            </option>
+
+                            @foreach (var worker in workers)
+                            {
+                                <option value="@worker.WorkerId">
+
+                                    @(worker.ApplicationUser?.Name
+                                        ?? "Worker")
+
+                                    -
+                                    @string.Join(
+                                        ", ",
+                                        worker.Specialities
+                                            .Select(s =>
+                                                s.Speciality))
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SERVICE DATE -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Service Date
+                        </label>
+
+                        <input type="date"
+                               name="serviceDate"
+                               class="form-control"
+                               required />
+
+                    </div>
+
+
+                    <!-- SERVICE TIME -->
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-bold">
+                            Service Time
+                        </label>
+
+                        <input type="time"
+                               name="serviceTime"
+                               class="form-control"
+                               required />
+
+                    </div>
+
+
+                    <!-- BUTTONS -->
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Assign Task
+
+                    </button>
+
+                    <a asp-action="ServiceRequests"
+                       class="btn btn-secondary ms-2">
+
+                        Cancel
+
+                    </a>
+
+                </form>
+            }
+
+        </div>
+
+    </div>
+
+</div>

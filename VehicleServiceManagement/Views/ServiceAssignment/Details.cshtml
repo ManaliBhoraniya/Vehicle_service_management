@@ -6,15 +6,39 @@
 
 <div class="container mt-4">
 
-    <div class="card shadow">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Assignment Details</h2>
+
+            <p class="text-muted mb-0">
+                View service assignment information.
+            </p>
+        </div>
+
+        <a asp-controller="ServiceManager"
+           asp-action="Assignments"
+           class="btn btn-outline-secondary">
+            Back to Assignments
+        </a>
+
+    </div>
+
+
+    <div class="card shadow-sm">
 
         <div class="card-header">
-            <h3>Service Assignment Details</h3>
+            <h5 class="mb-0">
+                Service Assignment
+            </h5>
         </div>
+
 
         <div class="card-body">
 
             <dl class="row">
+
+                <!-- ASSIGNMENT ID -->
 
                 <dt class="col-sm-4">
                     Assignment ID
@@ -25,6 +49,8 @@
                 </dd>
 
 
+                <!-- SERVICE REQUEST -->
+
                 <dt class="col-sm-4">
                     Service Request
                 </dt>
@@ -34,36 +60,24 @@
                     @if (Model.ServiceRequest != null)
                     {
                         <span>
-                            #@Model.ServiceRequest.ServiceRequestId
-                            -
+                            #@Model.ServiceRequestId
+                        </span>
+
+                        <span class="ms-2">
                             @Model.ServiceRequest.ServiceType
                         </span>
                     }
                     else
                     {
-                        <span>Not available</span>
+                        <span class="text-muted">
+                            No service request information
+                        </span>
                     }
 
                 </dd>
 
 
-                <dt class="col-sm-4">
-                    Customer
-                </dt>
-
-                <dd class="col-sm-8">
-
-                    @if (Model.ServiceRequest != null)
-                    {
-                        @Model.ServiceRequest.CustomerName
-                    }
-                    else
-                    {
-                        <span>Not available</span>
-                    }
-
-                </dd>
-
+                <!-- WORKER -->
 
                 <dt class="col-sm-4">
                     Worker
@@ -71,32 +85,46 @@
 
                 <dd class="col-sm-8">
 
-                    @if (Model.Worker?.ApplicationUser != null)
+                    @if (Model.Worker != null)
                     {
-                        @Model.Worker.ApplicationUser.Name
-                    }
-                    else if (Model.Worker != null)
-                    {
-                        @Model.Worker.Profession
+                        <div>
+                            <strong>
+                                @(Model.Worker.ApplicationUser?.Name ?? "Worker")
+                            </strong>
+                        </div>
+
+                        <div class="mt-2">
+
+                            @if (Model.Worker.Specialities != null &&
+                                 Model.Worker.Specialities.Any())
+                            {
+                                foreach (var speciality in Model.Worker.Specialities)
+                                {
+                                    <span class="badge bg-primary me-1 mb-1">
+                                        @speciality.Speciality
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    No specialities listed
+                                </span>
+                            }
+
+                        </div>
                     }
                     else
                     {
-                        <span>Not available</span>
+                        <span class="text-muted">
+                            No worker assigned
+                        </span>
                     }
 
                 </dd>
 
 
-                <dt class="col-sm-4">
-                    Profession
-                </dt>
-
-                <dd class="col-sm-8">
-
-                    @Model.Worker?.Profession
-
-                </dd>
-
+                <!-- STATUS -->
 
                 <dt class="col-sm-4">
                     Status
@@ -104,23 +132,52 @@
 
                 <dd class="col-sm-8">
 
-                    <span class="badge bg-primary">
-                        @Model.Status
-                    </span>
+                    @if (Model.Status == "Pending")
+                    {
+                        <span class="badge bg-warning text-dark">
+                            Pending
+                        </span>
+                    }
+                    else if (Model.Status == "Accepted")
+                    {
+                        <span class="badge bg-primary">
+                            Accepted
+                        </span>
+                    }
+                    else if (Model.Status == "Rejected")
+                    {
+                        <span class="badge bg-danger">
+                            Rejected
+                        </span>
+                    }
+                    else if (Model.Status == "Completed")
+                    {
+                        <span class="badge bg-success">
+                            Completed
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">
+                            @Model.Status
+                        </span>
+                    }
 
                 </dd>
 
+
+                <!-- ASSIGNED DATE -->
 
                 <dt class="col-sm-4">
                     Assigned Date
                 </dt>
 
                 <dd class="col-sm-8">
-
-                    @Model.AssignedDate.ToString("dd/MM/yyyy hh:mm tt")
-
+                    @Model.AssignedDate.ToString("dd-MM-yyyy hh:mm tt")
                 </dd>
 
+
+                <!-- COMPLETED DATE -->
 
                 <dt class="col-sm-4">
                     Completed Date
@@ -130,16 +187,21 @@
 
                     @if (Model.CompletedDate.HasValue)
                     {
-                        @Model.CompletedDate.Value.ToString(
-                            "dd/MM/yyyy hh:mm tt")
+                        <span>
+                            @Model.CompletedDate.Value.ToString("dd-MM-yyyy hh:mm tt")
+                        </span>
                     }
                     else
                     {
-                        <span>Not completed</span>
+                        <span class="text-muted">
+                            Not completed
+                        </span>
                     }
 
                 </dd>
 
+
+                <!-- NOTES -->
 
                 <dt class="col-sm-4">
                     Notes
@@ -149,11 +211,15 @@
 
                     @if (!string.IsNullOrWhiteSpace(Model.Notes))
                     {
-                        @Model.Notes
+                        <span>
+                            @Model.Notes
+                        </span>
                     }
                     else
                     {
-                        <span>No notes</span>
+                        <span class="text-muted">
+                            No notes
+                        </span>
                     }
 
                 </dd>
@@ -161,16 +227,18 @@
             </dl>
 
 
-            <div class="mt-3">
+            <div class="mt-4">
 
-                <a asp-action="Edit"
+                <a asp-controller="ServiceAssignment"
+                   asp-action="Edit"
                    asp-route-id="@Model.ServiceAssignmentId"
-                   class="btn btn-warning">
+                   class="btn btn-primary">
                     Edit
                 </a>
 
-                <a asp-action="Index"
-                   class="btn btn-secondary">
+                <a asp-controller="ServiceManager"
+                   asp-action="Assignments"
+                   class="btn btn-secondary ms-2">
                     Back
                 </a>
 

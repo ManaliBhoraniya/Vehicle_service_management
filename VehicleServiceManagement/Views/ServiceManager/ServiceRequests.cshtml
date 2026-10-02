@@ -4,150 +4,167 @@
     ViewData["Title"] = "Manage Service Requests";
 }
 
-<h2 class="mb-4">Manage Service Requests</h2>
+<div class="container mt-4">
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        No service requests found.
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Service Requests</h2>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Back to Dashboard
+        </a>
     </div>
-}
-else
-{
-    <div class="table-responsive">
 
-        <table class="table table-bordered table-hover">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
 
-            <thead class="table-dark">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
 
-                <tr>
-                    <th>ID</th>
-                    <th>Customer</th>
-                    <th>Vehicle</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Update Status</th>
-                </tr>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No service requests found.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
 
-            </thead>
+            <table class="table table-bordered table-hover align-middle">
 
-            <tbody>
-
-                @foreach (var request in Model)
-                {
+                <thead class="table-dark">
                     <tr>
-
-                        <td>
-                            @request.Id
-                        </td>
-
-                        <td>
-                            @request.Vehicle?.Customer?.Name
-                        </td>
-
-                        <td>
-                            @request.Vehicle?.VehicleNumber
-                        </td>
-
-                        <td>
-                            @request.RequestDate.ToString("dd-MM-yyyy HH:mm")
-                        </td>
-
-                        <td>
-
-                            @if (request.Status == "Pending")
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Pending
-                                </span>
-                            }
-                            else if (request.Status == "Assigned")
-                            {
-                                <span class="badge bg-primary">
-                                    Assigned
-                                </span>
-                            }
-                            else if (request.Status == "Completed")
-                            {
-                                <span class="badge bg-success">
-                                    Completed
-                                </span>
-                            }
-                            else if (request.Status == "Cancelled")
-                            {
-                                <span class="badge bg-danger">
-                                    Cancelled
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">
-                                    @request.Status
-                                </span>
-                            }
-
-                        </td>
-
-                        <td>
-
-                            <form asp-action="UpdateRequestStatus"
-                                  method="post">
-
-                                @Html.AntiForgeryToken()
-
-                                <input type="hidden"
-                                       name="id"
-                                       value="@request.Id" />
-
-                                <div class="input-group">
-
-                                    <select name="status"
-                                            class="form-select">
-
-                                        <option value="Pending"
-                                                selected="@(request.Status == "Pending")">
-                                            Pending
-                                        </option>
-
-                                        <option value="Assigned"
-                                                selected="@(request.Status == "Assigned")">
-                                            Assigned
-                                        </option>
-
-                                        <option value="Completed"
-                                                selected="@(request.Status == "Completed")">
-                                            Completed
-                                        </option>
-
-                                        <option value="Cancelled"
-                                                selected="@(request.Status == "Cancelled")">
-                                            Cancelled
-                                        </option>
-
-                                    </select>
-
-                                    <button type="submit"
-                                            class="btn btn-primary">
-                                        Update
-                                    </button>
-
-                                </div>
-
-                            </form>
-
-                        </td>
-
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Service Required</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Worker Task</th>
                     </tr>
-                }
+                </thead>
 
-            </tbody>
+                <tbody>
 
-        </table>
+                    @foreach (var request in Model)
+                    {
+                        <tr>
 
-    </div>
-}
+                            <td>
+                                @request.ServiceRequestId
+                            </td>
 
-<a asp-action="Index"
-   class="btn btn-secondary">
-    Back to Dashboard
-</a>
+                            <td>
+                                @request.Vehicle?.Customer?.Name
+                            </td>
+
+                            <td>
+                                @request.Vehicle?.VehicleNumber
+                            </td>
+
+                            <td>
+                                <strong>
+                                    @request.ServiceType
+                                </strong>
+
+                                @if (!string.IsNullOrWhiteSpace(request.Description))
+                                {
+                                    <br />
+
+                                    <small class="text-muted">
+                                        @request.Description
+                                    </small>
+                                }
+                            </td>
+
+                            <td>
+                                @request.RequestDate.ToString("dd-MM-yyyy HH:mm")
+                            </td>
+
+                            <td>
+
+                                @if (request.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+                                }
+                                else if (request.Status == "Assigned")
+                                {
+                                    <span class="badge bg-primary">
+                                        Assigned
+                                    </span>
+                                }
+                                else if (request.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">
+                                        Completed
+                                    </span>
+                                }
+                                else if (request.Status == "Cancelled")
+                                {
+                                    <span class="badge bg-danger">
+                                        Cancelled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @request.Status
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @if (request.Status == "Pending")
+                                {
+                                    <a asp-controller="ServiceManager"
+                                       asp-action="AssignWorker"
+                                       asp-route-id="@request.ServiceRequestId"
+                                       class="btn btn-success btn-sm">
+                                        Assign Worker
+                                    </a>
+                                }
+                                else if (request.Status == "Assigned")
+                                {
+                                    <span class="badge bg-primary">
+                                        Worker Accepted
+                                    </span>
+                                }
+                                else if (request.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">
+                                        Task Completed
+                                    </span>
+                                }
+                                else if (request.Status == "Cancelled")
+                                {
+                                    <span class="text-muted">
+                                        Cancelled
+                                    </span>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</div>

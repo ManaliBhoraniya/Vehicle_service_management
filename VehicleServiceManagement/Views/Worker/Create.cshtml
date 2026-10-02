@@ -1,99 +1,45 @@
 ﻿@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "Add Worker";
+    ViewData["Title"] = "Worker Registration";
 }
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">
-        Add Worker
-    </h2>
+    <div class="card shadow-sm">
 
-    <div class="row">
+        <div class="card-header">
+            <h3 class="mb-0">Worker Registration</h3>
+        </div>
 
-        <div class="col-md-6">
+        <div class="card-body">
 
-            <div class="card shadow-sm">
-
-                <div class="card-body">
-
-                    <form asp-action="Create"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <div asp-validation-summary="ModelOnly"
-                             class="text-danger mb-3">
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label asp-for="ApplicationUserId"
-                                   class="form-label">
-                                Application User ID
-                            </label>
-
-                            <input asp-for="ApplicationUserId"
-                                   class="form-control" />
-
-                            <span asp-validation-for="ApplicationUserId"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label asp-for="Profession"
-                                   class="form-label">
-                                Profession
-                            </label>
-
-                            <input asp-for="Profession"
-                                   class="form-control"
-                                   placeholder="e.g. Mechanic" />
-
-                            <span asp-validation-for="Profession"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <div class="mb-3 form-check">
-
-                            <input asp-for="IsAvailable"
-                                   class="form-check-input" />
-
-                            <label asp-for="IsAvailable"
-                                   class="form-check-label">
-                                Is Available
-                            </label>
-
-                        </div>
-
-                        <button type="submit"
-                                class="btn btn-success">
-                            Add Worker
-                        </button>
-
-                        <a asp-action="Manage"
-                           class="btn btn-secondary">
-                            Cancel
-                        </a>
-
-                    </form>
-
-                </div>
-
+            <div class="alert alert-info">
+                <strong>Workers register themselves.</strong>
+                <br />
+                Workers must create their own account, select their
+                specialities, and upload their resume.
+                The manager will then review and approve the account.
             </div>
+
+            <p>
+                Workers cannot be added manually from this page.
+            </p>
+
+            <a asp-controller="Account"
+               asp-action="Register"
+               class="btn btn-primary">
+                Register Worker
+            </a>
+
+            <a asp-controller="ServiceManager"
+               asp-action="Index"
+               class="btn btn-secondary ms-2">
+                Back to Manager Dashboard
+            </a>
 
         </div>
 
     </div>
 
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

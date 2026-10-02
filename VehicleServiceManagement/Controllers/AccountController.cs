@@ -218,7 +218,7 @@ namespace VehicleServiceManagement.Controllers
             string password,
             string confirmPassword,
             string role,
-            string profession,
+            List<string>? specialities,
             IFormFile? resume)
         {
             // =================================================
@@ -268,16 +268,20 @@ namespace VehicleServiceManagement.Controllers
 
             if (role == "Worker")
             {
-                if (string.IsNullOrWhiteSpace(profession))
+                // At least one speciality is required
+                if (specialities == null ||
+                    specialities.Count == 0)
                 {
                     ModelState.AddModelError(
-                        "Profession",
-                        "Profession is required for workers.");
+                        "Specialities",
+                        "Please select at least one speciality.");
 
                     return View();
                 }
 
-                if (resume == null || resume.Length == 0)
+                // Resume is required
+                if (resume == null ||
+                    resume.Length == 0)
                 {
                     ModelState.AddModelError(
                         "Resume",
@@ -407,6 +411,10 @@ namespace VehicleServiceManagement.Controllers
 
             if (role == "Worker")
             {
+                // ---------------------------------------------
+                // CREATE RESUME UPLOAD FOLDER
+                // ---------------------------------------------
+
                 var uploadsFolder =
                     Path.Combine(
                         Directory.GetCurrentDirectory(),
@@ -419,9 +427,17 @@ namespace VehicleServiceManagement.Controllers
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
+                // ---------------------------------------------
+                // GET FILE EXTENSION
+                // ---------------------------------------------
+
                 var extension =
                     Path.GetExtension(resume!.FileName)
                         .ToLowerInvariant();
+
+                // ---------------------------------------------
+                // CREATE UNIQUE FILE NAME
+                // ---------------------------------------------
 
                 var uniqueFileName =
                     Guid.NewGuid().ToString() + extension;
@@ -431,6 +447,10 @@ namespace VehicleServiceManagement.Controllers
                         uploadsFolder,
                         uniqueFileName);
 
+                // ---------------------------------------------
+                // SAVE RESUME
+                // ---------------------------------------------
+
                 using (var stream =
                        new FileStream(
                            filePath,
@@ -439,13 +459,18 @@ namespace VehicleServiceManagement.Controllers
                     await resume.CopyToAsync(stream);
                 }
 
+                // ---------------------------------------------
+                // CREATE WORKER
+                // ---------------------------------------------
+
                 var worker = new Worker
                 {
                     ApplicationUserId = user.Id,
-                    Profession = profession,
+
                     IsAvailable = false,
 
-                    ResumeFileName = resume.FileName,
+                    ResumeFileName =
+                        resume.FileName,
 
                     ResumeFilePath =
                         "/uploads/resumes/" +
@@ -456,9 +481,32 @@ namespace VehicleServiceManagement.Controllers
 
                 _context.Workers.Add(worker);
 
+                // Save first so WorkerId is generated
                 await _context.SaveChangesAsync();
 
-                // Worker must wait for manager approval
+                // ---------------------------------------------
+                // SAVE WORKER SPECIALITIES
+                // ---------------------------------------------
+
+                foreach (var speciality in specialities!)
+                {
+                    if (!string.IsNullOrWhiteSpace(speciality))
+                    {
+                        _context.WorkerSpecialities.Add(
+                            new WorkerSpeciality
+                            {
+                                WorkerId = worker.WorkerId,
+                                Speciality = speciality
+                            });
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                // ---------------------------------------------
+                // WORKER MUST WAIT FOR MANAGER APPROVAL
+                // ---------------------------------------------
+
                 return RedirectToAction(
                     "JobRequestSubmitted",
                     "Account");
@@ -545,15 +593,31 @@ namespace VehicleServiceManagement.Controllers
             if (user == null)
                 return Challenge();
 
+            // ---------------------------------------------
+            // REMOVE WORKER
+            // ---------------------------------------------
+
             var worker =
                 await _context.Workers
+                    .Include(w => w.Specialities)
                     .FirstOrDefaultAsync(
                         w => w.ApplicationUserId == user.Id);
 
             if (worker != null)
             {
+                // Remove worker specialities first
+                if (worker.Specialities != null)
+                {
+                    _context.WorkerSpecialities.RemoveRange(
+                        worker.Specialities);
+                }
+
                 _context.Workers.Remove(worker);
             }
+
+            // ---------------------------------------------
+            // REMOVE CUSTOMER
+            // ---------------------------------------------
 
             var customer =
                 await _context.Customers
@@ -566,6 +630,10 @@ namespace VehicleServiceManagement.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            // ---------------------------------------------
+            // REMOVE IDENTITY USER
+            // ---------------------------------------------
 
             var result =
                 await _userManager.DeleteAsync(user);

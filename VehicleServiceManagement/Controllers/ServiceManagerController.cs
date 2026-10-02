@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VehicleServiceManagement.Data;
+using VehicleServiceManagement.Models;
 
 namespace VehicleServiceManagement.Controllers
 {
@@ -21,6 +22,7 @@ namespace VehicleServiceManagement.Controllers
         // GET: /ServiceManager
         // =====================================================
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             ViewBag.CustomerCount =
@@ -48,13 +50,13 @@ namespace VehicleServiceManagement.Controllers
                 await _context.ServiceRequests
                     .CountAsync(s => s.Status == "Completed");
 
-            // =================================================
-            // PENDING WORKER JOB REQUESTS
-            // =================================================
-
             ViewBag.PendingJobRequests =
                 await _context.Workers
                     .CountAsync(w => w.Status == "Pending");
+
+            ViewBag.RejectedAssignments =
+                await _context.ServiceAssignments
+                    .CountAsync(a => a.Status == "Rejected");
 
             return View();
         }
@@ -68,11 +70,13 @@ namespace VehicleServiceManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> ServiceRequests()
         {
-            var requests = await _context.ServiceRequests
-                .Include(s => s.Vehicle)
-                    .ThenInclude(v => v.Customer)
-                .OrderByDescending(s => s.RequestDate)
-                .ToListAsync();
+            var requests =
+                await _context.ServiceRequests
+                    .Include(s => s.Vehicle)
+                        .ThenInclude(v => v.Customer)
+                    .OrderByDescending(
+                        s => s.RequestDate)
+                    .ToListAsync();
 
             return View(requests);
         }
@@ -80,7 +84,6 @@ namespace VehicleServiceManagement.Controllers
 
         // =====================================================
         // UPDATE SERVICE REQUEST STATUS
-        // POST: /ServiceManager/UpdateRequestStatus
         // =====================================================
 
         [HttpPost]
@@ -91,7 +94,8 @@ namespace VehicleServiceManagement.Controllers
         {
             var request =
                 await _context.ServiceRequests
-                    .FirstOrDefaultAsync(s => s.Id == id);
+                    .FirstOrDefaultAsync(
+                        s => s.ServiceRequestId == id);
 
             if (request == null)
             {
@@ -108,17 +112,341 @@ namespace VehicleServiceManagement.Controllers
 
 
         // =====================================================
+        // ASSIGN WORKER - GET
+        // Shows only accepted + available workers
+        // whose speciality matches the service request
+        // =====================================================
+
+        [HttpGet]
+        public async Task<IActionResult> AssignWorker(
+            int id)
+        {
+            var request =
+                await _context.ServiceRequests
+                    .Include(s => s.Vehicle)
+                        .ThenInclude(v => v.Customer)
+                    .FirstOrDefaultAsync(
+                        s => s.ServiceRequestId == id);
+
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            // -------------------------------------------------
+            // Find workers whose speciality matches
+            // the requested service type.
+            // -------------------------------------------------
+
+            var workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Include(w => w.Specialities)
+                    .Where(w =>
+                        w.Status == "Accepted" &&
+                        w.IsAvailable &&
+                        w.Specialities.Any(
+                            s => s.Speciality ==
+                                 request.ServiceType))
+                    .OrderBy(w =>
+                        w.ApplicationUser!.Name)
+                    .ToListAsync();
+
+            ViewBag.Workers = workers;
+
+            return View(request);
+        }
+
+
+        // =====================================================
+        // ASSIGN WORKER - POST
+        // =====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignWorker(
+            int serviceRequestId,
+            int workerId,
+            DateTime serviceDate,
+            TimeSpan serviceTime)
+        {
+            var request =
+                await _context.ServiceRequests
+                    .FirstOrDefaultAsync(
+                        s =>
+                            s.ServiceRequestId ==
+                            serviceRequestId);
+
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            // -------------------------------------------------
+            // Make sure the selected worker:
+            // 1. Exists
+            // 2. Is accepted
+            // 3. Is available
+            // 4. Has matching speciality
+            // -------------------------------------------------
+
+            var worker =
+                await _context.Workers
+                    .Include(w => w.Specialities)
+                    .FirstOrDefaultAsync(
+                        w =>
+                            w.WorkerId == workerId &&
+                            w.Status == "Accepted" &&
+                            w.IsAvailable &&
+                            w.Specialities.Any(
+                                s => s.Speciality ==
+                                     request.ServiceType));
+
+            if (worker == null)
+            {
+                TempData["Error"] =
+                    "The selected worker is not available or does not have the required speciality.";
+
+                return RedirectToAction(
+                    nameof(ServiceRequests));
+            }
+
+            // -------------------------------------------------
+            // Prevent duplicate active assignment
+            // -------------------------------------------------
+
+            var existingAssignment =
+                await _context.ServiceAssignments
+                    .AnyAsync(
+                        a =>
+                            a.ServiceRequestId ==
+                                serviceRequestId &&
+                            (a.Status == "Pending" ||
+                             a.Status == "Accepted"));
+
+            if (existingAssignment)
+            {
+                TempData["Error"] =
+                    "This service request already has an active worker assignment.";
+
+                return RedirectToAction(
+                    nameof(ServiceRequests));
+            }
+
+            // -------------------------------------------------
+            // Create assignment
+            // -------------------------------------------------
+
+            var assignment =
+                new ServiceAssignment
+                {
+                    ServiceRequestId =
+                        serviceRequestId,
+
+                    WorkerId =
+                        workerId,
+
+                    Status = "Pending",
+
+                    AssignedDate =
+                        serviceDate.Date.Add(serviceTime),
+
+                    Notes =
+                        "Task assigned by Service Manager."
+                };
+
+            _context.ServiceAssignments.Add(
+                assignment);
+
+            // IMPORTANT:
+            // Request remains Pending until worker accepts.
+            request.Status = "Pending";
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Task assigned successfully. The worker must accept or reject the task.";
+
+            return RedirectToAction(
+                nameof(ServiceRequests));
+        }
+
+
+        // =====================================================
+        // REASSIGN REJECTED TASK - GET
+        // =====================================================
+
+        [HttpGet]
+        public async Task<IActionResult> ReassignWorker(
+            int id)
+        {
+            var assignment =
+                await _context.ServiceAssignments
+                    .Include(a => a.ServiceRequest)
+                    .Include(a => a.Worker)
+                        .ThenInclude(w => w.ApplicationUser)
+                    .FirstOrDefaultAsync(
+                        a =>
+                            a.ServiceAssignmentId == id &&
+                            a.Status == "Rejected");
+
+            if (assignment == null)
+            {
+                return NotFound();
+            }
+
+            var serviceType =
+                assignment.ServiceRequest?.ServiceType;
+
+            if (string.IsNullOrWhiteSpace(serviceType))
+            {
+                TempData["Error"] =
+                    "The service type could not be found.";
+
+                return RedirectToAction(
+                    nameof(ServiceRequests));
+            }
+
+            var rejectedWorkerId =
+                assignment.WorkerId;
+
+            // -------------------------------------------------
+            // Find another accepted and available worker
+            // with the required speciality.
+            // -------------------------------------------------
+
+            var workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Include(w => w.Specialities)
+                    .Where(w =>
+                        w.Status == "Accepted" &&
+                        w.IsAvailable &&
+                        w.WorkerId != rejectedWorkerId &&
+                        w.Specialities.Any(
+                            s => s.Speciality == serviceType))
+                    .OrderBy(w =>
+                        w.ApplicationUser!.Name)
+                    .ToListAsync();
+
+            ViewBag.Workers = workers;
+
+            return View(assignment);
+        }
+
+
+        // =====================================================
+        // REASSIGN REJECTED TASK - POST
+        // =====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReassignWorker(
+            int assignmentId,
+            int workerId,
+            DateTime serviceDate,
+            TimeSpan serviceTime)
+        {
+            var oldAssignment =
+                await _context.ServiceAssignments
+                    .Include(a => a.ServiceRequest)
+                    .FirstOrDefaultAsync(
+                        a =>
+                            a.ServiceAssignmentId ==
+                                assignmentId &&
+                            a.Status == "Rejected");
+
+            if (oldAssignment == null)
+            {
+                return NotFound();
+            }
+
+            var request =
+                oldAssignment.ServiceRequest;
+
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            // -------------------------------------------------
+            // Find another matching worker
+            // -------------------------------------------------
+
+            var worker =
+                await _context.Workers
+                    .Include(w => w.Specialities)
+                    .FirstOrDefaultAsync(
+                        w =>
+                            w.WorkerId == workerId &&
+                            w.Status == "Accepted" &&
+                            w.IsAvailable &&
+                            w.WorkerId !=
+                                oldAssignment.WorkerId &&
+                            w.Specialities.Any(
+                                s => s.Speciality ==
+                                     request.ServiceType));
+
+            if (worker == null)
+            {
+                TempData["Error"] =
+                    "The selected worker is not available or does not have the required speciality.";
+
+                return RedirectToAction(
+                    nameof(ServiceRequests));
+            }
+
+            // -------------------------------------------------
+            // Create new assignment
+            // -------------------------------------------------
+
+            var newAssignment =
+                new ServiceAssignment
+                {
+                    ServiceRequestId =
+                        request.ServiceRequestId,
+
+                    WorkerId =
+                        workerId,
+
+                    Status = "Pending",
+
+                    AssignedDate =
+                        serviceDate.Date.Add(serviceTime),
+
+                    Notes =
+                        "Task reassigned by Service Manager."
+                };
+
+            _context.ServiceAssignments.Add(
+                newAssignment);
+
+            // Service request is again waiting for
+            // the new worker's response.
+            request.Status = "Pending";
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Task has been reassigned to another suitable worker.";
+
+            return RedirectToAction(
+                nameof(ServiceRequests));
+        }
+
+
+        // =====================================================
         // CUSTOMERS
-        // GET: /ServiceManager/Customers
         // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> Customers()
         {
-            var customers = await _context.Customers
-                .Include(c => c.ApplicationUser)
-                .Include(c => c.Vehicles)
-                .ToListAsync();
+            var customers =
+                await _context.Customers
+                    .Include(c => c.ApplicationUser)
+                    .Include(c => c.Vehicles)
+                    .ToListAsync();
 
             return View(customers);
         }
@@ -126,19 +454,18 @@ namespace VehicleServiceManagement.Controllers
 
         // =====================================================
         // WORKERS
-        // GET: /ServiceManager/Workers
+        // Only accepted workers
         // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> Workers()
         {
-            // Only accepted workers appear here.
-            // Pending workers appear under Job Requests.
-
-            var workers = await _context.Workers
-                .Include(w => w.ApplicationUser)
-                .Where(w => w.Status == "Accepted")
-                .ToListAsync();
+            var workers =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Include(w => w.Specialities)
+                    .Where(w => w.Status == "Accepted")
+                    .ToListAsync();
 
             return View(workers);
         }
@@ -146,16 +473,17 @@ namespace VehicleServiceManagement.Controllers
 
         // =====================================================
         // VEHICLES
-        // GET: /ServiceManager/Vehicles
         // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> Vehicles()
         {
-            var vehicles = await _context.Vehicles
-                .Include(v => v.Customer)
-                    .ThenInclude(c => c.ApplicationUser)
-                .ToListAsync();
+            var vehicles =
+                await _context.Vehicles
+                    .Include(v => v.Customer)
+                        .ThenInclude(c =>
+                            c.ApplicationUser)
+                    .ToListAsync();
 
             return View(vehicles);
         }
@@ -163,18 +491,21 @@ namespace VehicleServiceManagement.Controllers
 
         // =====================================================
         // ASSIGNMENTS
-        // GET: /ServiceManager/Assignments
         // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> Assignments()
         {
-            var assignments = await _context.ServiceAssignments
-                .Include(a => a.ServiceRequest)
-                    .ThenInclude(s => s.Vehicle)
-                .Include(a => a.Worker)
-                    .ThenInclude(w => w.ApplicationUser)
-                .ToListAsync();
+            var assignments =
+                await _context.ServiceAssignments
+                    .Include(a => a.ServiceRequest)
+                        .ThenInclude(s => s.Vehicle)
+                    .Include(a => a.Worker)
+                        .ThenInclude(w =>
+                            w.ApplicationUser)
+                    .OrderByDescending(
+                        a => a.AssignedDate)
+                    .ToListAsync();
 
             return View(assignments);
         }
@@ -182,25 +513,26 @@ namespace VehicleServiceManagement.Controllers
 
         // =====================================================
         // JOB REQUESTS
-        // GET: /ServiceManager/JobRequests
+        // Worker registration requests
         // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> JobRequests()
         {
-            var requests = await _context.Workers
-                .Include(w => w.ApplicationUser)
-                .Where(w => w.Status == "Pending")
-                .OrderBy(w => w.WorkerId)
-                .ToListAsync();
+            var requests =
+                await _context.Workers
+                    .Include(w => w.ApplicationUser)
+                    .Include(w => w.Specialities)
+                    .Where(w => w.Status == "Pending")
+                    .OrderBy(w => w.WorkerId)
+                    .ToListAsync();
 
             return View(requests);
         }
 
 
         // =====================================================
-        // ACCEPT JOB REQUEST
-        // POST: /ServiceManager/AcceptJobRequest
+        // ACCEPT WORKER JOB REQUEST
         // =====================================================
 
         [HttpPost]
@@ -218,8 +550,6 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
-            // Only pending requests can be accepted.
-
             if (worker.Status != "Pending")
             {
                 TempData["Error"] =
@@ -228,10 +558,6 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction(
                     nameof(JobRequests));
             }
-
-            // =================================================
-            // ACCEPT WORKER
-            // =================================================
 
             worker.Status = "Accepted";
 
@@ -248,8 +574,7 @@ namespace VehicleServiceManagement.Controllers
 
 
         // =====================================================
-        // REJECT JOB REQUEST
-        // POST: /ServiceManager/RejectJobRequest
+        // REJECT WORKER JOB REQUEST
         // =====================================================
 
         [HttpPost]
@@ -267,8 +592,6 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
-            // Only pending requests can be rejected.
-
             if (worker.Status != "Pending")
             {
                 TempData["Error"] =
@@ -277,10 +600,6 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction(
                     nameof(JobRequests));
             }
-
-            // =================================================
-            // REJECT WORKER
-            // =================================================
 
             worker.Status = "Rejected";
 

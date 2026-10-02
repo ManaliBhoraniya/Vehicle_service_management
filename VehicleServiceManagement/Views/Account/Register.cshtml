@@ -3,7 +3,9 @@
 }
 
 <div class="container mt-5">
+
     <div class="row justify-content-center">
+
         <div class="col-md-7 col-lg-6">
 
             <div class="card shadow-sm">
@@ -27,6 +29,7 @@
 
                         <!-- NAME -->
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Name
                             </label>
@@ -36,10 +39,12 @@
                                    class="form-control"
                                    placeholder="Enter your name"
                                    required />
+
                         </div>
 
                         <!-- EMAIL -->
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Email
                             </label>
@@ -49,10 +54,12 @@
                                    class="form-control"
                                    placeholder="Enter your email"
                                    required />
+
                         </div>
 
                         <!-- ROLE -->
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Register As
                             </label>
@@ -79,27 +86,169 @@
                                 </option>
 
                             </select>
+
                         </div>
 
                         <!-- WORKER ONLY FIELDS -->
                         <div id="workerFields"
                              style="display:none;">
 
-                            <!-- PROFESSION -->
+                            <!-- SPECIALITIES -->
                             <div class="mb-3">
-                                <label class="form-label">
-                                    Profession
+
+                                <label class="form-label fw-bold">
+                                    Select Your Specialities
                                 </label>
 
-                                <input type="text"
-                                       name="profession"
-                                       id="profession"
-                                       class="form-control"
-                                       placeholder="Enter your profession" />
+                                <p class="text-muted small">
+                                    Select all services that you are
+                                    qualified to perform.
+                                </p>
+
+                                <div id="specialityContainer"
+                                     class="border rounded p-3">
+
+                                    <!-- ENGINE REPAIR -->
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="Engine Repair"
+                                               id="engineRepair" />
+
+                                        <label class="form-check-label"
+                                               for="engineRepair">
+                                            Engine Repair
+                                        </label>
+
+                                    </div>
+
+                                    <!-- BRAKE REPAIR -->
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="Brake Repair"
+                                               id="brakeRepair" />
+
+                                        <label class="form-check-label"
+                                               for="brakeRepair">
+                                            Brake Repair
+                                        </label>
+
+                                    </div>
+
+                                    <!-- OIL CHANGE -->
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="Oil Change"
+                                               id="oilChange" />
+
+                                        <label class="form-check-label"
+                                               for="oilChange">
+                                            Oil Change
+                                        </label>
+
+                                    </div>
+
+                                    <!-- AC REPAIR -->
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="AC Repair"
+                                               id="acRepair" />
+
+                                        <label class="form-check-label"
+                                               for="acRepair">
+                                            AC Repair
+                                        </label>
+
+                                    </div>
+
+                                    <!-- ELECTRICAL REPAIR -->
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="Electrical Repair"
+                                               id="electricalRepair" />
+
+                                        <label class="form-check-label"
+                                               for="electricalRepair">
+                                            Electrical Repair
+                                        </label>
+
+                                    </div>
+
+                                    <!-- TIRE & WHEEL SERVICE -->
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="Tire & Wheel Service"
+                                               id="tireWheelService" />
+
+                                        <label class="form-check-label"
+                                               for="tireWheelService">
+                                            Tire &amp; Wheel Service
+                                        </label>
+
+                                    </div>
+
+                                    <!-- TRANSMISSION REPAIR -->
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="Transmission Repair"
+                                               id="transmissionRepair" />
+
+                                        <label class="form-check-label"
+                                               for="transmissionRepair">
+                                            Transmission Repair
+                                        </label>
+
+                                    </div>
+
+                                    <!-- GENERAL SERVICE -->
+                                    <div class="form-check">
+
+                                        <input class="form-check-input speciality-checkbox"
+                                               type="checkbox"
+                                               name="specialities"
+                                               value="General Service"
+                                               id="generalService" />
+
+                                        <label class="form-check-label"
+                                               for="generalService">
+                                            General Service
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+                                <div id="specialityError"
+                                     class="text-danger mt-2"
+                                     style="display:none;">
+                                    Please select at least one speciality.
+                                </div>
+
                             </div>
 
                             <!-- RESUME -->
                             <div class="mb-3">
+
                                 <label class="form-label">
                                     Resume
                                 </label>
@@ -113,12 +262,14 @@
                                 <small class="text-muted">
                                     PDF, DOC or DOCX. Maximum 5 MB.
                                 </small>
+
                             </div>
 
                         </div>
 
                         <!-- PASSWORD -->
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Password
                             </label>
@@ -133,10 +284,12 @@
                                 Minimum 6 characters with uppercase,
                                 lowercase, number and special character.
                             </small>
+
                         </div>
 
                         <!-- CONFIRM PASSWORD -->
                         <div class="mb-3">
+
                             <label class="form-label">
                                 Confirm Password
                             </label>
@@ -146,6 +299,7 @@
                                    class="form-control"
                                    placeholder="Confirm your password"
                                    required />
+
                         </div>
 
                         <!-- REGISTER -->
@@ -157,18 +311,24 @@
                     </form>
 
                     <div class="text-center mt-4">
+
                         Already have an account?
+
                         <a asp-controller="Account"
                            asp-action="Login">
                             Login
                         </a>
+
                     </div>
 
                 </div>
+
             </div>
 
         </div>
+
     </div>
+
 </div>
 
 @section Scripts {
@@ -185,38 +345,100 @@
             const workerFields =
                 document.getElementById("workerFields");
 
-            const profession =
-                document.getElementById("profession");
-
             const resume =
                 document.getElementById("resume");
 
+            const specialityCheckboxes =
+                document.querySelectorAll(
+                    ".speciality-checkbox"
+                );
+
             if (role === "Worker") {
 
+                // Show worker fields
                 workerFields.style.display = "block";
 
-                profession.required = true;
+                // Resume required
                 resume.required = true;
 
-            } else {
+            }
+            else {
 
+                // Hide worker fields
                 workerFields.style.display = "none";
 
-                profession.required = false;
+                // Resume not required
                 resume.required = false;
 
-                profession.value = "";
+                // Clear resume
                 resume.value = "";
+
+                // Clear speciality selections
+                specialityCheckboxes.forEach(
+                    checkbox => {
+                        checkbox.checked = false;
+                    }
+                );
+
+                document.getElementById(
+                    "specialityError"
+                ).style.display = "none";
             }
         }
 
-        document
-            .getElementById("role")
+
+        // Validate speciality selection
+        document.querySelector("form").addEventListener(
+            "submit",
+            function (event) {
+
+                const role =
+                    document.getElementById("role").value;
+
+                if (role !== "Worker") {
+                    return;
+                }
+
+                const checkboxes =
+                    document.querySelectorAll(
+                        ".speciality-checkbox:checked"
+                    );
+
+                const error =
+                    document.getElementById(
+                        "specialityError"
+                    );
+
+                if (checkboxes.length === 0) {
+
+                    event.preventDefault();
+
+                    error.style.display = "block";
+
+                    error.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                }
+                else {
+
+                    error.style.display = "none";
+
+                }
+            }
+        );
+
+
+        // Update fields when role changes
+        document.getElementById("role")
             .addEventListener(
                 "change",
                 updateWorkerFields
             );
 
+
+        // Run once when page loads
         updateWorkerFields();
 
     </script>

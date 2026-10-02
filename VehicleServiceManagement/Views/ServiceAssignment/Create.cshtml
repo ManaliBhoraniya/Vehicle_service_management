@@ -2,36 +2,57 @@
 
 @{
     ViewData["Title"] = "Create Service Assignment";
-
-    var workers =
-        ViewBag.Workers as List<VehicleServiceManagement.Models.Worker>
-        ?? new List<VehicleServiceManagement.Models.Worker>();
-
-    var serviceRequests =
-        ViewBag.ServiceRequests as List<VehicleServiceManagement.Models.ServiceRequest>
-        ?? new List<VehicleServiceManagement.Models.ServiceRequest>();
 }
 
 <div class="container mt-4">
 
-    <div class="card shadow">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>
+                Create Service Assignment
+            </h2>
+
+            <p class="text-muted mb-0">
+                Assign a service request to a qualified worker.
+            </p>
+        </div>
+
+        <a asp-controller="ServiceManager"
+           asp-action="Assignments"
+           class="btn btn-outline-secondary">
+            Back to Assignments
+        </a>
+
+    </div>
+
+
+    <div class="card shadow-sm">
 
         <div class="card-header">
-            <h3>Create Service Assignment</h3>
+
+            <h5 class="mb-0">
+                Assignment Details
+            </h5>
+
         </div>
+
 
         <div class="card-body">
 
-            <form asp-action="Create" method="post">
+            <form asp-controller="ServiceAssignment"
+                  asp-action="Create"
+                  method="post">
 
                 @Html.AntiForgeryToken()
+
 
                 <div asp-validation-summary="ModelOnly"
                      class="text-danger mb-3">
                 </div>
 
 
-                <!-- Service Request -->
+                <!-- SERVICE REQUEST -->
 
                 <div class="mb-3">
 
@@ -41,29 +62,12 @@
                     </label>
 
                     <select asp-for="ServiceRequestId"
-                            class="form-select">
+                            class="form-select"
+                            asp-items="ViewBag.ServiceRequestId">
 
                         <option value="">
                             -- Select Service Request --
                         </option>
-
-                        @foreach (var request in serviceRequests)
-                        {
-                            <option value="@request.ServiceRequestId">
-
-                                #@request.ServiceRequestId
-                                -
-                                @request.ServiceType
-
-                                @if (!string.IsNullOrWhiteSpace(request.CustomerName))
-                                {
-                                    <text>
-                                        - @request.CustomerName
-                                    </text>
-                                }
-
-                            </option>
-                        }
 
                     </select>
 
@@ -74,7 +78,7 @@
                 </div>
 
 
-                <!-- Worker -->
+                <!-- WORKER -->
 
                 <div class="mb-3">
 
@@ -84,29 +88,12 @@
                     </label>
 
                     <select asp-for="WorkerId"
-                            class="form-select">
+                            class="form-select"
+                            asp-items="ViewBag.WorkerId">
 
                         <option value="">
                             -- Select Worker --
                         </option>
-
-                        @foreach (var worker in workers)
-                        {
-                            <option value="@worker.WorkerId">
-
-                                @if (worker.ApplicationUser != null)
-                                {
-                                    @worker.ApplicationUser.Name
-                                }
-                                else
-                                {
-                                    @worker.Profession
-                                }
-
-                                - @worker.Profession
-
-                            </option>
-                        }
 
                     </select>
 
@@ -114,10 +101,15 @@
                           class="text-danger">
                     </span>
 
+                    <div class="form-text">
+                        Select an accepted and available worker
+                        with the required speciality.
+                    </div>
+
                 </div>
 
 
-                <!-- Status -->
+                <!-- STATUS -->
 
                 <div class="mb-3">
 
@@ -133,16 +125,16 @@
                             Pending
                         </option>
 
-                        <option value="In Progress">
-                            In Progress
+                        <option value="Accepted">
+                            Accepted
+                        </option>
+
+                        <option value="Rejected">
+                            Rejected
                         </option>
 
                         <option value="Completed">
                             Completed
-                        </option>
-
-                        <option value="Cancelled">
-                            Cancelled
                         </option>
 
                     </select>
@@ -154,7 +146,27 @@
                 </div>
 
 
-                <!-- Notes -->
+                <!-- ASSIGNED DATE -->
+
+                <div class="mb-3">
+
+                    <label asp-for="AssignedDate"
+                           class="form-label">
+                        Assigned Date
+                    </label>
+
+                    <input asp-for="AssignedDate"
+                           type="datetime-local"
+                           class="form-control" />
+
+                    <span asp-validation-for="AssignedDate"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- NOTES -->
 
                 <div class="mb-3">
 
@@ -165,7 +177,9 @@
 
                     <textarea asp-for="Notes"
                               class="form-control"
-                              rows="4"></textarea>
+                              rows="4"
+                              placeholder="Optional notes">
+                    </textarea>
 
                     <span asp-validation-for="Notes"
                           class="text-danger">
@@ -174,15 +188,16 @@
                 </div>
 
 
-                <div class="d-flex gap-2">
+                <div class="mt-4">
 
                     <button type="submit"
                             class="btn btn-primary">
-                        Assign Service
+                        Create Assignment
                     </button>
 
-                    <a asp-action="Index"
-                       class="btn btn-secondary">
+                    <a asp-controller="ServiceManager"
+                       asp-action="Assignments"
+                       class="btn btn-secondary ms-2">
                         Cancel
                     </a>
 
@@ -196,10 +211,12 @@
 
 </div>
 
-@section Scripts
-{
+
+@section Scripts {
+
     @{
         await Html.RenderPartialAsync(
             "_ValidationScriptsPartial");
     }
+
 }

@@ -6,60 +6,60 @@
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">
-        Worker Details
-    </h2>
-
     <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h3 class="mb-0">Worker Details</h3>
+        </div>
 
         <div class="card-body">
 
             <dl class="row">
 
-                <dt class="col-sm-3">
-                    Worker ID
-                </dt>
+                <dt class="col-sm-3">Worker ID</dt>
+                <dd class="col-sm-9">@Model.WorkerId</dd>
 
+                <dt class="col-sm-3">Name</dt>
                 <dd class="col-sm-9">
-                    @Model.Id
+                    @(Model.ApplicationUser?.Name ?? "N/A")
                 </dd>
 
-                <dt class="col-sm-3">
-                    Name
-                </dt>
-
+                <dt class="col-sm-3">Email</dt>
                 <dd class="col-sm-9">
-                    @Model.ApplicationUser?.Name
+                    @(Model.ApplicationUser?.Email ?? "N/A")
                 </dd>
 
-                <dt class="col-sm-3">
-                    Username
-                </dt>
-
+                <dt class="col-sm-3">Phone</dt>
                 <dd class="col-sm-9">
-                    @Model.ApplicationUser?.UserName
+                    @(Model.ApplicationUser?.PhoneNumber ?? "N/A")
                 </dd>
 
-                <dt class="col-sm-3">
-                    Email
-                </dt>
-
+                <dt class="col-sm-3">Specialities</dt>
                 <dd class="col-sm-9">
-                    @Model.ApplicationUser?.Email
+
+                    @if (Model.Specialities != null &&
+                         Model.Specialities.Any())
+                    {
+                        foreach (var speciality in Model.Specialities)
+                        {
+                            <span class="badge bg-primary me-1 mb-1">
+                                @speciality.Speciality
+                            </span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            No specialities listed
+                        </span>
+                    }
+
                 </dd>
 
-                <dt class="col-sm-3">
-                    Profession
-                </dt>
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">@Model.Status</dd>
 
-                <dd class="col-sm-9">
-                    @Model.Profession
-                </dd>
-
-                <dt class="col-sm-3">
-                    Availability
-                </dt>
-
+                <dt class="col-sm-3">Availability</dt>
                 <dd class="col-sm-9">
 
                     @if (Model.IsAvailable)
@@ -70,8 +70,8 @@
                     }
                     else
                     {
-                        <span class="badge bg-danger">
-                            Busy
+                        <span class="badge bg-secondary">
+                            Not Available
                         </span>
                     }
 
@@ -79,15 +79,10 @@
 
             </dl>
 
-            <a asp-action="Edit"
-               asp-route-id="@Model.Id"
-               class="btn btn-primary">
-                Edit
-            </a>
-
-            <a asp-action="Manage"
+            <a asp-controller="ServiceManager"
+               asp-action="Workers"
                class="btn btn-secondary">
-                Back
+                Back to Workers
             </a>
 
         </div>

@@ -1,120 +1,138 @@
 ﻿@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "Edit Profile";
+    ViewData["Title"] = "Edit Worker";
+
+    var specialityOptions = new[]
+    {
+        "Engine Repair",
+        "Brake Repair",
+        "Oil Change",
+        "AC Repair",
+        "Electrical Repair",
+        "Tire & Wheel Service",
+        "Transmission Repair",
+        "General Service"
+    };
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-7">
+<div class="container mt-4">
 
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Edit Profile</h3>
-                </div>
+    <div class="card shadow-sm">
 
-                <div class="card-body">
+        <div class="card-header">
+            <h3 class="mb-0">Edit Profile</h3>
+        </div>
 
-                    @if (TempData["Success"] != null)
-                    {
-                        <div class="alert alert-success">
-                            @TempData["Success"]
-                        </div>
-                    }
+        <div class="card-body">
 
-                    <form asp-action="Edit"
-                          asp-controller="Worker"
-                          method="post">
+            <form asp-controller="Worker"
+                  asp-action="Edit"
+                  method="post">
 
-                        @Html.AntiForgeryToken()
+                <input type="hidden"
+                       name="workerId"
+                       value="@Model.WorkerId" />
 
-                        <!-- IMPORTANT: send WorkerId using the exact
-                             parameter name expected by the controller -->
-                        <input type="hidden"
-                               name="workerId"
-                               value="@Model.WorkerId" />
+                <div class="mb-3">
 
-                        <div class="mb-3">
-                            <label class="form-label">
-                                Username / Email
-                            </label>
+                    <label class="form-label">
+                        Name
+                    </label>
 
-                            <input type="text"
-                                   class="form-control"
-                                   value="@Model.ApplicationUser?.UserName"
-                                   readonly />
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="name" class="form-label">
-                                Full Name
-                            </label>
-
-                            <input type="text"
-                                   id="name"
-                                   name="name"
-                                   class="form-control"
-                                   value="@Model.ApplicationUser?.Name"
-                                   required />
-
-                            <span class="text-danger">
-                                @Html.ValidationMessage("Name")
-                            </span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">
-                                Phone Number
-                            </label>
-
-                            <input type="text"
-                                   id="phone"
-                                   name="phone"
-                                   class="form-control"
-                                   value="@Model.ApplicationUser?.PhoneNumber" />
-
-                            <span class="text-danger">
-                                @Html.ValidationMessage("Phone")
-                            </span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="profession" class="form-label">
-                                Profession
-                            </label>
-
-                            <input type="text"
-                                   id="profession"
-                                   name="profession"
-                                   class="form-control"
-                                   value="@Model.Profession"
-                                   required />
-
-                            <span class="text-danger">
-                                @Html.ValidationMessage("Profession")
-                            </span>
-                        </div>
-
-                        <div class="d-flex gap-2 mt-4">
-
-                            <button type="submit"
-                                    class="btn btn-primary">
-                                Save Changes
-                            </button>
-
-                            <a asp-controller="Worker"
-                               asp-action="Index"
-                               class="btn btn-secondary">
-                                Cancel
-                            </a>
-
-                        </div>
-
-                    </form>
+                    <input type="text"
+                           name="name"
+                           value="@Model.ApplicationUser?.Name"
+                           class="form-control"
+                           required />
 
                 </div>
-            </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Phone
+                    </label>
+
+                    <input type="text"
+                           name="phone"
+                           value="@Model.ApplicationUser?.PhoneNumber"
+                           class="form-control" />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Email
+                    </label>
+
+                    <input type="text"
+                           value="@Model.ApplicationUser?.Email"
+                           class="form-control"
+                           readonly />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Specialities
+                    </label>
+
+                    <div class="row">
+
+                        @foreach (var speciality in specialityOptions)
+                        {
+                            var selected =
+                                Model.Specialities != null &&
+                                Model.Specialities.Any(
+                                    s => s.Speciality == speciality);
+
+                            <div class="col-md-6 col-lg-4 mb-2">
+
+                                <div class="form-check">
+
+                                    <input type="checkbox"
+                                           class="form-check-input"
+                                           name="specialities"
+                                           value="@speciality"
+                                           id="speciality_@speciality.GetHashCode()"
+                                           @(selected ? "checked" : "") />
+
+                                    <label class="form-check-label"
+                                           for="speciality_@speciality.GetHashCode()">
+                                        @speciality
+                                    </label>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                    <small class="text-muted">
+                        Select at least one speciality.
+                    </small>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Save Changes
+                </button>
+
+                <a asp-controller="Worker"
+                   asp-action="Index"
+                   class="btn btn-secondary ms-2">
+                    Cancel
+                </a>
+
+            </form>
 
         </div>
+
     </div>
+
 </div>

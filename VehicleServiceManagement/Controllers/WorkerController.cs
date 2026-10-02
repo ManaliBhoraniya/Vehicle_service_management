@@ -40,6 +40,7 @@ namespace VehicleServiceManagement.Controllers
 
             var worker = await _context.Workers
                 .Include(w => w.ApplicationUser)
+                .Include(w => w.Specialities)
                 .Include(w => w.Availabilities)
                 .Include(w => w.ServiceAssignments)
                     .ThenInclude(sa => sa.ServiceRequest)
@@ -56,7 +57,6 @@ namespace VehicleServiceManagement.Controllers
 
         // ====================================================
         // MY PROFILE
-        // Index = Worker My Profile
         // ====================================================
 
         [HttpGet]
@@ -71,6 +71,7 @@ namespace VehicleServiceManagement.Controllers
 
             var worker = await _context.Workers
                 .Include(w => w.ApplicationUser)
+                .Include(w => w.Specialities)
                 .Include(w => w.Availabilities)
                 .Include(w => w.ServiceAssignments)
                     .ThenInclude(sa => sa.ServiceRequest)
@@ -86,8 +87,7 @@ namespace VehicleServiceManagement.Controllers
         }
 
         // ====================================================
-        // EDIT MY PROFILE
-        // Edit = Worker Edit Profile
+        // EDIT MY PROFILE - GET
         // ====================================================
 
         [HttpGet]
@@ -102,6 +102,7 @@ namespace VehicleServiceManagement.Controllers
 
             var worker = await _context.Workers
                 .Include(w => w.ApplicationUser)
+                .Include(w => w.Specialities)
                 .FirstOrDefaultAsync(w =>
                     w.ApplicationUserId == user.Id);
 
@@ -113,13 +114,17 @@ namespace VehicleServiceManagement.Controllers
             return View(worker);
         }
 
+        // ====================================================
+        // EDIT MY PROFILE - POST
+        // ====================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int workerId,
             string name,
             string? phone,
-            string profession)
+            List<string>? specialities)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -130,6 +135,7 @@ namespace VehicleServiceManagement.Controllers
 
             var worker = await _context.Workers
                 .Include(w => w.ApplicationUser)
+                .Include(w => w.Specialities)
                 .FirstOrDefaultAsync(w =>
                     w.WorkerId == workerId &&
                     w.ApplicationUserId == user.Id);
@@ -139,6 +145,10 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
+            // -----------------------------------------------
+            // VALIDATE NAME
+            // -----------------------------------------------
+
             if (string.IsNullOrWhiteSpace(name))
             {
                 ModelState.AddModelError(
@@ -146,11 +156,16 @@ namespace VehicleServiceManagement.Controllers
                     "Name is required.");
             }
 
-            if (string.IsNullOrWhiteSpace(profession))
+            // -----------------------------------------------
+            // VALIDATE SPECIALITIES
+            // -----------------------------------------------
+
+            if (specialities == null ||
+                specialities.Count == 0)
             {
                 ModelState.AddModelError(
-                    "Profession",
-                    "Profession is required.");
+                    "Specialities",
+                    "Please select at least one speciality.");
             }
 
             if (!ModelState.IsValid)
@@ -158,14 +173,47 @@ namespace VehicleServiceManagement.Controllers
                 return View(worker);
             }
 
-            worker.ApplicationUser!.Name = name.Trim();
-            worker.ApplicationUser.PhoneNumber = phone?.Trim();
-            worker.Profession = profession.Trim();
+            // -----------------------------------------------
+            // UPDATE USER PROFILE
+            // -----------------------------------------------
+
+            worker.ApplicationUser!.Name =
+                name.Trim();
+
+            worker.ApplicationUser.PhoneNumber =
+                phone?.Trim();
+
+            // -----------------------------------------------
+            // REMOVE OLD SPECIALITIES
+            // -----------------------------------------------
+
+            _context.WorkerSpecialities.RemoveRange(
+                worker.Specialities);
+
+            // -----------------------------------------------
+            // ADD NEW SPECIALITIES
+            // -----------------------------------------------
+
+            foreach (var speciality in specialities!)
+            {
+                if (!string.IsNullOrWhiteSpace(speciality))
+                {
+                    _context.WorkerSpecialities.Add(
+                        new WorkerSpeciality
+                        {
+                            WorkerId =
+                                worker.WorkerId,
+
+                            Speciality =
+                                speciality.Trim()
+                        });
+                }
+            }
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
-                "Profile updated successfully.";
+                "Profile and specialities updated successfully.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -252,23 +300,30 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var availability = await _context.WorkerAvailabilities
-                .Include(a => a.Worker)
-                .FirstOrDefaultAsync(a =>
-                    a.WorkerAvailabilityId == availabilityId &&
-                    a.Worker!.ApplicationUserId == user.Id);
+            var availability =
+                await _context.WorkerAvailabilities
+                    .Include(a => a.Worker)
+                    .FirstOrDefaultAsync(a =>
+                        a.WorkerAvailabilityId ==
+                            availabilityId &&
+                        a.Worker!.ApplicationUserId ==
+                            user.Id);
 
             if (availability == null)
             {
                 return NotFound();
             }
 
-            availability.IsAvailable = isAvailable;
+            availability.IsAvailable =
+                isAvailable;
 
             if (isAvailable)
             {
-                availability.StartTime = startTime;
-                availability.EndTime = endTime;
+                availability.StartTime =
+                    startTime;
+
+                availability.EndTime =
+                    endTime;
             }
             else
             {
@@ -309,7 +364,8 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
-            if (resume == null || resume.Length == 0)
+            if (resume == null ||
+                resume.Length == 0)
             {
                 TempData["Error"] =
                     "Please select a resume.";
@@ -317,16 +373,17 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var extension = Path
-                .GetExtension(resume.FileName)
-                .ToLowerInvariant();
+            var extension =
+                Path.GetExtension(resume.FileName)
+                    .ToLowerInvariant();
 
-            var allowedExtensions = new[]
-            {
-                ".pdf",
-                ".doc",
-                ".docx"
-            };
+            var allowedExtensions =
+                new[]
+                {
+                    ".pdf",
+                    ".doc",
+                    ".docx"
+                };
 
             if (!allowedExtensions.Contains(extension))
             {
@@ -336,7 +393,8 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (resume.Length > 5 * 1024 * 1024)
+            if (resume.Length >
+                5 * 1024 * 1024)
             {
                 TempData["Error"] =
                     "Resume must be less than 5 MB.";
@@ -344,10 +402,11 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var folder = Path.Combine(
-                _environment.WebRootPath,
-                "uploads",
-                "resumes");
+            var folder =
+                Path.Combine(
+                    _environment.WebRootPath,
+                    "uploads",
+                    "resumes");
 
             if (!Directory.Exists(folder))
             {
@@ -358,13 +417,15 @@ namespace VehicleServiceManagement.Controllers
                 Guid.NewGuid().ToString() +
                 extension;
 
-            var filePath = Path.Combine(
-                folder,
-                fileName);
+            var filePath =
+                Path.Combine(
+                    folder,
+                    fileName);
 
-            using (var stream = new FileStream(
-                filePath,
-                FileMode.Create))
+            using (var stream =
+                   new FileStream(
+                       filePath,
+                       FileMode.Create))
             {
                 await resume.CopyToAsync(stream);
             }
@@ -373,7 +434,8 @@ namespace VehicleServiceManagement.Controllers
                 resume.FileName;
 
             worker.ResumeFilePath =
-                "/uploads/resumes/" + fileName;
+                "/uploads/resumes/" +
+                fileName;
 
             await _context.SaveChangesAsync();
 
@@ -406,15 +468,161 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
-            var assignments = await _context.ServiceAssignments
-                .Include(sa => sa.ServiceRequest)
-                .Where(sa =>
-                    sa.WorkerId == worker.WorkerId)
-                .OrderByDescending(sa =>
-                    sa.AssignedDate)
-                .ToListAsync();
+            var assignments =
+                await _context.ServiceAssignments
+                    .Include(sa => sa.ServiceRequest)
+                        .ThenInclude(sr => sr.Vehicle)
+                    .Where(sa =>
+                        sa.WorkerId ==
+                        worker.WorkerId)
+                    .OrderByDescending(sa =>
+                        sa.AssignedDate)
+                    .ToListAsync();
 
             return View(assignments);
+        }
+
+        // ====================================================
+        // ACCEPT TASK
+        // ====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AcceptTask(
+            int assignmentId)
+        {
+            var user =
+                await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction(
+                    "Login",
+                    "Account");
+            }
+
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(w =>
+                        w.ApplicationUserId ==
+                        user.Id &&
+                        w.Status == "Accepted");
+
+            if (worker == null)
+            {
+                return Forbid();
+            }
+
+            var assignment =
+                await _context.ServiceAssignments
+                    .Include(sa => sa.ServiceRequest)
+                    .FirstOrDefaultAsync(sa =>
+                        sa.ServiceAssignmentId ==
+                            assignmentId &&
+                        sa.WorkerId ==
+                            worker.WorkerId &&
+                        sa.Status == "Pending");
+
+            if (assignment == null)
+            {
+                TempData["Error"] =
+                    "This task is no longer available.";
+
+                return RedirectToAction(
+                    nameof(MyServices));
+            }
+
+            assignment.Status =
+                "Accepted";
+
+            if (assignment.ServiceRequest != null)
+            {
+                assignment.ServiceRequest.Status =
+                    "Assigned";
+            }
+
+            worker.IsAvailable = false;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Task accepted successfully.";
+
+            return RedirectToAction(
+                nameof(MyServices));
+        }
+
+        // ====================================================
+        // REJECT TASK
+        // ====================================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectTask(
+            int assignmentId)
+        {
+            var user =
+                await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction(
+                    "Login",
+                    "Account");
+            }
+
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(w =>
+                        w.ApplicationUserId ==
+                        user.Id &&
+                        w.Status == "Accepted");
+
+            if (worker == null)
+            {
+                return Forbid();
+            }
+
+            var assignment =
+                await _context.ServiceAssignments
+                    .Include(sa => sa.ServiceRequest)
+                    .FirstOrDefaultAsync(sa =>
+                        sa.ServiceAssignmentId ==
+                            assignmentId &&
+                        sa.WorkerId ==
+                            worker.WorkerId &&
+                        sa.Status == "Pending");
+
+            if (assignment == null)
+            {
+                TempData["Error"] =
+                    "This task is no longer available.";
+
+                return RedirectToAction(
+                    nameof(MyServices));
+            }
+
+            assignment.Status =
+                "Rejected";
+
+            assignment.Notes =
+                "Worker rejected this task.";
+
+            if (assignment.ServiceRequest != null)
+            {
+                assignment.ServiceRequest.Status =
+                    "Pending";
+            }
+
+            worker.IsAvailable = true;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] =
+                "Task rejected. The Manager can assign it to another worker.";
+
+            return RedirectToAction(
+                nameof(MyServices));
         }
 
         // ====================================================
@@ -426,33 +634,45 @@ namespace VehicleServiceManagement.Controllers
         public async Task<IActionResult> StartService(
             int assignmentId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user =
+                await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(
+                    "Login",
+                    "Account");
             }
 
             var assignment =
                 await _context.ServiceAssignments
                     .Include(sa => sa.Worker)
                     .FirstOrDefaultAsync(sa =>
-                        sa.ServiceAssignmentId == assignmentId &&
-                        sa.Worker!.ApplicationUserId == user.Id);
+                        sa.ServiceAssignmentId ==
+                            assignmentId &&
+                        sa.Worker!.ApplicationUserId ==
+                            user.Id &&
+                        sa.Status == "Accepted");
 
             if (assignment == null)
             {
                 return NotFound();
             }
 
-            assignment.Status = "In Progress";
+            // Keep status as Accepted.
+            // The new workflow uses:
+            // Pending -> Accepted -> Completed.
+
+            assignment.Notes =
+                "Service started by worker.";
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Service started successfully.";
 
-            return RedirectToAction(nameof(MyServices));
+            return RedirectToAction(
+                nameof(MyServices));
         }
 
         // ====================================================
@@ -462,36 +682,75 @@ namespace VehicleServiceManagement.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteService(
-            int assignmentId)
+            int assignmentId,
+            string? notes)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user =
+                await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(
+                    "Login",
+                    "Account");
             }
 
             var assignment =
                 await _context.ServiceAssignments
                     .Include(sa => sa.Worker)
+                    .Include(sa => sa.ServiceRequest)
                     .FirstOrDefaultAsync(sa =>
-                        sa.ServiceAssignmentId == assignmentId &&
-                        sa.Worker!.ApplicationUserId == user.Id);
+                        sa.ServiceAssignmentId ==
+                            assignmentId &&
+                        sa.Worker!.ApplicationUserId ==
+                            user.Id &&
+                        sa.Status == "Accepted");
 
             if (assignment == null)
             {
                 return NotFound();
             }
 
-            assignment.Status = "Completed";
-            assignment.CompletedDate = DateTime.Now;
+            assignment.Status =
+                "Completed";
+
+            assignment.CompletedDate =
+                DateTime.Now;
+
+            if (!string.IsNullOrWhiteSpace(notes))
+            {
+                assignment.Notes =
+                    notes.Trim();
+            }
+
+            if (assignment.ServiceRequest != null)
+            {
+                assignment.ServiceRequest.Status =
+                    "Completed";
+            }
+
+            // Worker becomes available again
+        workerAvailability:
+            ;
+
+            var worker =
+                await _context.Workers
+                    .FirstOrDefaultAsync(w =>
+                        w.WorkerId ==
+                        assignment.WorkerId);
+
+            if (worker != null)
+            {
+                worker.IsAvailable = true;
+            }
 
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
                 "Service marked as completed.";
 
-            return RedirectToAction(nameof(MyServices));
+            return RedirectToAction(
+                nameof(MyServices));
         }
     }
 }

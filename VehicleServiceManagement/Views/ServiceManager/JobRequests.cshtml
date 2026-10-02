@@ -4,168 +4,194 @@
     ViewData["Title"] = "Worker Job Requests";
 }
 
-<h2 class="mb-4">
-    Worker Job Requests
-</h2>
+<div class="container mt-4">
 
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Success"]
-    </div>
-}
+        <h2>Worker Job Requests</h2>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
-    </div>
-}
-
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-
-        No pending worker job requests.
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Back to Dashboard
+        </a>
 
     </div>
-}
-else
-{
-    <div class="table-responsive">
 
-        <table class="table table-bordered table-hover">
 
-            <thead class="table-dark">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
 
-                <tr>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
 
-                    <th>ID</th>
 
-                    <th>Name</th>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
 
-                    <th>Email</th>
+            No pending worker job requests.
 
-                    <th>Profession</th>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
 
-                    <th>Resume</th>
+            <table class="table table-bordered table-hover">
 
-                    <th>Action</th>
+                <thead class="table-dark">
 
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                @foreach (var worker in Model)
-                {
                     <tr>
 
-                        <td>
-                            @worker.WorkerId
-                        </td>
+                        <th>ID</th>
 
-                        <td>
-                            @worker.ApplicationUser?.Name
-                        </td>
+                        <th>Name</th>
 
-                        <td>
-                            @worker.ApplicationUser?.Email
-                        </td>
+                        <th>Email</th>
 
-                        <td>
-                            @worker.Profession
-                        </td>
+                        <th>Specialities</th>
 
-                        <td>
+                        <th>Resume</th>
 
-                            @if (!string.IsNullOrWhiteSpace(
-                                worker.ResumeFilePath))
-                            {
-                                <a href="@worker.ResumeFilePath"
-                                   target="_blank"
-                                   class="btn btn-sm btn-info">
-
-                                    View Resume
-
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="text-danger">
-                                    No Resume
-                                </span>
-                            }
-
-                        </td>
-
-                        <td>
-
-                            <div class="d-flex gap-2">
-
-                                <!-- ACCEPT -->
-
-                                <form asp-action="AcceptJobRequest"
-                                      method="post">
-
-                                    @Html.AntiForgeryToken()
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@worker.WorkerId" />
-
-                                    <button type="submit"
-                                            class="btn btn-success btn-sm">
-
-                                        Accept
-
-                                    </button>
-
-                                </form>
-
-
-                                <!-- REJECT -->
-
-                                <form asp-action="RejectJobRequest"
-                                      method="post">
-
-                                    @Html.AntiForgeryToken()
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@worker.WorkerId" />
-
-                                    <button type="submit"
-                                            class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Are you sure you want to reject this job request?');">
-
-                                        Reject
-
-                                    </button>
-
-                                </form>
-
-                            </div>
-
-                        </td>
+                        <th>Action</th>
 
                     </tr>
-                }
 
-            </tbody>
+                </thead>
 
-        </table>
+                <tbody>
 
-    </div>
-}
+                    @foreach (var worker in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @worker.WorkerId
+                            </td>
+
+                            <td>
+                                @worker.ApplicationUser?.Name
+                            </td>
+
+                            <td>
+                                @worker.ApplicationUser?.Email
+                            </td>
+
+                            <td>
+
+                                @if (worker.Specialities != null &&
+                                    worker.Specialities.Any())
+                                {
+                                    <div class="d-flex flex-wrap gap-1">
+
+                                        @foreach (
+                                            var speciality
+                                            in worker.Specialities)
+                                        {
+                                            <span class="badge bg-primary">
+                                                @speciality.Speciality
+                                            </span>
+                                        }
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No specialities selected
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                    worker.ResumeFilePath))
+                                {
+                                    <a href="@worker.ResumeFilePath"
+                                       target="_blank"
+                                       class="btn btn-sm btn-info">
+
+                                        View Resume
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">
+                                        No Resume
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                <div class="d-flex gap-2">
+
+                                    <!-- ACCEPT -->
+
+                                    <form asp-action="AcceptJobRequest"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@worker.WorkerId" />
+
+                                        <button type="submit"
+                                                class="btn btn-success btn-sm">
+
+                                            Accept
+
+                                        </button>
+
+                                    </form>
 
 
-<a asp-action="Index"
-   class="btn btn-secondary">
+                                    <!-- REJECT -->
 
-    Back to Dashboard
+                                    <form asp-action="RejectJobRequest"
+                                          method="post">
 
-</a>
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@worker.WorkerId" />
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Are you sure you want to reject this job request?');">
+
+                                            Reject
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</div>

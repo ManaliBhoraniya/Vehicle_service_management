@@ -6,19 +6,27 @@
     var pending = Model.ServiceAssignments
         .Count(x => x.Status == "Pending");
 
-    var inProgress = Model.ServiceAssignments
-        .Count(x => x.Status == "In Progress");
+    var accepted = Model.ServiceAssignments
+        .Count(x => x.Status == "Accepted");
 
     var completed = Model.ServiceAssignments
         .Count(x => x.Status == "Completed");
+
+    var rejected = Model.ServiceAssignments
+        .Count(x => x.Status == "Rejected");
 }
 
 <div class="container mt-4">
 
+    <!-- HEADER -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
-            <h1>Worker Dashboard</h1>
+
+            <h1>
+                Worker Dashboard
+            </h1>
 
             <p class="text-muted">
                 Welcome,
@@ -26,6 +34,7 @@
                     @(Model.ApplicationUser?.Name ?? "Worker")
                 </strong>
             </p>
+
         </div>
 
         @if (Model.IsAvailable)
@@ -44,6 +53,8 @@
     </div>
 
 
+    <!-- SUCCESS MESSAGE -->
+
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success">
@@ -57,9 +68,11 @@
     <div class="card shadow-sm mb-4">
 
         <div class="card-header">
+
             <h4 class="mb-0">
                 My Profile
             </h4>
+
         </div>
 
         <div class="card-body">
@@ -89,14 +102,35 @@
 
                     <p>
                         <strong>Phone:</strong>
-                        @(Model.ApplicationUser?.PhoneNumber
-                            ?? "Not provided")
+                        @(Model.ApplicationUser?.PhoneNumber ?? "Not provided")
                     </p>
 
-                    <p>
-                        <strong>Profession:</strong>
-                        @Model.Profession
-                    </p>
+                    <div class="mb-3">
+
+                        <strong>Specialities:</strong>
+
+                        <div class="mt-2">
+
+                            @if (Model.Specialities != null &&
+                                 Model.Specialities.Any())
+                            {
+                                foreach (var speciality in Model.Specialities)
+                                {
+                                    <span class="badge bg-primary me-1 mb-1">
+                                        @speciality.Speciality
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    No specialities selected.
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
 
                     <a asp-action="Index"
                        class="btn btn-primary">
@@ -121,7 +155,9 @@
 
     <div class="row mb-4">
 
-        <div class="col-md-4">
+        <!-- PENDING -->
+
+        <div class="col-md-3">
 
             <div class="card shadow-sm text-center">
 
@@ -131,7 +167,13 @@
                         @pending
                     </h1>
 
-                    <h5>Pending Work</h5>
+                    <h5>
+                        Pending Tasks
+                    </h5>
+
+                    <small class="text-muted">
+                        Waiting for your response
+                    </small>
 
                 </div>
 
@@ -140,17 +182,25 @@
         </div>
 
 
-        <div class="col-md-4">
+        <!-- ACCEPTED -->
+
+        <div class="col-md-3">
 
             <div class="card shadow-sm text-center">
 
                 <div class="card-body">
 
                     <h1 class="text-primary">
-                        @inProgress
+                        @accepted
                     </h1>
 
-                    <h5>In Progress</h5>
+                    <h5>
+                        Accepted
+                    </h5>
+
+                    <small class="text-muted">
+                        Work in progress
+                    </small>
 
                 </div>
 
@@ -159,7 +209,9 @@
         </div>
 
 
-        <div class="col-md-4">
+        <!-- COMPLETED -->
+
+        <div class="col-md-3">
 
             <div class="card shadow-sm text-center">
 
@@ -169,7 +221,32 @@
                         @completed
                     </h1>
 
-                    <h5>Completed</h5>
+                    <h5>
+                        Completed
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REJECTED -->
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm text-center">
+
+                <div class="card-body">
+
+                    <h1 class="text-secondary">
+                        @rejected
+                    </h1>
+
+                    <h5>
+                        Rejected
+                    </h5>
 
                 </div>
 
@@ -185,13 +262,16 @@
     <div class="card shadow-sm mb-4">
 
         <div class="card-header">
-            <h4>My Resume</h4>
+
+            <h4>
+                My Resume
+            </h4>
+
         </div>
 
         <div class="card-body">
 
-            @if (!string.IsNullOrEmpty(
-                Model.ResumeFilePath))
+            @if (!string.IsNullOrEmpty(Model.ResumeFilePath))
             {
                 <p>
                     <strong>
@@ -250,7 +330,11 @@
     <div class="card shadow-sm mb-4">
 
         <div class="card-header">
-            <h4>Availability</h4>
+
+            <h4>
+                Availability
+            </h4>
+
         </div>
 
         <div class="card-body">
@@ -310,12 +394,16 @@
     </div>
 
 
-    <!-- WORK -->
+    <!-- ASSIGNED WORK -->
 
     <div class="card shadow-sm mb-4">
 
         <div class="card-header">
-            <h4>My Assigned Work</h4>
+
+            <h4>
+                My Assigned Work
+            </h4>
+
         </div>
 
         <div class="card-body">
@@ -329,9 +417,19 @@
                         <thead class="table-dark">
 
                             <tr>
-                                <th>Service</th>
-                                <th>Assigned Date</th>
-                                <th>Status</th>
+
+                                <th>
+                                    Service
+                                </th>
+
+                                <th>
+                                    Assigned Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
                             </tr>
 
                         </thead>
@@ -355,32 +453,33 @@
 
                                     <td>
                                         @assignment.AssignedDate
-                                        .ToString("dd-MM-yyyy")
+                                            .ToString("dd-MM-yyyy")
                                     </td>
 
                                     <td>
 
-                                        @if (assignment.Status
-                                            == "Pending")
+                                        @if (assignment.Status == "Pending")
                                         {
                                             <span class="badge bg-warning text-dark">
                                                 Pending
                                             </span>
                                         }
-                                        else if (
-                                            assignment.Status
-                                            == "In Progress")
+                                        else if (assignment.Status == "Accepted")
                                         {
                                             <span class="badge bg-primary">
-                                                In Progress
+                                                Accepted / In Progress
                                             </span>
                                         }
-                                        else if (
-                                            assignment.Status
-                                            == "Completed")
+                                        else if (assignment.Status == "Completed")
                                         {
                                             <span class="badge bg-success">
                                                 Completed
+                                            </span>
+                                        }
+                                        else if (assignment.Status == "Rejected")
+                                        {
+                                            <span class="badge bg-danger">
+                                                Rejected
                                             </span>
                                         }
                                         else
