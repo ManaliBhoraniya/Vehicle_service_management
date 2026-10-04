@@ -1,50 +1,36 @@
-﻿@{
-    ViewData["Title"] = "Job Request Submitted";
+@{
+    ViewData["Title"] = "Application Submitted";
 }
 
-<div class="row justify-content-center">
-
-    <div class="col-md-7">
-
-        <div class="card shadow-sm mt-5">
-
-            <div class="card-body text-center p-5">
-
-                <h2 class="text-success mb-4">
-                    Job Request Submitted
-                </h2>
-
-                <p class="lead">
-                    Your worker registration has been submitted
-                    successfully.
-                </p>
-
-                <p>
-                    Your profile and resume will be reviewed
-                    by the Service Manager.
-                </p>
-
-                <p>
-                    You can log in only after your job request
-                    has been accepted.
-                </p>
-
-                <div class="mt-4">
-
-                    <a asp-controller="Account"
-                       asp-action="Login"
-                       class="btn btn-primary">
-
-                        Go to Login
-
-                    </a>
-
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 col-lg-6">
+        <div class="card border-0 shadow-lg text-center overflow-hidden">
+            <div class="p-5">
+                <div class="feature-icon-wrapper icon-success mx-auto mb-4" style="width: 72px; height: 72px; font-size: 2.2rem; border-radius: 50%;">
+                    <i class="bi bi-check-lg"></i>
                 </div>
 
+                <h2 class="fw-bold text-dark mb-3">Application Submitted!</h2>
+
+                <p class="text-muted lead fs-6 mb-3">
+                    Your technician registration has been received successfully by our service team.
+                </p>
+
+                <div class="p-3 bg-light rounded-3 text-muted small text-start mb-4 border">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-clock-history text-primary"></i>
+                        <span class="fw-semibold text-dark">What happens next?</span>
+                    </div>
+                    <ul class="mb-0 ps-3">
+                        <li>Your credentials, specialties, and uploaded resume will be evaluated by the Service Manager.</li>
+                        <li>Upon approval, your login access will be activated and you can start taking assignments.</li>
+                    </ul>
+                </div>
+
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Return to Login
+                </a>
             </div>
-
         </div>
-
     </div>
-
 </div>

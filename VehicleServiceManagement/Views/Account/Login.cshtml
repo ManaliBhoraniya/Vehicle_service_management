@@ -1,92 +1,69 @@
-﻿@{
-    ViewData["Title"] = "Login";
+@{
+    ViewData["Title"] = "Sign In";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-
-        <div class="card shadow-sm mt-5">
-
-            <div class="card-header text-center">
-                <h3>Login</h3>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon-badge">
+                <i class="bi bi-person-lock"></i>
             </div>
+            <h3 class="fw-bold text-dark mb-1">Welcome Back</h3>
+            <p class="text-muted small mb-0">Sign in to your AutoCare Pro account</p>
+        </div>
 
-            <div class="card-body">
+        <div class="auth-body">
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
 
-                <form asp-action="Login" method="post">
+                <div asp-validation-summary="All" class="text-danger small mb-3"></div>
 
-                    @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="bi bi-envelope me-1 text-muted"></i> Email Address
+                    </label>
+                    <input type="email"
+                           name="email"
+                           class="form-control"
+                           placeholder="name@example.com"
+                           required
+                           autofocus />
+                </div>
 
-                    <div asp-validation-summary="All"
-                         class="text-danger mb-3">
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="bi bi-shield-lock me-1 text-muted"></i> Password
+                    </label>
+                    <input type="password"
+                           name="password"
+                           class="form-control"
+                           placeholder="Enter your password"
+                           required />
+                </div>
 
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Email
-                        </label>
-
-                        <input type="email"
-                               name="email"
-                               class="form-control"
-                               placeholder="Enter your email"
-                               required />
-
-                    </div>
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
-                            Password
-                        </label>
-
-                        <input type="password"
-                               name="password"
-                               class="form-control"
-                               placeholder="Enter your password"
-                               required />
-
-                    </div>
-
-                    <div class="form-check mb-3">
-
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
                         <input type="checkbox"
                                name="rememberMe"
                                value="true"
                                class="form-check-input"
                                id="rememberMe" />
-
-                        <label class="form-check-label"
-                               for="rememberMe">
-                            Remember me
+                        <label class="form-check-label text-muted small" for="rememberMe">
+                            Remember me on this device
                         </label>
-
                     </div>
-
-                    <button type="submit"
-                            class="btn btn-primary w-100">
-                        Login
-                    </button>
-
-                </form>
-
-                <div class="text-center mt-3">
-
-                    <span>
-                        Don't have an account?
-                    </span>
-
-                    <a asp-action="Register">
-                        Register
-                    </a>
-
                 </div>
 
-            </div>
-
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                </button>
+            </form>
         </div>
 
+        <div class="auth-footer">
+            <span class="text-muted">Don't have an account?</span>
+            <a asp-action="Register" class="fw-semibold ms-1">Create one now</a>
+        </div>
     </div>
 </div>
 

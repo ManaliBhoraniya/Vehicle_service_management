@@ -1,85 +1,91 @@
-﻿@model IEnumerable<VehicleServiceManagement.Models.ServiceAssignment>
+@model IEnumerable<VehicleServiceManagement.Models.ServiceAssignment>
 
 @{
-    ViewData["Title"] = "Assignments";
+    ViewData["Title"] = "Service Assignments";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Service Assignments</h2>
+            <p class="text-muted small mb-0">Dispatched vehicle service tasks matched with technicians.</p>
+        </div>
 
-    <h2>Service Assignments</h2>
+        <div class="d-flex gap-2">
+            <a asp-controller="ServiceAssignment" asp-action="Create" class="btn btn-success btn-sm shadow-sm">
+                <i class="bi bi-plus-lg"></i> Create Assignment
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </div>
 
-    <a asp-controller="ServiceAssignment"
-       asp-action="Create"
-       class="btn btn-success">
-        Create Assignment
-    </a>
-
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm text-center p-5">
+            <div class="feature-icon-wrapper icon-primary mx-auto mb-3" style="width:64px;height:64px;font-size:2rem;">
+                <i class="bi bi-kanban"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">No Active Assignments</h5>
+            <p class="text-muted small mb-0">Assign incoming service requests to technicians to view them here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive border-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Assignment ID</th>
+                            <th>Ticket Ref</th>
+                            <th>Vehicle Plate</th>
+                            <th>Assigned Technician</th>
+                            <th>Scheduled Date</th>
+                            <th class="text-end">Scheduled Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var assignment in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary">#@assignment.Id</span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">#@assignment.ServiceRequestId</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-car-front text-muted"></i>
+                                        <span class="fw-bold text-dark">@(assignment.ServiceRequest?.Vehicle?.VehicleNumber ?? "-")</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="brand-icon" style="width:28px;height:28px;font-size:0.8rem;border-radius:6px;">
+                                            <i class="bi bi-tools"></i>
+                                        </div>
+                                        <span class="fw-semibold text-dark">@(assignment.Worker?.ApplicationUser?.Name ?? "Unassigned")</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">
+                                        <i class="bi bi-calendar3 me-1"></i> @assignment.ServiceDate.ToString("dd MMM yyyy")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge bg-secondary px-3 py-1">
+                                        <i class="bi bi-clock me-1"></i> @assignment.ServiceTime.ToString(@"hh\:mm")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 </div>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        No assignments found.
-    </div>
-}
-else
-{
-    <div class="table-responsive">
-
-        <table class="table table-bordered table-hover">
-
-            <thead class="table-dark">
-                <tr>
-                    <th>Assignment ID</th>
-                    <th>Request ID</th>
-                    <th>Vehicle</th>
-                    <th>Worker</th>
-                    <th>Service Date</th>
-                    <th>Service Time</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                @foreach (var assignment in Model)
-                {
-                    <tr>
-
-                        <td>
-                            @assignment.Id
-                        </td>
-
-                        <td>
-                            #@assignment.ServiceRequestId
-                        </td>
-
-                        <td>
-                            @assignment.ServiceRequest?.Vehicle?.VehicleNumber
-                        </td>
-
-                        <td>
-                            @assignment.Worker?.ApplicationUser?.Name
-                        </td>
-
-                        <td>
-                            @assignment.ServiceDate.ToString("dd-MM-yyyy")
-                        </td>
-
-                        <td>
-                            @assignment.ServiceTime.ToString(@"hh\:mm")
-                        </td>
-
-                    </tr>
-                }
-
-            </tbody>
-
-        </table>
-
-    </div>
-}
-
-<a asp-action="Index"
-   class="btn btn-secondary">
-    Back to Dashboard
-</a>

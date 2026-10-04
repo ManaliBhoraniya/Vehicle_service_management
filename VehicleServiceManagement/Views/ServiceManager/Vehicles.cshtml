@@ -1,70 +1,79 @@
-﻿@model IEnumerable<VehicleServiceManagement.Models.Vehicle>
+@model IEnumerable<VehicleServiceManagement.Models.Vehicle>
 
 @{
-    ViewData["Title"] = "Vehicles";
+    ViewData["Title"] = "All Registered Vehicles";
 }
 
-<h2 class="mb-4">All Vehicles</h2>
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Fleet Directory</h2>
+            <p class="text-muted small mb-0">Complete roster of client vehicles registered across the system.</p>
+        </div>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        No vehicles found.
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Dashboard
+        </a>
     </div>
-}
-else
-{
-    <div class="table-responsive">
 
-        <table class="table table-bordered table-hover">
-
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Vehicle Number</th>
-                    <th>Vehicle Model</th>
-                    <th>Vehicle Type</th>
-                    <th>Customer</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                @foreach (var vehicle in Model)
-                {
-                    <tr>
-
-                        <td>
-                            @vehicle.Id
-                        </td>
-
-                        <td>
-                            @vehicle.VehicleNumber
-                        </td>
-
-                        <td>
-                            @vehicle.VehicleModel
-                        </td>
-
-                        <td>
-                            @vehicle.VehicleType
-                        </td>
-
-                        <td>
-                            @vehicle.Customer?.Name
-                        </td>
-
-                    </tr>
-                }
-
-            </tbody>
-
-        </table>
-
-    </div>
-}
-
-<a asp-action="Index"
-   class="btn btn-secondary">
-    Back to Dashboard
-</a>
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm text-center p-5">
+            <div class="feature-icon-wrapper icon-info mx-auto mb-3" style="width:64px;height:64px;font-size:2rem;">
+                <i class="bi bi-car-front"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">No Vehicles Registered</h5>
+            <p class="text-muted small mb-0">Customer registered vehicles will appear in this database table.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive border-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Vehicle ID</th>
+                            <th>Registration / Plate</th>
+                            <th>Make & Model</th>
+                            <th>Type</th>
+                            <th class="text-end">Registered Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var vehicle in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary">#@vehicle.Id</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="brand-icon" style="width:32px; height:32px; font-size:0.9rem; border-radius:8px;">
+                                            <i class="bi bi-car-front-fill"></i>
+                                        </div>
+                                        <span class="fw-bold text-dark">@vehicle.VehicleNumber</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">@vehicle.VehicleModel</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-tag-fill me-1"></i> @vehicle.VehicleType
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-medium text-dark">
+                                        <i class="bi bi-person me-1 text-muted"></i> @(vehicle.Customer?.Name ?? "-")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

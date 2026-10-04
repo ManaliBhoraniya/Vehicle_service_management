@@ -2,242 +2,241 @@
 
 @if (Model == null || !Model.Any())
 {
-    <div class="alert alert-light border text-center py-4 text-muted">
-        No service requests found in this section.
+    <div class="p-5 text-center bg-white rounded-3 border">
+        <i class="bi bi-inbox text-muted" style="font-size: 2.5rem;"></i>
+        <h6 class="fw-bold text-dark mt-2 mb-1">No Tickets in this Category</h6>
+        <p class="text-muted small mb-0">No vehicle service requests match the selected view filter.</p>
     </div>
 }
 else
 {
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th style="width: 60px;">ID</th>
-                    <th>Customer</th>
-                    <th>Vehicle</th>
-                    <th>Service Required</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Worker Task</th>
-                    <th style="width: 100px;" class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var request in Model)
-                {
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive border-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
                     <tr>
-                        <td>
-                            @request.ServiceRequestId
-                        </td>
+                        <th style="width: 70px;">Ticket</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Service Category</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Assigned Staff</th>
+                        <th style="width: 100px;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var request in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="fw-bold text-primary">#@request.ServiceRequestId</span>
+                            </td>
 
-                        <td>
-                            @{
-                                var cust = request.Vehicle?.Customer ?? request.Customer;
-                                var custDisplayName = cust?.Name;
-                                if (string.IsNullOrWhiteSpace(custDisplayName))
-                                {
-                                    custDisplayName = cust?.ApplicationUser?.Name;
+                            <td>
+                                @{
+                                    var cust = request.Vehicle?.Customer ?? request.Customer;
+                                    var custDisplayName = cust?.Name;
+                                    if (string.IsNullOrWhiteSpace(custDisplayName))
+                                    {
+                                        custDisplayName = cust?.ApplicationUser?.Name;
+                                    }
+                                    if (string.IsNullOrWhiteSpace(custDisplayName))
+                                    {
+                                        custDisplayName = request.CustomerName;
+                                    }
                                 }
-                                if (string.IsNullOrWhiteSpace(custDisplayName))
-                                {
-                                    custDisplayName = request.CustomerName;
-                                }
-                            }
-                            @(string.IsNullOrWhiteSpace(custDisplayName) ? "N/A" : custDisplayName)
-                        </td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="brand-icon" style="width:28px;height:28px;font-size:0.8rem;border-radius:6px;">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(custDisplayName) ? "N/A" : custDisplayName)</span>
+                                </div>
+                            </td>
 
-                        <td>
-                            @(request.Vehicle?.VehicleNumber ?? "N/A")
-                        </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-car-front text-muted"></i>
+                                    <span class="fw-bold text-dark">@(request.Vehicle?.VehicleNumber ?? "N/A")</span>
+                                </div>
+                            </td>
 
-                        <td>
-                            <strong>
-                                @Html.Raw((request.ServiceType ?? "").Replace("&amp;", "&"))
-                            </strong>
-
-                            @if (!string.IsNullOrWhiteSpace(request.Description))
-                            {
-                                <br />
-                                <small class="text-muted">
-                                    @request.Description
-                                </small>
-                            }
-                        </td>
-
-                        <td>
-                            @request.RequestDate.ToString("dd-MM-yyyy HH:mm")
-                        </td>
-
-                        <td>
-                            @if (request.Status == "Pending")
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Pending
+                            <td>
+                                <span class="fw-bold text-dark d-block">
+                                    @Html.Raw((request.ServiceType ?? "").Replace("&amp;", "&"))
                                 </span>
-                            }
-                            else if (request.Status == "Assigned")
-                            {
-                                var activeAssignment = request.ServiceAssignments?
-                                    .OrderByDescending(a => a.AssignedDate)
-                                    .FirstOrDefault(a => a.Status == "Accepted" || a.Status == "Pending" || a.Status == "In Progress");
-
-                                @if (activeAssignment?.Status == "Pending")
+                                @if (!string.IsNullOrWhiteSpace(request.Description))
                                 {
-                                    <span class="badge bg-info text-dark">
-                                        Assigned (Pending Response)
+                                    <span class="text-muted small text-truncate d-inline-block" style="max-width: 200px;" title="@request.Description">
+                                        @request.Description
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <span class="text-muted small">
+                                    <i class="bi bi-calendar3 me-1"></i> @request.RequestDate.ToString("dd MMM yyyy, HH:mm")
+                                </span>
+                            </td>
+
+                            <td>
+                                @if (request.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-warning-emphasis">
+                                        <i class="bi bi-hourglass-split"></i> Pending
+                                    </span>
+                                }
+                                else if (request.Status == "Assigned")
+                                {
+                                    var activeAssignment = request.ServiceAssignments?
+                                        .OrderByDescending(a => a.AssignedDate)
+                                        .FirstOrDefault(a => a.Status == "Accepted" || a.Status == "Pending" || a.Status == "In Progress");
+
+                                    if (activeAssignment?.Status == "Pending")
+                                    {
+                                        <span class="badge bg-info text-info-emphasis">
+                                            <i class="bi bi-clock"></i> Response Pending
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary text-primary-emphasis">
+                                            <i class="bi bi-person-gear"></i> In Progress
+                                        </span>
+                                    }
+                                }
+                                else if (request.Status == "Rejected")
+                                {
+                                    <span class="badge bg-danger text-danger-emphasis">
+                                        <i class="bi bi-x-circle"></i> Rejected
+                                    </span>
+                                }
+                                else if (request.Status == "In Progress")
+                                {
+                                    <span class="badge bg-primary text-primary-emphasis">
+                                        <i class="bi bi-gear"></i> In Progress
+                                    </span>
+                                }
+                                else if (request.Status == "Completed")
+                                {
+                                    <span class="badge bg-success text-success-emphasis">
+                                        <i class="bi bi-check2-circle"></i> Completed
+                                    </span>
+                                }
+                                else if (request.Status == "Cancelled")
+                                {
+                                    <span class="badge bg-secondary">
+                                        Cancelled
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-primary">
-                                        In Progress
-                                    </span>
+                                    <span class="badge bg-secondary">@request.Status</span>
                                 }
-                            }
-                            else if (request.Status == "Rejected")
-                            {
-                                <span class="badge bg-danger">
-                                    Worker Rejected
-                                </span>
-                            }
-                            else if (request.Status == "In Progress")
-                            {
-                                <span class="badge bg-primary">
-                                    In Progress
-                                </span>
-                            }
-                            else if (request.Status == "Completed")
-                            {
-                                <span class="badge bg-success">
-                                    Completed
-                                </span>
-                            }
-                            else if (request.Status == "Cancelled")
-                            {
-                                <span class="badge bg-secondary">
-                                    Cancelled
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">
-                                    @request.Status
-                                </span>
-                            }
-                        </td>
+                            </td>
 
-                        <td>
-                            @if (request.Status == "Pending")
-                            {
-                                <a asp-controller="ServiceManager"
-                                   asp-action="AssignWorker"
-                                   asp-route-id="@request.ServiceRequestId"
-                                   class="btn btn-success btn-sm">
-                                    Assign Worker
-                                </a>
-                            }
-                            else if (request.Status == "Assigned" || request.Status == "In Progress")
-                            {
-                                var activeAssignment = request.ServiceAssignments?
-                                    .OrderByDescending(a => a.AssignedDate)
-                                    .FirstOrDefault(a => a.Status == "Accepted" || a.Status == "Pending" || a.Status == "In Progress");
-
-                                @if (activeAssignment?.Status == "Pending")
+                            <td>
+                                @if (request.Status == "Pending")
                                 {
-                                    <span class="badge bg-info text-dark mb-1">
-                                        Waiting for Response
-                                    </span>
-                                    @if (activeAssignment.Worker?.ApplicationUser != null)
-                                    {
-                                        <div class="small text-muted">
-                                            Sent to: <strong>@activeAssignment.Worker.ApplicationUser.Name</strong>
-                                        </div>
-                                    }
                                     <a asp-controller="ServiceManager"
                                        asp-action="AssignWorker"
                                        asp-route-id="@request.ServiceRequestId"
-                                       class="btn btn-outline-secondary btn-sm mt-1">
-                                        Reassign
+                                       class="btn btn-success btn-sm">
+                                        <i class="bi bi-person-plus"></i> Assign Worker
                                     </a>
                                 }
-                                else
+                                else if (request.Status == "Assigned" || request.Status == "In Progress")
                                 {
-                                    <span class="badge bg-primary mb-1">
-                                        Worker Accepted
-                                    </span>
-                                    @if (activeAssignment?.Worker?.ApplicationUser != null)
+                                    var activeAssignment = request.ServiceAssignments?
+                                        .OrderByDescending(a => a.AssignedDate)
+                                        .FirstOrDefault(a => a.Status == "Accepted" || a.Status == "Pending" || a.Status == "In Progress");
+
+                                    if (activeAssignment?.Status == "Pending")
                                     {
-                                        <div class="small text-muted">
-                                            Worker: <strong>@activeAssignment.Worker.ApplicationUser.Name</strong>
+                                        <div>
+                                            @if (activeAssignment.Worker?.ApplicationUser != null)
+                                            {
+                                                <span class="small text-muted d-block">
+                                                    Sent to: <strong>@activeAssignment.Worker.ApplicationUser.Name</strong>
+                                                </span>
+                                            }
+                                            <a asp-controller="ServiceManager"
+                                               asp-action="AssignWorker"
+                                               asp-route-id="@request.ServiceRequestId"
+                                               class="btn btn-outline-warning text-dark btn-sm mt-1">
+                                                Reassign
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="small">
+                                            @if (activeAssignment?.Worker?.ApplicationUser != null)
+                                            {
+                                                <span class="text-dark fw-semibold">
+                                                    <i class="bi bi-wrench me-1 text-primary"></i> @activeAssignment.Worker.ApplicationUser.Name
+                                                </span>
+                                            }
                                         </div>
                                     }
                                 }
-                            }
-                            else if (request.Status == "Rejected")
-                            {
-                                var rejectedAssignment = request.ServiceAssignments?
-                                    .OrderByDescending(a => a.AssignedDate)
-                                    .FirstOrDefault(a => a.Status == "Rejected");
-
-                                <div class="text-danger small mb-1">
-                                    <strong>@(rejectedAssignment?.Worker?.ApplicationUser?.Name ?? "Worker")</strong> rejected request
-                                </div>
-
-                                <a asp-controller="ServiceManager"
-                                   asp-action="AssignWorker"
-                                   asp-route-id="@request.ServiceRequestId"
-                                   class="btn btn-warning btn-sm">
-                                    Assign Another Worker
-                                </a>
-                            }
-                            else if (request.Status == "Completed")
-                            {
-                                var compAssignment = request.ServiceAssignments?
-                                    .OrderByDescending(a => a.CompletedDate ?? a.AssignedDate)
-                                    .FirstOrDefault(a => a.Status == "Completed");
-
-                                <span class="badge bg-success mb-1">
-                                    Task Completed
-                                </span>
-                                @if (compAssignment?.Worker?.ApplicationUser != null)
+                                else if (request.Status == "Rejected")
                                 {
-                                    <div class="small text-muted">
-                                        Worker: <strong>@compAssignment.Worker.ApplicationUser.Name</strong>
+                                    var rejectedAssignment = request.ServiceAssignments?
+                                        .OrderByDescending(a => a.AssignedDate)
+                                        .FirstOrDefault(a => a.Status == "Rejected");
+
+                                    <div>
+                                        <span class="text-danger small d-block">
+                                            Declined by @(rejectedAssignment?.Worker?.ApplicationUser?.Name ?? "Worker")
+                                        </span>
+                                        <a asp-controller="ServiceManager"
+                                           asp-action="AssignWorker"
+                                           asp-route-id="@request.ServiceRequestId"
+                                           class="btn btn-warning btn-sm mt-1">
+                                            Reassign
+                                        </a>
                                     </div>
                                 }
-                            }
-                            else if (request.Status == "Cancelled")
-                            {
-                                <span class="text-muted">
-                                    Cancelled
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">
-                                    @request.Status
-                                </span>
-                            }
-                        </td>
+                                else if (request.Status == "Completed")
+                                {
+                                    var compAssignment = request.ServiceAssignments?
+                                        .OrderByDescending(a => a.CompletedDate ?? a.AssignedDate)
+                                        .FirstOrDefault(a => a.Status == "Completed");
 
-                        <td class="text-center">
-                            <form asp-controller="ServiceManager"
-                                  asp-action="DeleteRequest"
-                                  asp-route-id="@request.ServiceRequestId"
-                                  method="post"
-                                  class="d-inline"
-                                  onsubmit="return confirm('Are you sure you want to delete Service Request #@request.ServiceRequestId? This action cannot be undone.');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit"
-                                        class="btn btn-outline-danger btn-sm"
-                                        title="Delete Service Request">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                                    <div class="small">
+                                        <span class="text-success fw-semibold">
+                                            <i class="bi bi-check-all"></i> Finished
+                                        </span>
+                                        @if (compAssignment?.Worker?.ApplicationUser != null)
+                                        {
+                                            <span class="text-muted d-block">by @compAssignment.Worker.ApplicationUser.Name</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">-</span>
+                                }
+                            </td>
+
+                            <td class="text-end">
+                                <form asp-controller="ServiceManager"
+                                      asp-action="DeleteRequest"
+                                      asp-route-id="@request.ServiceRequestId"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Are you sure you want to delete Service Request #@request.ServiceRequestId? This action cannot be undone.');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete Ticket">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 }

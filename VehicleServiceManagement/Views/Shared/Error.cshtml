@@ -1,25 +1,31 @@
-﻿@model ErrorViewModel
+@model ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "Application Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-lg text-center p-5">
+            <div class="feature-icon-wrapper icon-danger mx-auto mb-4" style="width: 72px; height: 72px; font-size: 2.2rem; border-radius: 50%;">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
+            <h2 class="fw-bold text-dark mb-2">Something Went Wrong</h2>
+            <p class="text-muted mb-4">An unexpected error occurred while processing your request.</p>
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+            @if (Model.ShowRequestId)
+            {
+                <div class="p-3 bg-light rounded-3 small mb-4 border">
+                    <span class="text-muted">Request Tracking ID:</span>
+                    <code class="fw-bold text-danger">@Model.RequestId</code>
+                </div>
+            }
+
+            <div class="d-flex justify-content-center gap-2">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">
+                    <i class="bi bi-house"></i> Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

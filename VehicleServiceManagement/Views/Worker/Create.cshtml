@@ -1,45 +1,28 @@
-﻿@model VehicleServiceManagement.Models.Worker
+@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "Worker Registration";
+    ViewData["Title"] = "Worker Registration Info";
 }
 
-<div class="container mt-4">
-
-    <div class="card shadow-sm">
-
-        <div class="card-header">
-            <h3 class="mb-0">Worker Registration</h3>
-        </div>
-
-        <div class="card-body">
-
-            <div class="alert alert-info">
-                <strong>Workers register themselves.</strong>
-                <br />
-                Workers must create their own account, select their
-                specialities, and upload their resume.
-                The manager will then review and approve the account.
+<div class="row justify-content-center py-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm text-center p-5">
+            <div class="feature-icon-wrapper icon-primary mx-auto mb-3" style="width:64px;height:64px;font-size:2rem;">
+                <i class="bi bi-person-plus-fill"></i>
             </div>
-
-            <p>
-                Workers cannot be added manually from this page.
+            <h4 class="fw-bold text-dark mb-2">Technicians Self-Register</h4>
+            <p class="text-muted small mb-4">
+                Technicians create their own accounts via the public portal, specify their mechanical specializations, and upload their credential resumes for administrative review.
             </p>
 
-            <a asp-controller="Account"
-               asp-action="Register"
-               class="btn btn-primary">
-                Register Worker
-            </a>
-
-            <a asp-controller="ServiceManager"
-               asp-action="Index"
-               class="btn btn-secondary ms-2">
-                Back to Manager Dashboard
-            </a>
-
+            <div class="d-flex justify-content-center gap-2">
+                <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-sm px-4">
+                    <i class="bi bi-box-arrow-up-right"></i> Open Registration Form
+                </a>
+                <a asp-controller="ServiceManager" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    Back to Dashboard
+                </a>
+            </div>
         </div>
-
     </div>
-
 </div>

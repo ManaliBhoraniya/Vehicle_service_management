@@ -1,60 +1,60 @@
-﻿@{
+@{
     ViewData["Title"] = "Privacy Policy";
 }
 
-<div class="container py-5">
-
+<div class="py-4">
     <div class="text-center mb-5">
-        <h1 class="fw-bold text-primary">
-            Privacy Policy
-        </h1>
-
-        <p class="text-muted">
-            Vehicle Service Management
-        </p>
+        <span class="badge bg-secondary px-3 py-2 mb-2">Legal Information</span>
+        <h1 class="fw-bold">Privacy Policy</h1>
+        <p class="text-muted">How AutoCare Pro handles and protects your vehicle and personal information.</p>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4 p-md-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <section class="mb-4">
+                        <h4 class="fw-bold text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check text-primary"></i> 1. Information We Collect
+                        </h4>
+                        <p class="text-muted">
+                            AutoCare Pro stores personal and technical information strictly necessary to provide vehicle service management functionality:
+                        </p>
+                        <ul class="text-muted">
+                            <li>Account details (name, email address, contact numbers, user roles).</li>
+                            <li>Vehicle identifiers (make, model, registration number, service logs).</li>
+                            <li>Service requests, technician task logs, and maintenance timelines.</li>
+                        </ul>
+                    </section>
 
-            <h4 class="fw-bold">
-                Information We Collect
-            </h4>
+                    <section class="mb-4">
+                        <h4 class="fw-bold text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-gear-fill text-success"></i> 2. How We Use Information
+                        </h4>
+                        <p class="text-muted">
+                            We utilize stored data to optimize your maintenance schedules, communicate diagnostics, allocate certified mechanics to service requests, and preserve audit histories for vehicle safety records.
+                        </p>
+                    </section>
 
-            <p class="text-muted">
-                The system may store information required to manage
-                customer accounts, vehicles, service requests, and
-                worker information.
-            </p>
+                    <section class="mb-4">
+                        <h4 class="fw-bold text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-lock-fill text-warning"></i> 3. Security & Account Integrity
+                        </h4>
+                        <p class="text-muted">
+                            Passwords are cryptographically hashed and never stored in plain text. We utilize role-based access control to prevent unauthorized modification of customer or service tickets.
+                        </p>
+                    </section>
 
-            <h4 class="fw-bold mt-4">
-                Use of Information
-            </h4>
-
-            <p class="text-muted">
-                Information is used to provide vehicle service management
-                functionality and to maintain service records.
-            </p>
-
-            <h4 class="fw-bold mt-4">
-                Account Security
-            </h4>
-
-            <p class="text-muted">
-                Users should keep their login credentials private and
-                secure.
-            </p>
-
-            <h4 class="fw-bold mt-4">
-                Contact
-            </h4>
-
-            <p class="text-muted mb-0">
-                If you have questions about this system, please use the
-                Contact Us page.
-            </p>
-
+                    <section>
+                        <h4 class="fw-bold text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-envelope-fill text-info"></i> 4. Contact Our Data Protection Team
+                        </h4>
+                        <p class="text-muted mb-0">
+                            For any inquiries regarding data protection or record updates, please submit a request via our <a asp-controller="Home" asp-action="Contact">Contact Page</a>.
+                        </p>
+                    </section>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>

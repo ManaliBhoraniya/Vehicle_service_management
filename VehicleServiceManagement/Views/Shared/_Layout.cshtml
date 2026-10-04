@@ -1,449 +1,349 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Vehicle Service Management</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <title>
-        @ViewData["Title"] - VehicleServiceManagement
-    </title>
-
-    <script type="importmap"></script>
-
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <link rel="stylesheet"
-          href="~/css/site.css"
-          asp-append-version="true" />
-
-    <link rel="stylesheet"
-          href="~/VehicleServiceManagement.styles.css"
-          asp-append-version="true" />
-
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/VehicleServiceManagement.styles.css" asp-append-version="true" />
 </head>
 
-
 <body>
-
     @{
-
-        var controllerName =
-            ViewContext.RouteData.Values["controller"]?.ToString();
-
-        var actionName =
-            ViewContext.RouteData.Values["action"]?.ToString();
-
-        bool isAccountPage =
-            controllerName == "Account" &&
-            (actionName == "Login" ||
-             actionName == "Register");
-
-        bool isAuthenticated =
-            User.Identity?.IsAuthenticated == true;
-
+        var controllerName = ViewContext.RouteData.Values["controller"]?.ToString();
+        var actionName = ViewContext.RouteData.Values["action"]?.ToString();
+        bool isAccountPage = controllerName == "Account" && (actionName == "Login" || actionName == "Register");
+        bool isAuthenticated = User.Identity?.IsAuthenticated == true;
     }
-
 
     <!-- ================================================= -->
     <!-- NAVBAR -->
     <!-- ================================================= -->
-
     <header>
-
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow">
-
-            <div class="container-fluid">
-
-
-                <!-- WEBSITE NAME -->
+        <nav class="navbar navbar-expand-lg site-navbar sticky-top">
+            <div class="container">
+                <!-- BRAND LOGO -->
                 @if (isAuthenticated && !isAccountPage)
                 {
-                    @if (User.IsInRole("Customer"))
+                    if (User.IsInRole("Customer"))
                     {
-                        <a class="navbar-brand"
-                           asp-controller="Customer"
-                           asp-action="Dashboard">
-
-                            VehicleServiceManagement
-
+                        <a class="navbar-brand" asp-controller="Customer" asp-action="Dashboard">
+                            <span class="brand-icon"><i class="bi bi-car-front-fill"></i></span>
+                            <span>Auto<span class="brand-text-accent">Care</span> Pro</span>
                         </a>
                     }
                     else if (User.IsInRole("Worker"))
                     {
-                        <a class="navbar-brand"
-                           asp-controller="Worker"
-                           asp-action="Dashboard">
-
-                            VehicleServiceManagement
-
+                        <a class="navbar-brand" asp-controller="Worker" asp-action="Dashboard">
+                            <span class="brand-icon"><i class="bi bi-tools"></i></span>
+                            <span>Auto<span class="brand-text-accent">Care</span> Pro</span>
                         </a>
                     }
                     else if (User.IsInRole("Admin"))
                     {
-                        <a class="navbar-brand"
-                           asp-controller="ServiceManager"
-                           asp-action="Index">
-
-                            VehicleServiceManagement
-
+                        <a class="navbar-brand" asp-controller="ServiceManager" asp-action="Index">
+                            <span class="brand-icon"><i class="bi bi-shield-fill-check"></i></span>
+                            <span>Auto<span class="brand-text-accent">Care</span> Pro</span>
                         </a>
                     }
                     else
                     {
-                        <a class="navbar-brand"
-                           asp-controller="Home"
-                           asp-action="Index">
-
-                            VehicleServiceManagement
-
+                        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                            <span class="brand-icon"><i class="bi bi-car-front-fill"></i></span>
+                            <span>Auto<span class="brand-text-accent">Care</span> Pro</span>
                         </a>
                     }
                 }
                 else
                 {
-                    <a class="navbar-brand"
-                       asp-controller="Account"
-                       asp-action="Login">
-
-                        VehicleServiceManagement
-
+                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                        <span class="brand-icon"><i class="bi bi-car-front-fill"></i></span>
+                        <span>Auto<span class="brand-text-accent">Care</span> Pro</span>
                     </a>
                 }
 
-
-                <!-- MOBILE MENU BUTTON -->
-
-                <button class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
-
-                    <span class="navbar-toggler-icon"></span>
-
+                <!-- MOBILE TOGGLE BUTTON -->
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="bi bi-list fs-2 text-dark"></i>
                 </button>
 
-
-                <!-- RIGHT SIDE NAVIGATION -->
-
+                <!-- NAVIGATION LINKS -->
                 <div class="navbar-collapse collapse justify-content-end">
-
-                    <ul class="navbar-nav align-items-center">
-
-
+                    <ul class="navbar-nav align-items-lg-center gap-1 my-2 my-lg-0">
                         @if (isAuthenticated && !isAccountPage)
                         {
-
-                            <!-- ================================= -->
-                            <!-- DASHBOARD -->
-                            <!-- ================================= -->
-
-                            <li class="nav-item">
-
+                            <!-- Role Badge -->
+                            <li class="nav-item d-none d-lg-block me-2">
                                 @if (User.IsInRole("Customer"))
                                 {
-                                    <a class="nav-link text-dark"
-                                       asp-controller="Customer"
-                                       asp-action="Dashboard">
+                                    <span class="badge bg-primary text-primary-emphasis px-3 py-2">
+                                        <i class="bi bi-person-fill"></i> Customer
+                                    </span>
+                                }
+                                else if (User.IsInRole("Worker"))
+                                {
+                                    <span class="badge bg-warning text-warning-emphasis px-3 py-2">
+                                        <i class="bi bi-wrench"></i> Technician
+                                    </span>
+                                }
+                                else if (User.IsInRole("Admin"))
+                                {
+                                    <span class="badge bg-danger text-danger-emphasis px-3 py-2">
+                                        <i class="bi bi-shield-lock-fill"></i> Service Manager
+                                    </span>
+                                }
+                            </li>
 
-                                        Dashboard
-
+                            <!-- Dashboard Link -->
+                            <li class="nav-item">
+                                @if (User.IsInRole("Customer"))
+                                {
+                                    <a class="nav-link @(controllerName == "Customer" && actionName == "Dashboard" ? "active" : "")"
+                                       asp-controller="Customer" asp-action="Dashboard">
+                                        <i class="bi bi-speedometer2"></i> Dashboard
                                     </a>
                                 }
                                 else if (User.IsInRole("Worker"))
                                 {
-                                    <a class="nav-link text-dark"
-                                       asp-controller="Worker"
-                                       asp-action="Dashboard">
-
-                                        Dashboard
-
+                                    <a class="nav-link @(controllerName == "Worker" && actionName == "Dashboard" ? "active" : "")"
+                                       asp-controller="Worker" asp-action="Dashboard">
+                                        <i class="bi bi-speedometer2"></i> Dashboard
                                     </a>
                                 }
                                 else if (User.IsInRole("Admin"))
                                 {
-                                    <a class="nav-link text-dark"
-                                       asp-controller="ServiceManager"
-                                       asp-action="Index">
-
-                                        Dashboard
-
+                                    <a class="nav-link @(controllerName == "ServiceManager" && actionName == "Index" ? "active" : "")"
+                                       asp-controller="ServiceManager" asp-action="Index">
+                                        <i class="bi bi-speedometer2"></i> Dashboard
                                     </a>
                                 }
-
                             </li>
 
-
-                            <!-- ================================= -->
-                            <!-- MY PROFILE -->
-                            <!-- ================================= -->
+                            <!-- Role-Specific Direct Links -->
                             @if (User.IsInRole("Customer"))
                             {
                                 <li class="nav-item">
-
-                                    <a class="nav-link text-dark"
-                                       asp-controller="Customer"
-                                       asp-action="Index">
-
-                                        My Profile
-
+                                    <a class="nav-link @(controllerName == "Vehicle" ? "active" : "")"
+                                       asp-controller="Vehicle" asp-action="Index">
+                                        <i class="bi bi-car-front"></i> My Vehicles
                                     </a>
-
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(controllerName == "ServiceRequest" ? "active" : "")"
+                                       asp-controller="ServiceRequest" asp-action="Index">
+                                        <i class="bi bi-clipboard-check"></i> Service Requests
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(controllerName == "Customer" && actionName == "Index" ? "active" : "")"
+                                       asp-controller="Customer" asp-action="Index">
+                                        <i class="bi bi-person"></i> Profile
+                                    </a>
                                 </li>
                             }
                             else if (User.IsInRole("Worker"))
                             {
                                 <li class="nav-item">
-
-                                    <a class="nav-link text-dark"
-                                       asp-controller="Worker"
-                                       asp-action="Index">
-
-                                        My Profile
-
+                                    <a class="nav-link @(controllerName == "Worker" && actionName == "MyServices" ? "active" : "")"
+                                       asp-controller="Worker" asp-action="MyServices">
+                                        <i class="bi bi-wrench-adjustable"></i> My Services
                                     </a>
-
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(controllerName == "Worker" && actionName == "Availability" ? "active" : "")"
+                                       asp-controller="Worker" asp-action="Availability">
+                                        <i class="bi bi-clock-history"></i> Availability
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(controllerName == "Worker" && actionName == "Index" ? "active" : "")"
+                                       asp-controller="Worker" asp-action="Index">
+                                        <i class="bi bi-person"></i> Profile
+                                    </a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(controllerName == "ServiceManager" && actionName == "Assignments" ? "active" : "")"
+                                       asp-controller="ServiceManager" asp-action="Assignments">
+                                        <i class="bi bi-kanban"></i> Assignments
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(controllerName == "ServiceManager" && actionName == "Workers" ? "active" : "")"
+                                       asp-controller="ServiceManager" asp-action="Workers">
+                                        <i class="bi bi-people"></i> Workers
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(controllerName == "ServiceManager" && actionName == "JobRequests" ? "active" : "")"
+                                       asp-controller="ServiceManager" asp-action="JobRequests">
+                                        <i class="bi bi-file-earmark-person"></i> Applications
+                                    </a>
                                 </li>
                             }
 
-
-                            <!-- ================================= -->
-                            <!-- ABOUT US -->
-                            <!-- ================================= -->
-
+                            <!-- Common Links -->
                             <li class="nav-item">
-
-                                <a class="nav-link text-dark"
-                                   asp-controller="Home"
-                                   asp-action="About">
-
-                                    About Us
-
+                                <a class="nav-link @(controllerName == "Home" && actionName == "About" ? "active" : "")"
+                                   asp-controller="Home" asp-action="About">
+                                    <i class="bi bi-info-circle"></i> About
                                 </a>
-
                             </li>
 
-
-                            <!-- ================================= -->
-                            <!-- CONTACT US -->
-                            <!-- ================================= -->
-
                             <li class="nav-item">
-
-                                <a class="nav-link text-dark"
-                                   asp-controller="Home"
-                                   asp-action="Contact">
-
-                                    Contact Us
-
+                                <a class="nav-link @(controllerName == "Home" && actionName == "Contact" ? "active" : "")"
+                                   asp-controller="Home" asp-action="Contact">
+                                    <i class="bi bi-envelope"></i> Contact
                                 </a>
-
                             </li>
 
-
-                            <!-- ================================= -->
-                            <!-- LOGOUT -->
-                            <!-- ================================= -->
-
-                            <li class="nav-item">
-
-                                <form asp-controller="Account"
-                                      asp-action="Logout"
-                                      method="post"
-                                      class="d-inline">
-
+                            <!-- Logout Button -->
+                            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-
-                                    <button type="submit"
-                                            class="btn btn-danger ms-2">
-
-                                        Logout
-
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
                                     </button>
-
                                 </form>
-
                             </li>
-
                         }
                         else
                         {
-
-                            <!-- ================================= -->
-                            <!-- PUBLIC PAGES -->
-                            <!-- ================================= -->
-
+                            <!-- Public navigation links -->
                             <li class="nav-item">
-
-                                <a class="nav-link text-dark"
-                                   asp-controller="Home"
-                                   asp-action="About">
-
-                                    About Us
-
+                                <a class="nav-link @(controllerName == "Home" && actionName == "Index" ? "active" : "")"
+                                   asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house"></i> Home
                                 </a>
-
                             </li>
-
-
                             <li class="nav-item">
-
-                                <a class="nav-link text-dark"
-                                   asp-controller="Home"
-                                   asp-action="Contact">
-
-                                    Contact Us
-
+                                <a class="nav-link @(controllerName == "Home" && actionName == "About" ? "active" : "")"
+                                   asp-controller="Home" asp-action="About">
+                                    <i class="bi bi-info-circle"></i> About
                                 </a>
-
                             </li>
-
+                            <li class="nav-item">
+                                <a class="nav-link @(controllerName == "Home" && actionName == "Contact" ? "active" : "")"
+                                   asp-controller="Home" asp-action="Contact">
+                                    <i class="bi bi-envelope"></i> Contact
+                                </a>
+                            </li>
+                            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                                <a class="btn btn-sm btn-outline-primary w-100" asp-controller="Account" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                                </a>
+                            </li>
+                            <li class="nav-item ms-lg-1 mt-2 mt-lg-0">
+                                <a class="btn btn-sm btn-primary w-100" asp-controller="Account" asp-action="Register">
+                                    <i class="bi bi-person-plus"></i> Get Started
+                                </a>
+                            </li>
                         }
-
                     </ul>
-
                 </div>
-
             </div>
-
         </nav>
-
     </header>
-
 
     <!-- ================================================= -->
     <!-- BACK BUTTON -->
     <!-- ================================================= -->
     @if (isAuthenticated &&
-             !isAccountPage &&
-             ViewData["Title"]?.ToString() != "Customer Dashboard" &&
-             ViewData["Title"]?.ToString() != "Worker Dashboard")
+         !isAccountPage &&
+         ViewData["Title"]?.ToString() != "Customer Dashboard" &&
+         ViewData["Title"]?.ToString() != "Worker Dashboard" &&
+         ViewData["Title"]?.ToString() != "Service Manager Dashboard")
     {
-        <div class="container mt-3">
-
-            <button type="button"
-                    class="btn btn-outline-secondary btn-sm"
-                    onclick="goBack()">
-
-                Back
-
+        <div class="container back-nav-container">
+            <button type="button" class="btn-back" onclick="goBack()">
+                <i class="bi bi-arrow-left"></i> Back
             </button>
-
         </div>
     }
-
 
     <!-- ================================================= -->
     <!-- MAIN CONTENT -->
     <!-- ================================================= -->
-
-    <div class="container">
-
-        <main role="main"
-              class="pb-3">
-
+    <main role="main" class="pb-5 pt-3">
+        <div class="container">
             @RenderBody()
-
-        </main>
-
-    </div>
-
+        </div>
+    </main>
 
     <!-- ================================================= -->
     <!-- FOOTER -->
     <!-- ================================================= -->
-
-    <footer class="border-top footer text-muted">
-
+    <footer class="site-footer">
         <div class="container">
-
-            &copy; 2026 - VehicleServiceManagement -
-
-            <a asp-controller="Home"
-               asp-action="Privacy">
-
-                Privacy
-
-            </a>
-
+            <div class="row g-4 align-items-center">
+                <div class="col-md-5">
+                    <div class="footer-brand">
+                        <span class="brand-icon" style="width:30px; height:30px; font-size:0.9rem;"><i class="bi bi-car-front-fill"></i></span>
+                        <span>AutoCare Pro</span>
+                    </div>
+                    <p class="text-muted mb-0 small">
+                        Smart automotive service management platform for vehicle owners, certified technicians, and service teams.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex gap-3">
+                        <a asp-controller="Home" asp-action="About" class="small">About</a>
+                        <a asp-controller="Home" asp-action="Contact" class="small">Contact Support</a>
+                        <a asp-controller="Home" asp-action="Privacy" class="small">Privacy Policy</a>
+                    </div>
+                </div>
+                <div class="col-md-3 text-md-end text-muted small">
+                    &copy; 2026 AutoCare Pro. All rights reserved.
+                </div>
+            </div>
         </div>
-
     </footer>
 
-
-    <!-- ================================================= -->
-    <!-- SCRIPTS -->
-    <!-- ================================================= -->
-
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="~/js/site.js"
-            asp-append-version="true">
-    </script>
-
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script>
-
-            function goBack() {
-
-                if (document.referrer &&
-                    document.referrer !== window.location.href) {
-
-                    history.back();
-
+        function goBack() {
+            if (document.referrer && document.referrer !== window.location.href) {
+                history.back();
+            } else {
+                @if (User.IsInRole("Customer"))
+                {
+                    <text>window.location.href = '@Url.Action("Dashboard", "Customer")';</text>
                 }
-                else {
-
-                    @if (User.IsInRole("Customer"))
-                        {
-                            <text>
-                                    window.location.href =
-                                    '@Url.Action("Dashboard", "Customer")';
-                            </text>
-                    }
-                            else if (User.IsInRole("Worker"))
-                        {
-                            <text>
-                                    window.location.href =
-                                    '@Url.Action("Dashboard", "Worker")';
-                            </text>
-                    }
-                            else if (User.IsInRole("Admin"))
-                        {
-                            <text>
-                                    window.location.href =
-                                    '@Url.Action("Index", "ServiceManager")';
-                            </text>
-                    }
-                        else
-                        {
-                            <text>
-                                    window.location.href =
-                                    '@Url.Action("Index", "Home")';
-                            </text>
-                    }
-
-                        }
-
+                else if (User.IsInRole("Worker"))
+                {
+                    <text>window.location.href = '@Url.Action("Dashboard", "Worker")';</text>
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    <text>window.location.href = '@Url.Action("Index", "ServiceManager")';</text>
+                }
+                else
+                {
+                    <text>window.location.href = '@Url.Action("Index", "Home")';</text>
+                }
             }
-
+        }
     </script>
 
-
-    @await RenderSectionAsync(
-        "Scripts",
-        required: false)
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>
-

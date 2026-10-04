@@ -1,97 +1,85 @@
-﻿@{
+@{
     ViewData["Title"] = "About Us";
 }
 
-<div class="container py-5">
-
+<div class="py-4">
     <!-- Page Header -->
     <div class="text-center mb-5">
-        <h1 class="fw-bold text-primary">About Us</h1>
-        <p class="text-muted">
-            Vehicle Service Management System
+        <span class="badge bg-primary text-primary-emphasis px-3 py-2 mb-2">Our Mission</span>
+        <h1 class="fw-bold">Redefining Vehicle Care & Maintenance</h1>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            A modern, transparent, and technology-driven platform connecting vehicle owners, professional technicians, and service managers under one unified roof.
         </p>
     </div>
 
-    <!-- About Section -->
+    <!-- About Section Card -->
     <div class="row justify-content-center">
-        <div class="col-lg-9">
-
-            <div class="card shadow-sm border-0">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 mb-5">
                 <div class="card-body p-4 p-md-5">
-
-                    <h3 class="fw-bold mb-3">
-                        Vehicle Service Management
-                    </h3>
-
-                    <p class="text-muted">
-                        Vehicle Service Management is a web-based system
-                        designed to make vehicle servicing easier and more
-                        organized for customers, workers, and service managers.
-                    </p>
-
-                    <p class="text-muted">
-                        Customers can manage their vehicles, submit service
-                        requests, and track their service information.
-                        Workers can manage their availability, view assigned
-                        services, and update the progress of their work.
-                    </p>
-
-                    <p class="text-muted">
-                        The system also helps service managers organize
-                        service requests, assign work to workers, and manage
-                        the overall vehicle service process.
-                    </p>
+                    <div class="row align-items-center g-4 mb-4">
+                        <div class="col-md-7">
+                            <h3 class="fw-bold mb-3">Next-Generation Auto Management</h3>
+                            <p class="text-muted">
+                                AutoCare Pro was founded to resolve the chaos of conventional car servicing. We replace confusing paper tickets and lack of updates with a streamlined digital platform designed for full transparency and operational speed.
+                            </p>
+                            <p class="text-muted mb-0">
+                                Whether you're an individual driver maintaining your daily vehicle, a certified technician looking for structured assignments, or a service center manager optimizing throughput, our system provides full end-to-end tooling.
+                            </p>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <div class="p-4 rounded-4 bg-light border">
+                                <div class="stat-value text-primary mb-1">99.8%</div>
+                                <div class="stat-label mb-3">On-Time Service Deliveries</div>
+                                <div class="stat-value text-success mb-1">24/7</div>
+                                <div class="stat-label">Support & Request Tracking</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <hr class="my-4" />
 
-                    <h4 class="fw-bold mb-3">
-                        What We Provide
-                    </h4>
+                    <h4 class="fw-bold mb-4">What We Provide</h4>
 
-                    <div class="row g-3">
-
+                    <div class="row g-4">
                         <div class="col-md-4">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-primary">
-                                    Vehicle Management
-                                </h5>
-                                <p class="text-muted mb-0">
-                                    Manage vehicle details and keep service
-                                    information organized.
+                            <div class="feature-box h-100">
+                                <div class="feature-icon-wrapper icon-primary">
+                                    <i class="bi bi-car-front-fill"></i>
+                                </div>
+                                <h5 class="fw-bold">Vehicle Fleet Tracking</h5>
+                                <p class="text-muted small mb-0">
+                                    Keep vehicle profiles, VINs, registration dates, and complete service histories neatly structured in one dashboard.
                                 </p>
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-success">
-                                    Service Requests
-                                </h5>
-                                <p class="text-muted mb-0">
-                                    Customers can submit service requests
-                                    and follow their service progress.
+                            <div class="feature-box h-100">
+                                <div class="feature-icon-wrapper icon-success">
+                                    <i class="bi bi-tools"></i>
+                                </div>
+                                <h5 class="fw-bold">Transparent Workflow</h5>
+                                <p class="text-muted small mb-0">
+                                    Submit service requests with detailed notes. Get real-time status transitions as your technician works on the repair.
                                 </p>
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="border rounded p-3 h-100">
-                                <h5 class="text-warning">
-                                    Worker Management
-                                </h5>
-                                <p class="text-muted mb-0">
-                                    Workers can manage availability and
-                                    handle assigned service requests.
+                            <div class="feature-box h-100">
+                                <div class="feature-icon-wrapper icon-warning">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <h5 class="fw-bold">Certified Specialists</h5>
+                                <p class="text-muted small mb-0">
+                                    Technicians can set availability, display specialization credentials, and systematically execute assignments.
                                 </p>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
-
         </div>
     </div>
-
 </div>

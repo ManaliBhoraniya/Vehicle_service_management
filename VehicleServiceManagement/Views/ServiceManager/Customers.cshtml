@@ -1,70 +1,77 @@
-﻿@model IEnumerable<VehicleServiceManagement.Models.Customer>
+@model IEnumerable<VehicleServiceManagement.Models.Customer>
 
 @{
-    ViewData["Title"] = "Customers";
+    ViewData["Title"] = "Customer Directory";
 }
 
-<h2 class="mb-4">Customers</h2>
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Customer Directory</h2>
+            <p class="text-muted small mb-0">Overview of all registered vehicle owners and their vehicle counts.</p>
+        </div>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        No customers found.
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Dashboard
+        </a>
     </div>
-}
-else
-{
-    <div class="table-responsive">
 
-        <table class="table table-bordered table-hover">
-
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Vehicles</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                @foreach (var customer in Model)
-                {
-                    <tr>
-
-                        <td>
-                            @customer.Id
-                        </td>
-
-                        <td>
-                            @customer.Name
-                        </td>
-
-                        <td>
-                            @customer.ApplicationUser?.Email
-                        </td>
-
-                        <td>
-                            @customer.Phone
-                        </td>
-
-                        <td>
-                            @(customer.Vehicles?.Count ?? 0)
-                        </td>
-
-                    </tr>
-                }
-
-            </tbody>
-
-        </table>
-
-    </div>
-}
-
-<a asp-action="Index"
-   class="btn btn-secondary">
-    Back to Dashboard
-</a>
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm text-center p-5">
+            <div class="feature-icon-wrapper icon-primary mx-auto mb-3" style="width:64px;height:64px;font-size:2rem;">
+                <i class="bi bi-people"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">No Customers Registered</h5>
+            <p class="text-muted small mb-0">Registered vehicle owners will appear here automatically.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive border-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Customer Name</th>
+                            <th>Email Address</th>
+                            <th>Phone</th>
+                            <th class="text-end">Vehicles Owned</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var customer in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary">#@customer.Id</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="brand-icon" style="width:32px; height:32px; font-size:0.9rem; border-radius:8px;">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <span class="fw-semibold text-dark">@customer.Name</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-muted">@(customer.ApplicationUser?.Email ?? "-")</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">@(string.IsNullOrEmpty(customer.Phone) ? "-" : customer.Phone)</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge bg-primary text-primary-emphasis px-3 py-2">
+                                        <i class="bi bi-car-front-fill me-1"></i> @(customer.Vehicles?.Count ?? 0)
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

@@ -1,92 +1,85 @@
-﻿@model VehicleServiceManagement.Models.Worker
+@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "Worker Details";
+    ViewData["Title"] = "Technician Details";
 }
 
-<div class="container mt-4">
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Technician #@Model.WorkerId</h5>
+                        <span class="text-muted small">Specialist Profile & Qualifications</span>
+                    </div>
+                </div>
 
-    <div class="card shadow-sm">
+                @if (Model.IsAvailable)
+                {
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                        <i class="bi bi-check-circle-fill"></i> Available
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary px-3 py-2">
+                        <i class="bi bi-dash-circle"></i> Not Available
+                    </span>
+                }
+            </div>
 
-        <div class="card-header">
-            <h3 class="mb-0">Worker Details</h3>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Technician Name</label>
+                        <span class="fs-5 fw-bold text-dark">@(Model.ApplicationUser?.Name ?? "N/A")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Email Address</label>
+                        <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.Email ?? "N/A")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Phone Number</label>
+                        <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.PhoneNumber ?? "N/A")</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Application Status</label>
+                        <span class="badge bg-primary text-primary-emphasis px-3 py-2">@Model.Status</span>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="text-muted small d-block mb-2">Technician Specialties</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (Model.Specialities != null && Model.Specialities.Any())
+                            {
+                                foreach (var speciality in Model.Specialities)
+                                {
+                                    <span class="badge bg-primary text-primary-emphasis px-3 py-2">
+                                        <i class="bi bi-patch-check-fill me-1"></i> @speciality.Speciality
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">No specialities listed.</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                    <a asp-controller="ServiceManager" asp-action="Workers" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back to Workers List
+                    </a>
+                </div>
+            </div>
         </div>
-
-        <div class="card-body">
-
-            <dl class="row">
-
-                <dt class="col-sm-3">Worker ID</dt>
-                <dd class="col-sm-9">@Model.WorkerId</dd>
-
-                <dt class="col-sm-3">Name</dt>
-                <dd class="col-sm-9">
-                    @(Model.ApplicationUser?.Name ?? "N/A")
-                </dd>
-
-                <dt class="col-sm-3">Email</dt>
-                <dd class="col-sm-9">
-                    @(Model.ApplicationUser?.Email ?? "N/A")
-                </dd>
-
-                <dt class="col-sm-3">Phone</dt>
-                <dd class="col-sm-9">
-                    @(Model.ApplicationUser?.PhoneNumber ?? "N/A")
-                </dd>
-
-                <dt class="col-sm-3">Specialities</dt>
-                <dd class="col-sm-9">
-
-                    @if (Model.Specialities != null &&
-                         Model.Specialities.Any())
-                    {
-                        foreach (var speciality in Model.Specialities)
-                        {
-                            <span class="badge bg-primary me-1 mb-1">
-                                @speciality.Speciality
-                            </span>
-                        }
-                    }
-                    else
-                    {
-                        <span class="text-muted">
-                            No specialities listed
-                        </span>
-                    }
-
-                </dd>
-
-                <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9">@Model.Status</dd>
-
-                <dt class="col-sm-3">Availability</dt>
-                <dd class="col-sm-9">
-
-                    @if (Model.IsAvailable)
-                    {
-                        <span class="badge bg-success">
-                            Available
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">
-                            Not Available
-                        </span>
-                    }
-
-                </dd>
-
-            </dl>
-
-            <a asp-controller="ServiceManager"
-               asp-action="Workers"
-               class="btn btn-secondary">
-                Back to Workers
-            </a>
-
-        </div>
-
     </div>
-
 </div>

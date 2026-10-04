@@ -1,49 +1,54 @@
-﻿@model VehicleServiceManagement.Models.Vehicle
+@model VehicleServiceManagement.Models.Vehicle
 
 @{
     ViewData["Title"] = "Delete Vehicle";
 }
 
-<h2>Delete Vehicle</h2>
+<div class="row justify-content-center py-3">
+    <div class="col-lg-6">
+        <div class="card border-danger border-opacity-25 shadow-sm">
+            <div class="card-header bg-danger-subtle bg-opacity-25 py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                    <h5 class="fw-bold text-danger mb-0">Confirm Vehicle Deletion</h5>
+                </div>
+            </div>
 
-<div class="alert alert-danger">
-    Are you sure you want to delete this vehicle?
-</div>
+            <div class="card-body p-4">
+                <p class="text-muted">
+                    Are you sure you want to permanently remove this vehicle from your account? Any pending service requests associated with this vehicle may be affected.
+                </p>
 
-<div class="card">
-    <div class="card-body">
+                <div class="p-3 bg-light rounded-3 mb-4 border">
+                    <div class="row g-2">
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Vehicle Number:</span>
+                            <strong class="text-dark">@Model.VehicleNumber</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Model:</span>
+                            <strong class="text-dark">@Model.VehicleModel</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Type:</span>
+                            <span class="badge bg-secondary">@Model.VehicleType</span>
+                        </div>
+                    </div>
+                </div>
 
-        <h5>
-            @Model.VehicleNumber
-        </h5>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
 
-        <p>
-            <strong>Vehicle Model:</strong>
-            @Model.VehicleModel
-        </p>
-
-        <p>
-            <strong>Vehicle Type:</strong>
-            @Model.VehicleType
-        </p>
-
-        <form asp-action="Delete"
-              asp-route-id="@Model.Id"
-              method="post">
-
-            @Html.AntiForgeryToken()
-
-            <button type="submit"
-                    class="btn btn-danger">
-                Yes, Delete
-            </button>
-
-            <a asp-action="Index"
-               class="btn btn-secondary">
-                Cancel
-            </a>
-
-        </form>
-
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-trash"></i> Yes, Delete Vehicle
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>

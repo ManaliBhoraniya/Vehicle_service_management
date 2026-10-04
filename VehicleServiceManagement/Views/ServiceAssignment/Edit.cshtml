@@ -1,247 +1,110 @@
-﻿@model VehicleServiceManagement.Models.ServiceAssignment
+@model VehicleServiceManagement.Models.ServiceAssignment
 
 @{
     ViewData["Title"] = "Edit Service Assignment";
 }
 
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h2>
-                Edit Service Assignment
-            </h2>
-
-            <p class="text-muted mb-0">
-                Update the assignment information.
-            </p>
-
-        </div>
-
-        <a asp-controller="ServiceManager"
-           asp-action="Assignments"
-           class="btn btn-outline-secondary">
-            Back to Assignments
-        </a>
-
-    </div>
-
-
-    <div class="card shadow-sm">
-
-        <div class="card-header">
-
-            <h5 class="mb-0">
-                Assignment Information
-            </h5>
-
-        </div>
-
-
-        <div class="card-body">
-
-            <form asp-controller="ServiceAssignment"
-                  asp-action="Edit"
-                  method="post">
-
-                @Html.AntiForgeryToken()
-
-                <input type="hidden"
-                       asp-for="ServiceAssignmentId" />
-
-
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3">
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon" style="width: 34px; height: 34px; font-size: 1rem;">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">Update Service Assignment</h4>
+                        <p class="text-muted small mb-0">Modify technician allocation, scheduled timestamps, and dispatch notes</p>
+                    </div>
                 </div>
+            </div>
 
+            <div class="card-body p-4">
+                <form asp-controller="ServiceAssignment" asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ServiceAssignmentId" />
 
-                <!-- SERVICE REQUEST -->
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
 
-                <div class="mb-3">
-
-                    <label asp-for="ServiceRequestId"
-                           class="form-label">
-                        Service Request
-                    </label>
-
-                    <select asp-for="ServiceRequestId"
-                            class="form-select"
-                            asp-items="ViewBag.ServiceRequestId">
-
-                        <option value="">
-                            -- Select Service Request --
-                        </option>
-
-                    </select>
-
-                    <span asp-validation-for="ServiceRequestId"
-                          class="text-danger">
-                    </span>
-
-                </div>
-
-
-                <!-- WORKER -->
-
-                <div class="mb-3">
-
-                    <label asp-for="WorkerId"
-                           class="form-label">
-                        Worker
-                    </label>
-
-                    <select asp-for="WorkerId"
-                            class="form-select"
-                            asp-items="ViewBag.WorkerId">
-
-                        <option value="">
-                            -- Select Worker --
-                        </option>
-
-                    </select>
-
-                    <span asp-validation-for="WorkerId"
-                          class="text-danger">
-                    </span>
-
-                    <div class="form-text">
-                        Select an accepted and available worker
-                        with the required speciality.
+                    <!-- SERVICE REQUEST -->
+                    <div class="mb-3">
+                        <label asp-for="ServiceRequestId" class="form-label">
+                            <i class="bi bi-ticket-detailed me-1 text-muted"></i> Service Request Ticket
+                        </label>
+                        <select asp-for="ServiceRequestId" class="form-select" asp-items="ViewBag.ServiceRequestId" required>
+                            <option value="">-- Select Service Request --</option>
+                        </select>
+                        <span asp-validation-for="ServiceRequestId" class="text-danger small"></span>
                     </div>
 
-                </div>
+                    <!-- WORKER -->
+                    <div class="mb-3">
+                        <label asp-for="WorkerId" class="form-label">
+                            <i class="bi bi-person me-1 text-muted"></i> Assigned Technician
+                        </label>
+                        <select asp-for="WorkerId" class="form-select" asp-items="ViewBag.WorkerId" required>
+                            <option value="">-- Select Worker --</option>
+                        </select>
+                        <span asp-validation-for="WorkerId" class="text-danger small"></span>
+                    </div>
 
+                    <!-- STATUS -->
+                    <div class="mb-3">
+                        <label asp-for="Status" class="form-label">
+                            <i class="bi bi-tag me-1 text-muted"></i> Status
+                        </label>
+                        <select asp-for="Status" class="form-select">
+                            <option value="Pending">Pending</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
 
-                <!-- STATUS -->
+                    <div class="row g-3 mb-3">
+                        <!-- ASSIGNED DATE -->
+                        <div class="col-md-6">
+                            <label asp-for="AssignedDate" class="form-label">
+                                <i class="bi bi-calendar-event me-1 text-muted"></i> Assigned Timestamp
+                            </label>
+                            <input asp-for="AssignedDate" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="AssignedDate" class="text-danger small"></span>
+                        </div>
 
-                <div class="mb-3">
+                        <!-- COMPLETED DATE -->
+                        <div class="col-md-6">
+                            <label asp-for="CompletedDate" class="form-label">
+                                <i class="bi bi-calendar-check me-1 text-muted"></i> Completed Timestamp
+                            </label>
+                            <input asp-for="CompletedDate" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="CompletedDate" class="text-danger small"></span>
+                        </div>
+                    </div>
 
-                    <label asp-for="Status"
-                           class="form-label">
-                        Status
-                    </label>
+                    <!-- NOTES -->
+                    <div class="mb-4">
+                        <label asp-for="Notes" class="form-label">
+                            <i class="bi bi-chat-text me-1 text-muted"></i> Dispatch Instructions & Notes
+                        </label>
+                        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Notes" class="text-danger small"></span>
+                    </div>
 
-                    <select asp-for="Status"
-                            class="form-select">
-
-                        <option value="Pending">
-                            Pending
-                        </option>
-
-                        <option value="Accepted">
-                            Accepted
-                        </option>
-
-                        <option value="Rejected">
-                            Rejected
-                        </option>
-
-                        <option value="Completed">
-                            Completed
-                        </option>
-
-                    </select>
-
-                    <span asp-validation-for="Status"
-                          class="text-danger">
-                    </span>
-
-                </div>
-
-
-                <!-- ASSIGNED DATE -->
-
-                <div class="mb-3">
-
-                    <label asp-for="AssignedDate"
-                           class="form-label">
-                        Assigned Date
-                    </label>
-
-                    <input asp-for="AssignedDate"
-                           type="datetime-local"
-                           class="form-control" />
-
-                    <span asp-validation-for="AssignedDate"
-                          class="text-danger">
-                    </span>
-
-                </div>
-
-
-                <!-- COMPLETED DATE -->
-
-                <div class="mb-3">
-
-                    <label asp-for="CompletedDate"
-                           class="form-label">
-                        Completed Date
-                    </label>
-
-                    <input asp-for="CompletedDate"
-                           type="datetime-local"
-                           class="form-control" />
-
-                    <span asp-validation-for="CompletedDate"
-                          class="text-danger">
-                    </span>
-
-                </div>
-
-
-                <!-- NOTES -->
-
-                <div class="mb-3">
-
-                    <label asp-for="Notes"
-                           class="form-label">
-                        Notes
-                    </label>
-
-                    <textarea asp-for="Notes"
-                              class="form-control"
-                              rows="4"
-                              placeholder="Optional notes">
-                    </textarea>
-
-                    <span asp-validation-for="Notes"
-                          class="text-danger">
-                    </span>
-
-                </div>
-
-
-                <div class="mt-4">
-
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Save Changes
-                    </button>
-
-                    <a asp-controller="ServiceManager"
-                       asp-action="Assignments"
-                       class="btn btn-secondary ms-2">
-                        Cancel
-                    </a>
-
-                </div>
-
-            </form>
-
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg"></i> Save Changes
+                        </button>
+                        <a asp-controller="ServiceManager" asp-action="Assignments" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-
     </div>
-
 </div>
 
-
 @section Scripts {
-
-    @{
-        await Html.RenderPartialAsync(
-            "_ValidationScriptsPartial");
-    }
-
+    <partial name="_ValidationScriptsPartial" />
 }

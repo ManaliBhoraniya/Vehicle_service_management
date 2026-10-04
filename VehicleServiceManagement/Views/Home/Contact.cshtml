@@ -1,128 +1,93 @@
-﻿@{
+@{
     ViewData["Title"] = "Contact Us";
 }
 
-<div class="container py-5">
-
+<div class="py-4">
     <!-- Page Header -->
     <div class="text-center mb-5">
-        <h1 class="fw-bold text-primary">Contact Us</h1>
-
-        <p class="text-muted">
-            Get in touch with our Vehicle Service Management team.
+        <span class="badge bg-primary text-primary-emphasis px-3 py-2 mb-2">Help & Support</span>
+        <h1 class="fw-bold">We're Here to Help You</h1>
+        <p class="text-muted mx-auto" style="max-width: 580px;">
+            Have questions about an ongoing service, technician registration, or fleet management? Reach out to our dedicated support crew.
         </p>
     </div>
 
-
-    <div class="row justify-content-center g-4">
-
+    <!-- Contact Info Cards -->
+    <div class="row justify-content-center g-4 mb-5">
         <!-- Address -->
         <div class="col-md-4">
-
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4 text-center">
-
-                    <h4 class="fw-bold text-primary mb-3">
-                        Address
-                    </h4>
-
-                    <p class="text-muted mb-0">
-                        Vehicle Service Management Center
-                        <br />
-                        Gujarat, India
+            <div class="card h-100 card-hover-lift border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <div class="feature-icon-wrapper icon-primary mx-auto mb-3">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Visit Our Center</h5>
+                    <p class="text-muted small mb-0">
+                        AutoCare Pro Service Hub<br />
+                        Tech Park Road, Gujarat, India
                     </p>
-
                 </div>
             </div>
-
         </div>
-
 
         <!-- Phone -->
         <div class="col-md-4">
-
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4 text-center">
-
-                    <h4 class="fw-bold text-success mb-3">
-                        Phone
-                    </h4>
-
-                    <p class="text-muted mb-0">
-                        +91 98765 43210
+            <div class="card h-100 card-hover-lift border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <div class="feature-icon-wrapper icon-success mx-auto mb-3">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Call Our Helpline</h5>
+                    <p class="text-muted small mb-0">
+                        +91 98765 43210<br />
+                        Toll Free: 1800 123 4567
                     </p>
-
                 </div>
             </div>
-
         </div>
-
 
         <!-- Email -->
         <div class="col-md-4">
-
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4 text-center">
-
-                    <h4 class="fw-bold text-warning mb-3">
-                        Email
-                    </h4>
-
-                    <p class="text-muted mb-0">
-                        support@vehicleservice.com
+            <div class="card h-100 card-hover-lift border-0 shadow-sm text-center">
+                <div class="card-body p-4">
+                    <div class="feature-icon-wrapper icon-warning mx-auto mb-3">
+                        <i class="bi bi-envelope-open-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Email Inquiries</h5>
+                    <p class="text-muted small mb-0">
+                        support@autocarepro.com<br />
+                        helpdesk@autocarepro.com
                     </p>
-
                 </div>
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- Working Hours -->
-
-    <div class="row justify-content-center mt-4">
-
-        <div class="col-md-8">
-
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4 text-center">
-
-                    <h4 class="fw-bold text-danger mb-3">
-                        Working Hours
-                    </h4>
-
-                    <p class="text-muted mb-1">
-                        Monday - Saturday
-                    </p>
-
-                    <p class="text-muted mb-0">
-                        9:00 AM - 6:00 PM
-                    </p>
-
+    <!-- Working Hours & Center Information -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5 text-center">
+                    <div class="feature-icon-wrapper icon-info mx-auto mb-3">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Operating Hours</h4>
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-4 text-muted">
+                        <div class="p-3 bg-light rounded-3 flex-fill">
+                            <span class="fw-bold text-dark d-block">Monday - Friday</span>
+                            <span class="small">08:00 AM - 08:00 PM</span>
+                        </div>
+                        <div class="p-3 bg-light rounded-3 flex-fill">
+                            <span class="fw-bold text-dark d-block">Saturday</span>
+                            <span class="small">09:00 AM - 06:00 PM</span>
+                        </div>
+                        <div class="p-3 bg-light rounded-3 flex-fill">
+                            <span class="fw-bold text-dark d-block">Sunday</span>
+                            <span class="small text-danger">Emergency Tow Only</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
-
     </div>
-
-
-    <!-- Additional Information -->
-
-    <div class="text-center mt-5">
-
-        <h4 class="fw-bold">
-            Vehicle Service Management
-        </h4>
-
-        <p class="text-muted">
-            For vehicle service information, service requests,
-            worker assistance, or account-related support,
-            please contact us using the details provided above.
-        </p>
-
-    </div>
-
 </div>

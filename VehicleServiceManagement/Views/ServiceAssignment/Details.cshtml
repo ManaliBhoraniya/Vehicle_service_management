@@ -1,251 +1,127 @@
-﻿@model VehicleServiceManagement.Models.ServiceAssignment
+@model VehicleServiceManagement.Models.ServiceAssignment
 
 @{
     ViewData["Title"] = "Assignment Details";
 }
 
-<div class="container mt-4">
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon" style="width: 36px; height: 36px; font-size: 1.1rem;">
+                        <i class="bi bi-kanban"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Service Assignment #@Model.ServiceAssignmentId</h5>
+                        <span class="text-muted small">Assigned on @Model.AssignedDate.ToString("dd MMMM yyyy, hh:mm tt")</span>
+                    </div>
+                </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-            <h2>Assignment Details</h2>
-
-            <p class="text-muted mb-0">
-                View service assignment information.
-            </p>
-        </div>
-
-        <a asp-controller="ServiceManager"
-           asp-action="Assignments"
-           class="btn btn-outline-secondary">
-            Back to Assignments
-        </a>
-
-    </div>
-
-
-    <div class="card shadow-sm">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Service Assignment
-            </h5>
-        </div>
-
-
-        <div class="card-body">
-
-            <dl class="row">
-
-                <!-- ASSIGNMENT ID -->
-
-                <dt class="col-sm-4">
-                    Assignment ID
-                </dt>
-
-                <dd class="col-sm-8">
-                    @Model.ServiceAssignmentId
-                </dd>
-
-
-                <!-- SERVICE REQUEST -->
-
-                <dt class="col-sm-4">
-                    Service Request
-                </dt>
-
-                <dd class="col-sm-8">
-
-                    @if (Model.ServiceRequest != null)
-                    {
-                        <span>
-                            #@Model.ServiceRequestId
-                        </span>
-
-                        <span class="ms-2">
-                            @Model.ServiceRequest.ServiceType
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="text-muted">
-                            No service request information
-                        </span>
-                    }
-
-                </dd>
-
-
-                <!-- WORKER -->
-
-                <dt class="col-sm-4">
-                    Worker
-                </dt>
-
-                <dd class="col-sm-8">
-
-                    @if (Model.Worker != null)
-                    {
-                        <div>
-                            <strong>
-                                @(Model.Worker.ApplicationUser?.Name ?? "Worker")
-                            </strong>
-                        </div>
-
-                        <div class="mt-2">
-
-                            @if (Model.Worker.Specialities != null &&
-                                 Model.Worker.Specialities.Any())
-                            {
-                                foreach (var speciality in Model.Worker.Specialities)
-                                {
-                                    <span class="badge bg-primary me-1 mb-1">
-                                        @speciality.Speciality
-                                    </span>
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">
-                                    No specialities listed
-                                </span>
-                            }
-
-                        </div>
-                    }
-                    else
-                    {
-                        <span class="text-muted">
-                            No worker assigned
-                        </span>
-                    }
-
-                </dd>
-
-
-                <!-- STATUS -->
-
-                <dt class="col-sm-4">
-                    Status
-                </dt>
-
-                <dd class="col-sm-8">
-
+                <div>
                     @if (Model.Status == "Pending")
                     {
-                        <span class="badge bg-warning text-dark">
-                            Pending
+                        <span class="badge bg-warning text-warning-emphasis px-3 py-2">
+                            <i class="bi bi-hourglass-split"></i> Pending Confirmation
                         </span>
                     }
                     else if (Model.Status == "Accepted")
                     {
-                        <span class="badge bg-primary">
-                            Accepted
-                        </span>
-                    }
-                    else if (Model.Status == "Rejected")
-                    {
-                        <span class="badge bg-danger">
-                            Rejected
+                        <span class="badge bg-primary text-primary-emphasis px-3 py-2">
+                            <i class="bi bi-person-gear"></i> In Progress
                         </span>
                     }
                     else if (Model.Status == "Completed")
                     {
-                        <span class="badge bg-success">
-                            Completed
+                        <span class="badge bg-success text-success-emphasis px-3 py-2">
+                            <i class="bi bi-check2-circle"></i> Completed
+                        </span>
+                    }
+                    else if (Model.Status == "Rejected")
+                    {
+                        <span class="badge bg-danger text-danger-emphasis px-3 py-2">
+                            <i class="bi bi-x-circle"></i> Rejected
                         </span>
                     }
                     else
                     {
-                        <span class="badge bg-secondary">
-                            @Model.Status
-                        </span>
+                        <span class="badge bg-secondary px-3 py-2">@Model.Status</span>
                     }
-
-                </dd>
-
-
-                <!-- ASSIGNED DATE -->
-
-                <dt class="col-sm-4">
-                    Assigned Date
-                </dt>
-
-                <dd class="col-sm-8">
-                    @Model.AssignedDate.ToString("dd-MM-yyyy hh:mm tt")
-                </dd>
-
-
-                <!-- COMPLETED DATE -->
-
-                <dt class="col-sm-4">
-                    Completed Date
-                </dt>
-
-                <dd class="col-sm-8">
-
-                    @if (Model.CompletedDate.HasValue)
-                    {
-                        <span>
-                            @Model.CompletedDate.Value.ToString("dd-MM-yyyy hh:mm tt")
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="text-muted">
-                            Not completed
-                        </span>
-                    }
-
-                </dd>
-
-
-                <!-- NOTES -->
-
-                <dt class="col-sm-4">
-                    Notes
-                </dt>
-
-                <dd class="col-sm-8">
-
-                    @if (!string.IsNullOrWhiteSpace(Model.Notes))
-                    {
-                        <span>
-                            @Model.Notes
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="text-muted">
-                            No notes
-                        </span>
-                    }
-
-                </dd>
-
-            </dl>
-
-
-            <div class="mt-4">
-
-                <a asp-controller="ServiceAssignment"
-                   asp-action="Edit"
-                   asp-route-id="@Model.ServiceAssignmentId"
-                   class="btn btn-primary">
-                    Edit
-                </a>
-
-                <a asp-controller="ServiceManager"
-                   asp-action="Assignments"
-                   class="btn btn-secondary ms-2">
-                    Back
-                </a>
-
+                </div>
             </div>
 
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- TICKET LINK -->
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Service Request Ticket</label>
+                        @if (Model.ServiceRequest != null)
+                        {
+                            <span class="fs-6 fw-bold text-dark">
+                                #@Model.ServiceRequestId - @Model.ServiceRequest.ServiceType
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No service request data</span>
+                        }
+                    </div>
+
+                    <!-- WORKER -->
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Assigned Technician</label>
+                        @if (Model.Worker != null)
+                        {
+                            <span class="fs-6 fw-bold text-dark">
+                                @(Model.Worker.ApplicationUser?.Name ?? "Worker #" + Model.WorkerId)
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No worker assigned</span>
+                        }
+                    </div>
+
+                    <!-- TIMESTAMPS -->
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Assigned Date & Time</label>
+                        <span class="fw-semibold text-dark">
+                            <i class="bi bi-calendar-event me-1 text-muted"></i> @Model.AssignedDate.ToString("dd MMM yyyy, hh:mm tt")
+                        </span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Completed Date & Time</label>
+                        @if (Model.CompletedDate.HasValue)
+                        {
+                            <span class="fw-semibold text-success">
+                                <i class="bi bi-calendar-check me-1 text-success"></i> @Model.CompletedDate.Value.ToString("dd MMM yyyy, hh:mm tt")
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Not completed yet</span>
+                        }
+                    </div>
+
+                    <!-- NOTES -->
+                    <div class="col-12">
+                        <label class="text-muted small d-block">Dispatch Notes & Special Instructions</label>
+                        <div class="p-3 bg-light rounded-3 text-dark mt-1">
+                            @(string.IsNullOrWhiteSpace(Model.Notes) ? "No special instructions provided." : Model.Notes)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                    <a asp-controller="ServiceAssignment" asp-action="Edit" asp-route-id="@Model.ServiceAssignmentId" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Edit Assignment
+                    </a>
+                    <a asp-controller="ServiceManager" asp-action="Assignments" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back to Assignments
+                    </a>
+                </div>
+            </div>
         </div>
-
     </div>
-
 </div>

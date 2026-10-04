@@ -1,140 +1,113 @@
 @model IEnumerable<VehicleServiceManagement.Models.Worker>
 
 @{
-    ViewData["Title"] = "Workers";
+    ViewData["Title"] = "Technician Roster";
 }
 
-<div class="container mt-4">
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Technician Roster</h2>
+            <p class="text-muted small mb-0">Monitor mechanic profiles, certified specialties, and active shift availability.</p>
+        </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h2>Workers</h2>
-
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Back to Dashboard
-        </a>
-
+        <div class="d-flex gap-2">
+            <a asp-action="JobRequests" class="btn btn-warning btn-sm text-dark">
+                <i class="bi bi-file-earmark-person"></i> Job Requests
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Dashboard
+            </a>
+        </div>
     </div>
-
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">
-
-            No workers found.
-
+        <div class="card border-0 shadow-sm text-center p-5">
+            <div class="feature-icon-wrapper icon-warning mx-auto mb-3" style="width:64px;height:64px;font-size:2rem;">
+                <i class="bi bi-tools"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">No Technicians Enrolled</h5>
+            <p class="text-muted small mb-0">Approved worker candidates will be listed in this active staff roster.</p>
         </div>
     }
     else
     {
-        <div class="table-responsive">
-
-            <table class="table table-bordered table-hover">
-
-                <thead class="table-dark">
-
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>Name</th>
-
-                        <th>Email</th>
-
-                        <th>Specialities</th>
-
-                        <th>Available</th>
-
-                        <th>Actions</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @foreach (var worker in Model)
-                    {
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive border-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
                         <tr>
-
-                            <td>
-                                @worker.WorkerId
-                            </td>
-
-                            <td>
-                                @worker.ApplicationUser?.Name
-                            </td>
-
-                            <td>
-                                @worker.ApplicationUser?.Email
-                            </td>
-
-                            <td>
-
-                                @if (worker.Specialities != null &&
-                                    worker.Specialities.Any())
-                                {
-                                    <div class="d-flex flex-wrap gap-1">
-
-                                        @foreach (
-                                            var speciality
-                                            in worker.Specialities)
-                                        {
-                                            <span class="badge bg-primary">
-                                                @speciality.Speciality
-                                            </span>
-                                        }
-
-                                    </div>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">
-                                        No specialities
-                                    </span>
-                                }
-
-                            </td>
-
-                            <td>
-
-                                @if (worker.IsAvailable)
-                                {
-                                    <span class="badge bg-success">
-                                        Available
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">
-                                        Unavailable
-                                    </span>
-                                }
-
-                            </td>
-
-                            <td>
-
-                                <a asp-controller="ServiceManager"
-                                   asp-action="WorkerDetails"
-                                   asp-route-id="@worker.WorkerId"
-                                   class="btn btn-sm btn-info text-white">
-
-                                    Details
-
-                                </a>
-
-                            </td>
-
+                            <th>Technician</th>
+                            <th>Contact Email</th>
+                            <th>Certified Specialties</th>
+                            <th>Shift Status</th>
+                            <th class="text-end">Actions</th>
                         </tr>
-                    }
-
-                </tbody>
-
-            </table>
-
+                    </thead>
+                    <tbody>
+                        @foreach (var worker in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="brand-icon" style="width:34px; height:34px; font-size:1rem; border-radius:8px;">
+                                            <i class="bi bi-person-workspace"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">@(worker.ApplicationUser?.Name ?? "Technician")</span>
+                                            <span class="text-muted small">ID: #@worker.WorkerId</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-muted">@(worker.ApplicationUser?.Email ?? "-")</span>
+                                </td>
+                                <td>
+                                    @if (worker.Specialities != null && worker.Specialities.Any())
+                                    {
+                                        <div class="d-flex flex-wrap gap-1">
+                                            @foreach (var speciality in worker.Specialities)
+                                            {
+                                                <span class="badge bg-primary text-primary-emphasis">
+                                                    @speciality.Speciality
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">No specialities listed</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (worker.IsAvailable)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                            <i class="bi bi-check-circle-fill"></i> Available
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                            <i class="bi bi-dash-circle"></i> Unavailable
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-controller="ServiceManager"
+                                       asp-action="WorkerDetails"
+                                       asp-route-id="@worker.WorkerId"
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
-
 </div>

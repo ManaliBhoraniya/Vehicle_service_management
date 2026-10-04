@@ -3,226 +3,138 @@
 @{
     ViewData["Title"] = "Create Service Request";
 
-    var vehicles =
-        ViewBag.Vehicles as IEnumerable<VehicleServiceManagement.Models.Vehicle>;
+    var vehicles = ViewBag.Vehicles as IEnumerable<VehicleServiceManagement.Models.Vehicle>;
 }
 
-<div class="container mt-4">
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Create Service Request</h2>
+        <p class="text-muted small mb-0">Describe the symptoms or maintenance required for your vehicle.</p>
+    </div>
 
-    <h2 class="mb-4">
-        Create Service Request
-    </h2>
-
-    <div class="row">
-
-        <!-- SERVICE REQUEST FORM -->
-
-        <div class="col-md-7">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        New Service Request
-                    </h5>
+    <div class="row g-4">
+        <!-- SERVICE FORM -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="brand-icon" style="width: 32px; height: 32px; font-size: 1rem;">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <h5 class="fw-bold mb-0">Service Ticket Details</h5>
+                    </div>
                 </div>
 
-                <div class="card-body">
-
-                    <form asp-action="Create"
-                          method="post">
-
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
                         @Html.AntiForgeryToken()
 
-                        <div asp-validation-summary="ModelOnly"
-                             class="text-danger mb-3">
-                        </div>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
 
-
-                        <!-- VEHICLE -->
-
+                        <!-- VEHICLE SELECTION -->
                         <div class="mb-3">
-
-                            <label asp-for="VehicleId"
-                                   class="form-label">
-                                Select Vehicle
+                            <label asp-for="VehicleId" class="form-label">
+                                <i class="bi bi-car-front me-1 text-muted"></i> Select Vehicle
                             </label>
-
-                            <select asp-for="VehicleId"
-                                    class="form-select">
-
-                                <option value="">
-                                    -- Select Vehicle --
-                                </option>
-
+                            <select asp-for="VehicleId" class="form-select" required>
+                                <option value="">-- Choose Registered Vehicle --</option>
                                 @if (vehicles != null)
                                 {
                                     foreach (var vehicle in vehicles)
                                     {
                                         <option value="@vehicle.Id">
-                                            @vehicle.VehicleNumber -
-                                            @vehicle.VehicleModel
+                                            @vehicle.VehicleNumber (@vehicle.VehicleModel - @vehicle.VehicleType)
                                         </option>
                                     }
                                 }
-
                             </select>
-
-                            <span asp-validation-for="VehicleId"
-                                  class="text-danger">
-                            </span>
-
+                            <span asp-validation-for="VehicleId" class="text-danger small"></span>
                         </div>
 
-
-                        <!-- SERVICE TYPE -->
-
+                        <!-- SERVICE CATEGORY -->
                         <div class="mb-3">
-
-                            <label asp-for="ServiceType"
-                                   class="form-label">
-                                Service Type
+                            <label asp-for="ServiceType" class="form-label">
+                                <i class="bi bi-wrench me-1 text-muted"></i> Primary Service Needed
                             </label>
-
-                            <select asp-for="ServiceType"
-                                    class="form-select">
-
-                                <option value="">
-                                    -- Select Service Type --
-                                </option>
-
-                                <option value="General Service">
-                                    General Service
-                                </option>
-
-                                <option value="Brake Repair">
-                                    Brake Repair / Brake Problem
-                                </option>
-
-                                <option value="Engine Repair">
-                                    Engine Repair / Engine Problem
-                                </option>
-
-                                <option value="Oil Change">
-                                    Oil Change
-                                </option>
-
-                                <option value="AC Repair">
-                                    AC Repair / AC Problem
-                                </option>
-
-                                <option value="Electrical Repair">
-                                    Electrical Repair / Problem
-                                </option>
-
-                                <option value="Tire & Wheel Service">
-                                    Tire &amp; Wheel Service / Tyre Problem
-                                </option>
-
-                                <option value="Transmission Repair">
-                                    Transmission Repair
-                                </option>
-
-                                <option value="Battery Problem">
-                                    Battery Problem
-                                </option>
-
-                                <option value="Other">
-                                    Other
-                                </option>
-
+                            <select asp-for="ServiceType" class="form-select" required>
+                                <option value="">-- Choose Service Type --</option>
+                                <option value="General Service">General Periodic Maintenance & Inspection</option>
+                                <option value="Brake Repair">Brake Inspection & Pad Replacement</option>
+                                <option value="Engine Repair">Engine Diagnostics & Performance Repair</option>
+                                <option value="Oil Change">Oil Change, Filter & Fluid Top-Up</option>
+                                <option value="AC Repair">Air Conditioning & Climate System Repair</option>
+                                <option value="Electrical Repair">Electrical Wiring, Lights & Sensors</option>
+                                <option value="Tire & Wheel Service">Tire Alignment, Balancing & Replacement</option>
+                                <option value="Transmission Repair">Gearbox & Transmission Service</option>
+                                <option value="Battery Problem">Battery Health Check & Replacement</option>
+                                <option value="Other">Other Custom Issue</option>
                             </select>
-
-                            <span asp-validation-for="ServiceType"
-                                  class="text-danger">
-                            </span>
-
+                            <span asp-validation-for="ServiceType" class="text-danger small"></span>
                         </div>
-
 
                         <!-- PROBLEM DESCRIPTION -->
-
-                        <div class="mb-3">
-
-                            <label asp-for="Description"
-                                   class="form-label">
-                                Describe the Problem
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label">
+                                <i class="bi bi-chat-left-text me-1 text-muted"></i> Detailed Symptoms & Notes
                             </label>
-
                             <textarea asp-for="Description"
                                       class="form-control"
-                                      rows="5"
-                                      placeholder="Please describe the problem with your vehicle..."></textarea>
-
-                            <span asp-validation-for="Description"
-                                  class="text-danger">
-                            </span>
-
-                            <small class="text-muted">
-                                Please provide details about the
-                                problem so the service manager and
-                                worker can understand the issue.
-                            </small>
-
+                                      rows="4"
+                                      placeholder="Explain strange noises, dashboard warning lights, when the problem occurs, or any specific requests..."
+                                      required></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
 
-
-                        <!-- BUTTONS -->
-
-                        <div class="mt-4">
-
-                            <button type="submit"
-                                    class="btn btn-success">
-                                Submit Service Request
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="bi bi-send-check"></i> Submit Service Ticket
                             </button>
-
-                            <a asp-action="Index"
-                               class="btn btn-secondary">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
                                 Cancel
                             </a>
-
                         </div>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
 
-
-        <!-- INFORMATION -->
-
-        <div class="col-md-5">
-
-            <div class="card shadow-sm">
-
-                <div class="card-body">
-
-                    <h5 class="mb-3">
-                        Service Request Information
-                    </h5>
-
-                    <p class="text-muted mb-2">
-                        Select your vehicle, choose the required
-                        service, and describe the problem clearly.
-                    </p>
-
-                    <p class="text-muted mb-0">
-                        Your request will be submitted with
-                        <strong>Pending</strong> status and reviewed
-                        by the service team.
-                    </p>
-
+        <!-- HELPFUL INFO SIDEBAR -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-info-circle text-primary me-2"></i> How It Works
+                    </h6>
                 </div>
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <span class="badge bg-primary rounded-circle p-2" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">1</span>
+                        <div>
+                            <span class="fw-bold text-dark d-block">Submission & Intake</span>
+                            <span class="text-muted small">Your request enters the queue with <strong>Pending</strong> status.</span>
+                        </div>
+                    </div>
 
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <span class="badge bg-warning rounded-circle p-2 text-dark" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">2</span>
+                        <div>
+                            <span class="fw-bold text-dark d-block">Specialist Assignment</span>
+                            <span class="text-muted small">The Service Manager assigns a certified technician matched to your issue.</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <span class="badge bg-success rounded-circle p-2" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">3</span>
+                        <div>
+                            <span class="fw-bold text-dark d-block">Execution & Notification</span>
+                            <span class="text-muted small">Track progress until completion and vehicle pickup clearance.</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 @section Scripts {

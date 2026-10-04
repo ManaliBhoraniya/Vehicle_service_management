@@ -1,8 +1,193 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Vehicle Service & Maintenance Platform";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- HERO SECTION -->
+<div class="hero-section">
+    <div class="row align-items-center position-relative" style="z-index: 2;">
+        <div class="col-lg-8">
+            <span class="hero-pill">
+                <i class="bi bi-shield-check text-info"></i> Modern Vehicle Care Management System
+            </span>
+            <h1 class="hero-title">
+                Smart, Reliable & Effortless <span class="text-info">Vehicle Servicing</span>
+            </h1>
+            <p class="hero-lead">
+                Manage your vehicles, book maintenance appointments in seconds, track repair progress in real time, and connect with certified automotive specialists.
+            </p>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    @if (User.IsInRole("Customer"))
+                    {
+                        <a asp-controller="Customer" asp-action="Dashboard" class="btn btn-primary btn-lg px-4 shadow">
+                            <i class="bi bi-speedometer2"></i> Open Customer Dashboard
+                        </a>
+                        <a asp-controller="ServiceRequest" asp-action="Create" class="btn btn-outline-light btn-lg px-4">
+                            <i class="bi bi-plus-circle"></i> Request Service
+                        </a>
+                    }
+                    else if (User.IsInRole("Worker"))
+                    {
+                        <a asp-controller="Worker" asp-action="Dashboard" class="btn btn-warning btn-lg px-4 shadow">
+                            <i class="bi bi-wrench"></i> Open Technician Portal
+                        </a>
+                    }
+                    else if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="ServiceManager" asp-action="Index" class="btn btn-info btn-lg px-4 shadow text-white">
+                            <i class="bi bi-speedometer"></i> Open Manager Portal
+                        </a>
+                    }
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg px-4 shadow">
+                        <i class="bi bi-person-plus"></i> Get Started Free
+                    </a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In to Account
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4 d-none d-lg-block text-center">
+            <div class="p-4 rounded-4" style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15);">
+                <i class="bi bi-wrench-adjustable-circle text-info" style="font-size: 5rem;"></i>
+                <h4 class="text-white mt-3 mb-1">Fast & Certified</h4>
+                <p class="text-white-50 small mb-3">Complete end-to-end service cycle management for every ride.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50"><i class="bi bi-check-circle-fill"></i> 100% Insured</span>
+                    <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-50"><i class="bi bi-clock-fill"></i> Same Day Ready</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PORTAL AUDIENCE CARDS -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 card-hover-lift border-0 shadow-sm">
+            <div class="card-body p-4 text-center">
+                <div class="feature-icon-wrapper icon-primary mx-auto">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <h4 class="fw-bold mb-2">For Vehicle Owners</h4>
+                <p class="text-muted small mb-4">
+                    Register all your family or commercial vehicles, schedule periodic maintenance, and track live repair progress.
+                </p>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm w-100">
+                    Customer Access <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 card-hover-lift border-0 shadow-sm">
+            <div class="card-body p-4 text-center">
+                <div class="feature-icon-wrapper icon-warning mx-auto">
+                    <i class="bi bi-tools"></i>
+                </div>
+                <h4 class="fw-bold mb-2">For Technicians</h4>
+                <p class="text-muted small mb-4">
+                    Manage service tasks, update ongoing diagnostics, configure daily shift availability, and submit specialty profiles.
+                </p>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-warning text-dark btn-sm w-100">
+                    Technician Portal <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 card-hover-lift border-0 shadow-sm">
+            <div class="card-body p-4 text-center">
+                <div class="feature-icon-wrapper icon-info mx-auto">
+                    <i class="bi bi-shield-lock"></i>
+                </div>
+                <h4 class="fw-bold mb-2">For Service Managers</h4>
+                <p class="text-muted small mb-4">
+                    Automate technician assignment, supervise fleet requests, review incoming staff applications, and optimize shop flow.
+                </p>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-info btn-sm w-100">
+                    Manager Console <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KEY FEATURES SECTION -->
+<div class="mb-5">
+    <div class="text-center mb-4">
+        <span class="badge bg-primary text-primary-emphasis px-3 py-2 mb-2">Why AutoCare Pro</span>
+        <h2 class="fw-bold">Engineered for Seamless Automotive Workflow</h2>
+        <p class="text-muted">Everything you need to deliver and experience 5-star vehicle service.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-primary">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Instant Booking</h5>
+                <p class="text-muted small mb-0">
+                    Pick your vehicle, describe the issue, and create a service ticket in less than 60 seconds.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-success">
+                    <i class="bi bi-activity"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Live Status Tracking</h5>
+                <p class="text-muted small mb-0">
+                    Real-time status updates from Pending, to Assigned, to In-Progress and Ready for Pickup.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-warning">
+                    <i class="bi bi-patch-check"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Certified Mechanics</h5>
+                <p class="text-muted small mb-0">
+                    Every service request is handled by qualified technicians specialized in your vehicle category.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="feature-box">
+                <div class="feature-icon-wrapper icon-info">
+                    <i class="bi bi-file-earmark-medical"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Full Service History</h5>
+                <p class="text-muted small mb-0">
+                    Permanent digital records of inspections, replaced parts, and service logs for higher vehicle resale value.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CALL TO ACTION BANNER -->
+<div class="p-5 rounded-4 text-center my-4" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1px solid #bfdbfe;">
+    <h3 class="fw-bold text-dark mb-2">Ready to Experience Hassle-Free Vehicle Care?</h3>
+    <p class="text-muted mb-4 max-w-600 mx-auto">Join hundreds of vehicle owners who trust our platform for timely diagnostics, trusted repairs, and clear communication.</p>
+    <div class="d-flex justify-content-center gap-3">
+        <a asp-controller="Account" asp-action="Register" class="btn btn-primary px-4 py-2">
+            Create Free Account
+        </a>
+        <a asp-controller="Home" asp-action="Contact" class="btn btn-outline-secondary px-4 py-2">
+            Contact Support
+        </a>
+    </div>
 </div>

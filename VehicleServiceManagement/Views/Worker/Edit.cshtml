@@ -1,7 +1,7 @@
-﻿@model VehicleServiceManagement.Models.Worker
+@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "Edit Worker";
+    ViewData["Title"] = "Edit Technician Profile";
 
     var specialityOptions = new[]
     {
@@ -16,123 +16,96 @@
     };
 }
 
-<div class="container mt-4">
-
-    <div class="card shadow-sm">
-
-        <div class="card-header">
-            <h3 class="mb-0">Edit Profile</h3>
-        </div>
-
-        <div class="card-body">
-
-            <form asp-controller="Worker"
-                  asp-action="Edit"
-                  method="post">
-
-                <input type="hidden"
-                       name="workerId"
-                       value="@Model.WorkerId" />
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Name
-                    </label>
-
-                    <input type="text"
-                           name="name"
-                           value="@Model.ApplicationUser?.Name"
-                           class="form-control"
-                           required />
-
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon" style="width: 34px; height: 34px; font-size: 1rem;">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">Edit Technician Profile</h4>
+                        <p class="text-muted small mb-0">Update your contact details and active automotive specialties</p>
+                    </div>
                 </div>
+            </div>
 
-                <div class="mb-3">
+            <div class="card-body p-4">
+                <form asp-controller="Worker" asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="workerId" value="@Model.WorkerId" />
 
-                    <label class="form-label">
-                        Phone
-                    </label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-person me-1 text-muted"></i> Full Name
+                            </label>
+                            <input type="text"
+                                   name="name"
+                                   value="@Model.ApplicationUser?.Name"
+                                   class="form-control"
+                                   required />
+                        </div>
 
-                    <input type="text"
-                           name="phone"
-                           value="@Model.ApplicationUser?.PhoneNumber"
-                           class="form-control" />
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-telephone me-1 text-muted"></i> Phone Number
+                            </label>
+                            <input type="text"
+                                   name="phone"
+                                   value="@Model.ApplicationUser?.PhoneNumber"
+                                   class="form-control" />
+                        </div>
 
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Email
-                    </label>
-
-                    <input type="text"
-                           value="@Model.ApplicationUser?.Email"
-                           class="form-control"
-                           readonly />
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Specialities
-                    </label>
-
-                    <div class="row">
-
-                        @foreach (var speciality in specialityOptions)
-                        {
-                            var selected =
-                                Model.Specialities != null &&
-                                Model.Specialities.Any(
-                                    s => s.Speciality == speciality);
-
-                            <div class="col-md-6 col-lg-4 mb-2">
-
-                                <div class="form-check">
-
-                                    <input type="checkbox"
-                                           class="form-check-input"
-                                           name="specialities"
-                                           value="@speciality"
-                                           id="speciality_@speciality.GetHashCode()"
-                                           @(selected ? "checked" : "") />
-
-                                    <label class="form-check-label"
-                                           for="speciality_@speciality.GetHashCode()">
-                                        @speciality
-                                    </label>
-
-                                </div>
-
-                            </div>
-                        }
-
+                        <div class="col-12">
+                            <label class="form-label">
+                                <i class="bi bi-envelope me-1 text-muted"></i> Registered Email (Read-Only)
+                            </label>
+                            <input type="text"
+                                   value="@Model.ApplicationUser?.Email"
+                                   class="form-control bg-light"
+                                   readonly />
+                        </div>
                     </div>
 
-                    <small class="text-muted">
-                        Select at least one speciality.
-                    </small>
+                    <div class="mb-4 pt-3 border-top">
+                        <label class="form-label fw-bold mb-2">
+                            <i class="bi bi-patch-check me-1 text-primary"></i> Certified Specialties
+                        </label>
+                        <p class="text-muted small mb-3">Select the repairs and maintenance areas you are qualified to handle.</p>
 
-                </div>
+                        <div class="row g-2">
+                            @foreach (var speciality in specialityOptions)
+                            {
+                                var selected = Model.Specialities != null && Model.Specialities.Any(s => s.Speciality == speciality);
+                                <div class="col-sm-6">
+                                    <div class="form-check p-2 bg-light rounded border">
+                                        <input type="checkbox"
+                                               class="form-check-input ms-1"
+                                               name="specialities"
+                                               value="@speciality"
+                                               id="speciality_@speciality.GetHashCode()"
+                                               @(selected ? "checked" : "") />
+                                        <label class="form-check-label ms-2 fw-medium text-dark" for="speciality_@speciality.GetHashCode()">
+                                            @speciality
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
 
-                <button type="submit"
-                        class="btn btn-primary">
-                    Save Changes
-                </button>
-
-                <a asp-controller="Worker"
-                   asp-action="Index"
-                   class="btn btn-secondary ms-2">
-                    Cancel
-                </a>
-
-            </form>
-
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg"></i> Save Profile
+                        </button>
+                        <a asp-controller="Worker" asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-
     </div>
-
 </div>

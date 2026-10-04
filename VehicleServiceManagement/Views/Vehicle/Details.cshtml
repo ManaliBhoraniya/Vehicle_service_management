@@ -1,52 +1,56 @@
-﻿@model VehicleServiceManagement.Models.Vehicle
+@model VehicleServiceManagement.Models.Vehicle
 
 @{
     ViewData["Title"] = "Vehicle Details";
 }
 
-<h2>Vehicle Details</h2>
+<div class="row justify-content-center py-3">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon" style="width: 34px; height: 34px; font-size: 1rem;">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Vehicle Details</h5>
+                </div>
+                <span class="badge bg-primary text-primary-emphasis">
+                    <i class="bi bi-tag-fill me-1"></i> @Model.VehicleType
+                </span>
+            </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">License Plate / Vehicle Number</label>
+                        <span class="fs-5 fw-bold text-dark">@Model.VehicleNumber</span>
+                    </div>
 
-        <dl class="row">
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Make & Model</label>
+                        <span class="fs-5 fw-bold text-dark">@Model.VehicleModel</span>
+                    </div>
 
-            <dt class="col-sm-3">
-                Vehicle Number
-            </dt>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Vehicle Type</label>
+                        <span class="fs-6 fw-semibold text-dark">@Model.VehicleType</span>
+                    </div>
 
-            <dd class="col-sm-9">
-                @Model.VehicleNumber
-            </dd>
+                    <div class="col-sm-6">
+                        <label class="text-muted small d-block">Record ID</label>
+                        <span class="fs-6 fw-semibold text-muted">#@Model.Id</span>
+                    </div>
+                </div>
 
-            <dt class="col-sm-3">
-                Vehicle Model
-            </dt>
-
-            <dd class="col-sm-9">
-                @Model.VehicleModel
-            </dd>
-
-            <dt class="col-sm-3">
-                Vehicle Type
-            </dt>
-
-            <dd class="col-sm-9">
-                @Model.VehicleType
-            </dd>
-
-        </dl>
-
-        <a asp-action="Edit"
-           asp-route-id="@Model.Id"
-           class="btn btn-primary">
-            Edit
-        </a>
-
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Back
-        </a>
-
+                <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Edit Vehicle
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Back to Fleet
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

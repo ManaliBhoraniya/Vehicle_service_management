@@ -1,588 +1,223 @@
-﻿@{
-    ViewData["Title"] = "Register";
+@{
+    ViewData["Title"] = "Create Account";
 }
 
-<div class="container mt-5">
-
-    <div class="row justify-content-center">
-
-        <div class="col-md-7 col-lg-6">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header text-center">
-
-                    <h2>
-                        Create Account
-                    </h2>
-
-                </div>
-
-
-                <div class="card-body">
-
-                    <form asp-action="Register"
-                          asp-controller="Account"
-                          method="post"
-                          enctype="multipart/form-data">
-
-                        @Html.AntiForgeryToken()
-
-
-                        <!-- VALIDATION -->
-
-                        <div asp-validation-summary="All"
-                             class="text-danger mb-3">
-                        </div>
-
-
-                        <!-- ================================================= -->
-                        <!-- NAME -->
-                        <!-- ================================================= -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Name
-                            </label>
-
-                            <input type="text"
-                                   name="name"
-                                   class="form-control"
-                                   placeholder="Enter your name"
-                                   required />
-
-                        </div>
-
-
-                        <!-- ================================================= -->
-                        <!-- EMAIL -->
-                        <!-- ================================================= -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Email
-                            </label>
-
-                            <input type="email"
-                                   name="email"
-                                   class="form-control"
-                                   placeholder="Enter your email"
-                                   required />
-
-                        </div>
-
-
-                        <!-- ================================================= -->
-                        <!-- ROLE -->
-                        <!-- ================================================= -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Register As
-                            </label>
-
-                            <select name="role"
-                                    id="role"
-                                    class="form-select"
-                                    required>
-
-                                <option value="">
-                                    -- Select Role --
-                                </option>
-
-                                <option value="Customer">
-                                    Customer
-                                </option>
-
-                                <option value="Worker">
-                                    Worker
-                                </option>
-
-                            </select>
-
-                            <small class="text-muted">
-                                Manager accounts are created by the system.
-                            </small>
-
-                        </div>
-
-
-                        <!-- ================================================= -->
-                        <!-- WORKER ONLY FIELDS -->
-                        <!-- ================================================= -->
-
-                        <div id="workerFields"
-                             style="display:none;">
-
-
-                            <!-- ================================================= -->
-                            <!-- SPECIALITIES -->
-                            <!-- ================================================= -->
-
-                            <div class="mb-3">
-
-                                <label class="form-label fw-bold">
-                                    Select Your Specialities
-                                </label>
-
-                                <p class="text-muted small">
-                                    Select all services that you are
-                                    qualified to perform.
-                                </p>
-
-
-                                <div id="specialityContainer"
-                                     class="border rounded p-3">
-
-
-                                    <!-- ENGINE REPAIR -->
-
-                                    <div class="form-check mb-2">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="Engine Repair"
-                                               id="engineRepair" />
-
-                                        <label class="form-check-label"
-                                               for="engineRepair">
-
-                                            Engine Repair
-
-                                        </label>
-
-                                    </div>
-
-
-                                    <!-- BRAKE REPAIR -->
-
-                                    <div class="form-check mb-2">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="Brake Repair"
-                                               id="brakeRepair" />
-
-                                        <label class="form-check-label"
-                                               for="brakeRepair">
-
-                                            Brake Repair
-
-                                        </label>
-
-                                    </div>
-
-
-                                    <!-- OIL CHANGE -->
-
-                                    <div class="form-check mb-2">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="Oil Change"
-                                               id="oilChange" />
-
-                                        <label class="form-check-label"
-                                               for="oilChange">
-
-                                            Oil Change
-
-                                        </label>
-
-                                    </div>
-
-
-                                    <!-- AC REPAIR -->
-
-                                    <div class="form-check mb-2">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="AC Repair"
-                                               id="acRepair" />
-
-                                        <label class="form-check-label"
-                                               for="acRepair">
-
-                                            AC Repair
-
-                                        </label>
-
-                                    </div>
-
-
-                                    <!-- ELECTRICAL REPAIR -->
-
-                                    <div class="form-check mb-2">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="Electrical Repair"
-                                               id="electricalRepair" />
-
-                                        <label class="form-check-label"
-                                               for="electricalRepair">
-
-                                            Electrical Repair
-
-                                        </label>
-
-                                    </div>
-
-
-                                    <!-- TIRE & WHEEL SERVICE -->
-
-                                    <div class="form-check mb-2">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="Tire & Wheel Service"
-                                               id="tireWheelService" />
-
-                                        <label class="form-check-label"
-                                               for="tireWheelService">
-
-                                            Tire &amp; Wheel Service
-
-                                        </label>
-
-                                    </div>
-
-
-                                    <!-- TRANSMISSION REPAIR -->
-
-                                    <div class="form-check mb-2">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="Transmission Repair"
-                                               id="transmissionRepair" />
-
-                                        <label class="form-check-label"
-                                               for="transmissionRepair">
-
-                                            Transmission Repair
-
-                                        </label>
-
-                                    </div>
-
-
-                                    <!-- GENERAL SERVICE -->
-
-                                    <div class="form-check">
-
-                                        <input class="form-check-input speciality-checkbox"
-                                               type="checkbox"
-                                               name="specialities"
-                                               value="General Service"
-                                               id="generalService" />
-
-                                        <label class="form-check-label"
-                                               for="generalService">
-
-                                            General Service
-
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div id="specialityError"
-                                     class="text-danger mt-2"
-                                     style="display:none;">
-
-                                    Please select at least one speciality.
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- ================================================= -->
-                            <!-- RESUME -->
-                            <!-- ================================================= -->
-
-                            <div class="mb-3">
-
-                                <label class="form-label">
-                                    Resume
-                                </label>
-
-                                <input type="file"
-                                       name="resume"
-                                       id="resume"
-                                       class="form-control"
-                                       accept=".pdf,.doc,.docx" />
-
-                                <small class="text-muted">
-                                    PDF, DOC or DOCX. Maximum 5 MB.
-                                </small>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- ================================================= -->
-                        <!-- PASSWORD -->
-                        <!-- ================================================= -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Password
-                            </label>
-
-                            <input type="password"
-                                   name="password"
-                                   class="form-control"
-                                   placeholder="Enter your password"
-                                   required />
-
-                            <small class="text-muted">
-
-                                Minimum 6 characters with uppercase,
-                                lowercase, number and special character.
-
-                            </small>
-
-                        </div>
-
-
-                        <!-- ================================================= -->
-                        <!-- CONFIRM PASSWORD -->
-                        <!-- ================================================= -->
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Confirm Password
-                            </label>
-
-                            <input type="password"
-                                   name="confirmPassword"
-                                   class="form-control"
-                                   placeholder="Confirm your password"
-                                   required />
-
-                        </div>
-
-
-                        <!-- ================================================= -->
-                        <!-- REGISTER -->
-                        <!-- ================================================= -->
-
-                        <button type="submit"
-                                class="btn btn-success w-100">
-
-                            Register
-
-                        </button>
-
-                    </form>
-
-
-                    <!-- ================================================= -->
-                    <!-- LOGIN -->
-                    <!-- ================================================= -->
-
-                    <div class="text-center mt-4">
-
-                        Already have an account?
-
-                        <a asp-controller="Account"
-                           asp-action="Login">
-
-                            Login
-
-                        </a>
-
-                    </div>
-
-                </div>
-
+<div class="auth-wrapper py-5">
+    <div class="auth-card auth-card-wide shadow-lg">
+        <div class="auth-header">
+            <div class="auth-icon-badge">
+                <i class="bi bi-person-plus-fill"></i>
             </div>
-
+            <h3 class="fw-bold text-dark mb-1">Create Your Account</h3>
+            <p class="text-muted small mb-0">Join AutoCare Pro as a Customer or Certified Technician</p>
         </div>
 
-    </div>
+        <div class="auth-body">
+            <form asp-action="Register" asp-controller="Account" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
 
+                <!-- VALIDATION SUMMARY -->
+                <div asp-validation-summary="All" class="alert alert-danger py-2 small mb-4"></div>
+
+                <div class="row g-3">
+                    <!-- FULL NAME -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="bi bi-person me-1 text-muted"></i> Full Name
+                        </label>
+                        <input type="text"
+                               name="name"
+                               class="form-control"
+                               placeholder="e.g. Alex Johnson"
+                               required />
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="bi bi-envelope me-1 text-muted"></i> Email Address
+                        </label>
+                        <input type="email"
+                               name="email"
+                               class="form-control"
+                               placeholder="alex@example.com"
+                               required />
+                    </div>
+
+                    <!-- ROLE SELECTION -->
+                    <div class="col-12">
+                        <label class="form-label">
+                            <i class="bi bi-person-badge me-1 text-muted"></i> I Want to Register As
+                        </label>
+                        <select name="role" id="role" class="form-select" required>
+                            <option value="">-- Choose Account Type --</option>
+                            <option value="Customer">Vehicle Owner (Customer)</option>
+                            <option value="Worker">Automotive Technician / Specialist</option>
+                        </select>
+                        <div class="form-text text-muted small">
+                            <i class="bi bi-info-circle"></i> Service Manager and Admin accounts are provisioned internally.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WORKER SPECIFIC SECTION -->
+                <div id="workerFields" class="mt-4 p-3 bg-light rounded-3 border" style="display:none;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-tools text-primary fs-5"></i>
+                        <h5 class="fw-bold mb-0">Technician Qualifications</h5>
+                    </div>
+                    <p class="text-muted small mb-3">Select the automotive specialties you are qualified to perform.</p>
+
+                    <!-- SPECIALITIES CHECKBOX GRID -->
+                    <label class="form-label fw-bold mb-2">Specialities</label>
+                    <div id="specialityContainer" class="row g-2 mb-3">
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="Engine Repair" id="engineRepair" />
+                                <label class="form-check-label ms-2 fw-medium" for="engineRepair">Engine Repair</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="Brake Repair" id="brakeRepair" />
+                                <label class="form-check-label ms-2 fw-medium" for="brakeRepair">Brake Repair</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="Oil Change" id="oilChange" />
+                                <label class="form-check-label ms-2 fw-medium" for="oilChange">Oil Change & Lube</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="AC Repair" id="acRepair" />
+                                <label class="form-check-label ms-2 fw-medium" for="acRepair">Heating & AC Repair</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="Electrical Repair" id="electricalRepair" />
+                                <label class="form-check-label ms-2 fw-medium" for="electricalRepair">Electrical Diagnostics</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="Tire & Wheel Service" id="tireWheelService" />
+                                <label class="form-check-label ms-2 fw-medium" for="tireWheelService">Tire & Wheel Service</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="Transmission Repair" id="transmissionRepair" />
+                                <label class="form-check-label ms-2 fw-medium" for="transmissionRepair">Transmission Repair</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check p-2 bg-white rounded border">
+                                <input class="form-check-input ms-1 speciality-checkbox" type="checkbox" name="specialities" value="General Service" id="generalService" />
+                                <label class="form-check-label ms-2 fw-medium" for="generalService">General Inspection & Service</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="specialityError" class="alert alert-warning py-2 small mb-3" style="display:none;">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Please select at least one speciality to apply as a technician.
+                    </div>
+
+                    <!-- RESUME UPLOAD -->
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-file-earmark-arrow-up me-1"></i> Upload Resume / Certifications
+                        </label>
+                        <input type="file" name="resume" id="resume" class="form-control" accept=".pdf,.doc,.docx" />
+                        <div class="form-text text-muted small">Accepted file types: PDF, DOC, or DOCX (Max 5 MB).</div>
+                    </div>
+                </div>
+
+                <!-- PASSWORD SECTION -->
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="bi bi-lock me-1 text-muted"></i> Password
+                        </label>
+                        <input type="password"
+                               name="password"
+                               class="form-control"
+                               placeholder="Create password"
+                               required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="bi bi-shield-check me-1 text-muted"></i> Confirm Password
+                        </label>
+                        <input type="password"
+                               name="confirmPassword"
+                               class="form-control"
+                               placeholder="Repeat password"
+                               required />
+                    </div>
+                </div>
+
+                <div class="form-text text-muted small mt-2 mb-4">
+                    <i class="bi bi-info-circle"></i> Password must contain at least 6 characters, including uppercase, lowercase, numbers and symbols.
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fs-6">
+                    <i class="bi bi-check-circle-fill"></i> Complete Registration
+                </button>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            <span class="text-muted">Already registered?</span>
+            <a asp-controller="Account" asp-action="Login" class="fw-semibold ms-1">Sign in here</a>
+        </div>
+    </div>
 </div>
 
-
 @section Scripts {
-
     <partial name="_ValidationScriptsPartial" />
 
-
     <script>
-
         function updateWorkerFields() {
-
-            const role =
-                document.getElementById("role").value;
-
-
-            const workerFields =
-                document.getElementById(
-                    "workerFields"
-                );
-
-
-            const resume =
-                document.getElementById(
-                    "resume"
-                );
-
-
-            const specialityCheckboxes =
-                document.querySelectorAll(
-                    ".speciality-checkbox"
-                );
-
+            const role = document.getElementById("role").value;
+            const workerFields = document.getElementById("workerFields");
+            const resume = document.getElementById("resume");
+            const specialityCheckboxes = document.querySelectorAll(".speciality-checkbox");
 
             if (role === "Worker") {
-
-                // Show worker fields
-
-                workerFields.style.display =
-                    "block";
-
-
-                // Resume required
-
-                resume.required =
-                    true;
-
-            }
-            else {
-
-                // Hide worker fields
-
-                workerFields.style.display =
-                    "none";
-
-
-                // Resume not required
-
-                resume.required =
-                    false;
-
-
-                // Clear resume
-
-                resume.value =
-                    "";
-
-
-                // Clear speciality selections
-
-                specialityCheckboxes.forEach(
-                    checkbox => {
-
-                        checkbox.checked =
-                            false;
-
-                    }
-                );
-
-
-                document.getElementById(
-                    "specialityError"
-                ).style.display =
-                    "none";
+                workerFields.style.display = "block";
+                resume.required = true;
+            } else {
+                workerFields.style.display = "none";
+                resume.required = false;
+                resume.value = "";
+                specialityCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                document.getElementById("specialityError").style.display = "none";
             }
         }
 
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const role = document.getElementById("role").value;
+            if (role !== "Worker") return;
 
-        // =====================================================
-        // VALIDATE SPECIALITY
-        // =====================================================
+            const checkboxes = document.querySelectorAll(".speciality-checkbox:checked");
+            const error = document.getElementById("specialityError");
 
-        document.querySelector("form")
-            .addEventListener(
-                "submit",
-                function (event) {
+            if (checkboxes.length === 0) {
+                event.preventDefault();
+                error.style.display = "flex";
+                error.scrollIntoView({ behavior: "smooth", block: "center" });
+            } else {
+                error.style.display = "none";
+            }
+        });
 
-                    const role =
-                        document.getElementById(
-                            "role"
-                        ).value;
-
-
-                    if (role !== "Worker") {
-
-                        return;
-                    }
-
-
-                    const checkboxes =
-                        document.querySelectorAll(
-                            ".speciality-checkbox:checked"
-                        );
-
-
-                    const error =
-                        document.getElementById(
-                            "specialityError"
-                        );
-
-
-                    if (checkboxes.length === 0) {
-
-                        event.preventDefault();
-
-
-                        error.style.display =
-                            "block";
-
-
-                        error.scrollIntoView({
-                            behavior: "smooth",
-                            block: "center"
-                        });
-
-                    }
-                    else {
-
-                        error.style.display =
-                            "none";
-
-                    }
-
-                }
-            );
-
-
-        // =====================================================
-        // ROLE CHANGE
-        // =====================================================
-
-        document.getElementById("role")
-            .addEventListener(
-                "change",
-                updateWorkerFields
-            );
-
-
-        // =====================================================
-        // INITIAL PAGE LOAD
-        // =====================================================
-
+        document.getElementById("role").addEventListener("change", updateWorkerFields);
         updateWorkerFields();
-
     </script>
 }

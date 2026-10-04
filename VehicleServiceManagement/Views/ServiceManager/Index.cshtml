@@ -1,231 +1,181 @@
-﻿@{
+@{
     ViewData["Title"] = "Service Manager Dashboard";
 }
 
-<h2 class="mb-4">Service Manager Dashboard</h2>
+<div class="py-3">
+    <!-- DASHBOARD HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <span class="badge bg-danger text-danger-emphasis px-3 py-1 mb-1">
+                <i class="bi bi-shield-lock-fill"></i> Manager Operations Console
+            </span>
+            <h2 class="fw-bold mb-0">Service Operations Overview</h2>
+            <p class="text-muted small mb-0">Supervise workshop flow, assign certified technicians, and approve applications.</p>
+        </div>
 
-<div class="row g-4">
-
-    <!-- CUSTOMERS -->
-
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-
-                <h6>Customers</h6>
-
-                <h2>
-                    @ViewBag.CustomerCount
-                </h2>
-
-                <a asp-action="Customers"
-                   class="btn btn-outline-primary btn-sm">
-                    View Customers
-                </a>
-
-            </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Assignments" class="btn btn-primary btn-sm shadow-sm">
+                <i class="bi bi-kanban"></i> Manage Assignments
+            </a>
+            <a asp-action="JobRequests" class="btn btn-warning btn-sm text-dark">
+                <i class="bi bi-file-earmark-person"></i> Review Applications
+            </a>
         </div>
     </div>
 
-
-    <!-- VEHICLES -->
-
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-
-                <h6>Vehicles</h6>
-
-                <h2>
-                    @ViewBag.VehicleCount
-                </h2>
-
-                <a asp-action="Vehicles"
-                   class="btn btn-outline-primary btn-sm">
-                    View Vehicles
-                </a>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- WORKERS -->
-
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-
-                <h6>Workers</h6>
-
-                <h2>
-                    @ViewBag.WorkerCount
-                </h2>
-
-                <a asp-action="Workers"
-                   class="btn btn-outline-primary btn-sm">
-                    View Workers
-                </a>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- SERVICE REQUESTS -->
-
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-
-                <h6>Service Requests</h6>
-
-                <h2>
-                    @ViewBag.ServiceRequestCount
-                </h2>
-
-                <a asp-action="ServiceRequests"
-                   class="btn btn-outline-primary btn-sm">
-                    View Requests
-                </a>
-
-            </div>
-        </div>
-    </div>
-
-</div>
-
-
-<!-- ================================================= -->
-<!-- SERVICE REQUEST STATUS -->
-<!-- ================================================= -->
-
-<div class="row g-4 mt-2">
-
-    <!-- PENDING -->
-
-    <div class="col-md-4">
-        <div class="card border-warning shadow-sm">
-            <div class="card-body text-center">
-
-                <h5>Pending Requests</h5>
-
-                <h2>
-                    @ViewBag.PendingRequests
-                </h2>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ASSIGNED -->
-
-    <div class="col-md-4">
-        <div class="card border-primary shadow-sm">
-            <div class="card-body text-center">
-
-                <h5>Assigned Requests</h5>
-
-                <h2>
-                    @ViewBag.AssignedRequests
-                </h2>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- COMPLETED -->
-
-    <div class="col-md-4">
-        <div class="card border-success shadow-sm">
-            <div class="card-body text-center">
-
-                <h5>Completed Requests</h5>
-
-                <h2>
-                    @ViewBag.CompletedRequests
-                </h2>
-
-            </div>
-        </div>
-    </div>
-
-</div>
-
-
-<!-- ================================================= -->
-<!-- WORKER JOB REQUESTS -->
-<!-- ================================================= -->
-
-<div class="row g-4 mt-2">
-
-    <div class="col-md-12">
-
-        <div class="card border-warning shadow-sm">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between align-items-center">
-
-                    <div>
-
-                        <h5 class="mb-1">
-                            Worker Job Requests
-                        </h5>
-
-                        <p class="text-muted mb-0">
-                            New worker applications waiting for review.
-                        </p>
-
+    <!-- PRIMARY STAT COUNTERS -->
+    <div class="row g-3 mb-4">
+        <!-- CUSTOMERS -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="stat-label">Active Customers</span>
+                    <div class="stat-icon icon-primary">
+                        <i class="bi bi-people-fill"></i>
                     </div>
-
-                    <div class="text-center">
-
-                        <h2 class="mb-2">
-                            @ViewBag.PendingJobRequests
-                        </h2>
-
-                        <a asp-action="JobRequests"
-                           class="btn btn-warning">
-
-                            View Job Requests
-
-                        </a>
-
-                    </div>
-
                 </div>
-
+                <div class="stat-value text-primary">@ViewBag.CustomerCount</div>
+                <a asp-action="Customers" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                    Directory <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
             </div>
-
         </div>
 
+        <!-- VEHICLES -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="stat-label">Registered Fleet</span>
+                    <div class="stat-icon icon-info">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+                </div>
+                <div class="stat-value text-info">@ViewBag.VehicleCount</div>
+                <a asp-action="Vehicles" class="btn btn-sm btn-outline-info mt-2 w-100">
+                    Fleet List <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- WORKERS -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="stat-label">Technicians</span>
+                    <div class="stat-icon icon-warning">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                </div>
+                <div class="stat-value text-warning">@ViewBag.WorkerCount</div>
+                <a asp-action="Workers" class="btn btn-sm btn-outline-warning text-dark mt-2 w-100">
+                    Staff Roster <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- SERVICE REQUESTS -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="stat-label">Total Requests</span>
+                    <div class="stat-icon icon-success">
+                        <i class="bi bi-clipboard2-check-fill"></i>
+                    </div>
+                </div>
+                <div class="stat-value text-success">@ViewBag.ServiceRequestCount</div>
+                <a asp-action="ServiceRequests" class="btn btn-sm btn-outline-success mt-2 w-100">
+                    All Tickets <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </div>
+        </div>
     </div>
 
-</div>
+    <!-- PIPELINE STATUS & JOB APPLICATIONS -->
+    <div class="row g-4 mb-4">
+        <!-- SERVICE PIPELINE STATUS CARDS -->
+        <div class="col-lg-7">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-diagram-3 text-primary me-2"></i> Workshop Service Flow
+                    </h5>
+                    <a asp-action="ServiceRequests" class="small text-primary fw-semibold">View All Tickets</a>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 bg-light border text-center h-100">
+                                <div class="stat-icon icon-warning mx-auto mb-2" style="width:38px;height:38px;font-size:1.1rem;">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                                <span class="text-muted small d-block">Pending</span>
+                                <h3 class="fw-bold text-warning mb-0">@ViewBag.PendingRequests</h3>
+                            </div>
+                        </div>
 
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 bg-light border text-center h-100">
+                                <div class="stat-icon icon-primary mx-auto mb-2" style="width:38px;height:38px;font-size:1.1rem;">
+                                    <i class="bi bi-person-gear"></i>
+                                </div>
+                                <span class="text-muted small d-block">Assigned</span>
+                                <h3 class="fw-bold text-primary mb-0">@ViewBag.AssignedRequests</h3>
+                            </div>
+                        </div>
 
-<!-- ================================================= -->
-<!-- MANAGER ACTIONS -->
-<!-- ================================================= -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 bg-light border text-center h-100">
+                                <div class="stat-icon icon-success mx-auto mb-2" style="width:38px;height:38px;font-size:1.1rem;">
+                                    <i class="bi bi-check2-circle"></i>
+                                </div>
+                                <span class="text-muted small d-block">Completed</span>
+                                <h3 class="fw-bold text-success mb-0">@ViewBag.CompletedRequests</h3>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="mt-4">
+                    <div class="mt-4 pt-3 border-top d-flex gap-2">
+                        <a asp-action="Assignments" class="btn btn-outline-primary btn-sm flex-fill">
+                            <i class="bi bi-sliders"></i> Dispatch Console
+                        </a>
+                        <a asp-action="ServiceRequests" class="btn btn-outline-secondary btn-sm flex-fill">
+                            <i class="bi bi-list-columns-reverse"></i> Review Requests
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <a asp-action="Assignments"
-       class="btn btn-primary">
+        <!-- WORKER JOB REQUESTS BANNER -->
+        <div class="col-lg-5">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-person-badge text-warning me-2"></i> Technician Applications
+                    </h5>
+                </div>
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-warning-subtle border border-warning-subtle mb-3">
+                            <div>
+                                <span class="text-muted small d-block">Pending Applicant Reviews</span>
+                                <span class="fs-2 fw-bold text-dark">@ViewBag.PendingJobRequests</span>
+                            </div>
+                            <div class="stat-icon icon-warning">
+                                <i class="bi bi-file-earmark-person-fill"></i>
+                            </div>
+                        </div>
 
-        Manage Assignments
+                        <p class="text-muted small mb-0">
+                            New automotive mechanics and technician candidates waiting for license and resume evaluation before login activation.
+                        </p>
+                    </div>
 
-    </a>
-
-
-    <a asp-action="JobRequests"
-       class="btn btn-warning">
-
-        Job Requests
-
-    </a>
-
+                    <a asp-action="JobRequests" class="btn btn-warning text-dark w-100 mt-3 py-2">
+                        <i class="bi bi-file-earmark-check"></i> Process Job Requests (@ViewBag.PendingJobRequests)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

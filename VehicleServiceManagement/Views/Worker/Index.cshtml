@@ -1,277 +1,203 @@
-﻿@model VehicleServiceManagement.Models.Worker
+@model VehicleServiceManagement.Models.Worker
 
 @{
     ViewData["Title"] = "My Profile";
 }
 
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h2 class="mb-1">My Profile</h2>
-
-            <p class="text-muted mb-0">
-                View and manage your worker profile.
-            </p>
+            <h2 class="fw-bold mb-1">Technician Profile</h2>
+            <p class="text-muted small mb-0">View and manage your technical specialty badges, contact data, and credentials.</p>
         </div>
 
-        <a asp-controller="Worker"
-           asp-action="Dashboard"
-           class="btn btn-outline-primary">
-            Dashboard
-        </a>
-
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" class="btn btn-primary btn-sm">
+                <i class="bi bi-pencil-square"></i> Edit Profile
+            </a>
+            <a asp-action="Dashboard" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </div>
     </div>
-
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <div>@TempData["Error"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-
-    <div class="card shadow-sm">
-
-        <div class="card-header">
-
-            <h5 class="mb-0">
-                Worker Information
-            </h5>
-
-        </div>
-
-
-        <div class="card-body">
-
-            <div class="row">
-
-                <!-- LEFT SIDE -->
-
-                <div class="col-md-6">
-
-                    <div class="mb-3">
-
-                        <strong>Name</strong>
-
-                        <div>
-                            @(Model.ApplicationUser?.Name ?? "Not provided")
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <strong>Username</strong>
-
-                        <div>
-                            @(Model.ApplicationUser?.UserName ?? "Not provided")
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <strong>Email</strong>
-
-                        <div>
-                            @(Model.ApplicationUser?.Email ?? "Not provided")
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <strong>Phone</strong>
-
-                        <div>
-                            @(Model.ApplicationUser?.PhoneNumber ?? "Not provided")
-                        </div>
-
-                    </div>
-
+    <div class="row g-4">
+        <!-- PROFILE INFORMATION -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-badge-fill text-primary fs-5"></i>
+                    <h5 class="fw-bold mb-0">Profile Information</h5>
                 </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Full Name</span>
+                            <span class="fs-6 fw-bold text-dark">@(Model.ApplicationUser?.Name ?? "Not provided")</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Username</span>
+                            <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.UserName ?? "Not provided")</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Email Address</span>
+                            <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.Email ?? "Not provided")</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Phone Number</span>
+                            <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.PhoneNumber ?? "Not provided")</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Application Status</span>
+                            @if (Model.Status == "Accepted")
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-check-circle-fill"></i> Accepted / Approved
+                                </span>
+                            }
+                            else if (Model.Status == "Pending")
+                            {
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                    <i class="bi bi-hourglass-split"></i> Pending Review
+                                </span>
+                            }
+                            else if (Model.Status == "Rejected")
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                    <i class="bi bi-x-circle-fill"></i> Application Rejected
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@Model.Status</span>
+                            }
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Duty Availability</span>
+                            @if (Model.IsAvailable)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-check-circle-fill"></i> Available for Jobs
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                    <i class="bi bi-pause-circle-fill"></i> Currently Off-Duty
+                                </span>
+                            }
+                        </div>
+                    </div>
 
-
-                <!-- RIGHT SIDE -->
-
-                <div class="col-md-6">
-
-                    <div class="mb-3">
-
-                        <strong>Specialities</strong>
-
-                        <div class="mt-2">
-
-                            @if (Model.Specialities != null &&
-                                 Model.Specialities.Any())
+                    <div class="mt-4 pt-3 border-top">
+                        <span class="fw-semibold text-dark d-block mb-2">Assigned Specialties:</span>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (Model.Specialities != null && Model.Specialities.Any())
                             {
                                 foreach (var speciality in Model.Specialities)
                                 {
-                                    <span class="badge bg-primary me-1 mb-1">
-                                        @speciality.Speciality
+                                    <span class="badge bg-primary text-primary-emphasis px-3 py-2">
+                                        <i class="bi bi-patch-check-fill me-1"></i> @speciality.Speciality
                                     </span>
                                 }
                             }
                             else
                             {
-                                <span class="text-muted">
-                                    No specialities selected.
-                                </span>
+                                <span class="text-muted small">No specialities linked yet.</span>
                             }
-
                         </div>
-
                     </div>
-
-
-                    <div class="mb-3">
-
-                        <strong>Status</strong>
-
-                        <div class="mt-1">
-
-                            @if (Model.Status == "Accepted")
-                            {
-                                <span class="badge bg-success">
-                                    Accepted
-                                </span>
-                            }
-                            else if (Model.Status == "Pending")
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Pending Approval
-                                </span>
-                            }
-                            else if (Model.Status == "Rejected")
-                            {
-                                <span class="badge bg-danger">
-                                    Rejected
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">
-                                    @Model.Status
-                                </span>
-                            }
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <strong>Availability</strong>
-
-                        <div class="mt-1">
-
-                            @if (Model.IsAvailable)
-                            {
-                                <span class="badge bg-success">
-                                    Available
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">
-                                    Not Available
-                                </span>
-                            }
-
-                        </div>
-
-                    </div>
-
                 </div>
-
             </div>
 
-
-            <hr />
-
-
-            <!-- RESUME -->
-
-            <div class="mb-4">
-
-                <h5>
-                    Resume
-                </h5>
-
-
-                @if (!string.IsNullOrEmpty(Model.ResumeFilePath))
-                {
-                    <div class="mb-2">
-
-                        <strong>
-                            @Model.ResumeFileName
-                        </strong>
-
-                    </div>
-
-
-                    <a href="@Model.ResumeFilePath"
-                       target="_blank"
-                       class="btn btn-outline-primary">
-                        View Resume
-                    </a>
-                }
-                else
-                {
-                    <p class="text-muted">
-                        No resume uploaded.
-                    </p>
-                }
-
+            <!-- RESUME CARD -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-file-earmark-pdf text-primary me-2"></i> Uploaded Documents
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (!string.IsNullOrEmpty(Model.ResumeFilePath))
+                    {
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-file-earmark-check-fill text-primary fs-3"></i>
+                                <div>
+                                    <span class="fw-semibold text-dark d-block">@Model.ResumeFileName</span>
+                                    <span class="text-muted small">Verified Technician Resume</span>
+                                </div>
+                            </div>
+                            <a href="@Model.ResumeFilePath" target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> View Resume
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0">No document attached.</p>
+                    }
+                </div>
             </div>
-
-
-            <hr />
-
-
-            <!-- ACTIONS -->
-
-            <div class="d-flex gap-2 flex-wrap">
-
-                <a asp-controller="Worker"
-                   asp-action="Edit"
-                   class="btn btn-primary">
-                    Edit Profile
-                </a>
-
-
-                <a asp-controller="Worker"
-                   asp-action="MyServices"
-                   class="btn btn-outline-primary">
-                    My Services
-                </a>
-
-
-                <a asp-controller="Worker"
-                   asp-action="Availability"
-                   class="btn btn-outline-secondary">
-                    Manage Availability
-                </a>
-
-            </div>
-
         </div>
 
-    </div>
+        <!-- QUICK ACCESS SIDEBAR -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">Quick Management</h6>
+                </div>
+                <div class="card-body p-3 d-flex flex-column gap-2">
+                    <a asp-controller="Worker" asp-action="Edit" class="quick-action-card">
+                        <div class="action-icon icon-primary">
+                            <i class="bi bi-pencil"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">Edit Information</div>
+                            <div class="text-muted small">Update phone & skills</div>
+                        </div>
+                    </a>
 
+                    <a asp-controller="Worker" asp-action="MyServices" class="quick-action-card">
+                        <div class="action-icon icon-success">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">Assigned Tasks</div>
+                            <div class="text-muted small">Review active work</div>
+                        </div>
+                    </a>
+
+                    <a asp-controller="Worker" asp-action="Availability" class="quick-action-card">
+                        <div class="action-icon icon-warning">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">Shift Schedule</div>
+                            <div class="text-muted small">Manage working days</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

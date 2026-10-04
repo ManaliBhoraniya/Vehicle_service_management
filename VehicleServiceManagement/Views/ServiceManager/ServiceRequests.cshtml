@@ -50,35 +50,39 @@
     var completedRequests = allRequests.Where(r => GetRequestCategory(r) == "Completed").ToList();
 }
 
-<div class="container mt-4">
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Service Tickets Dispatch</h2>
+            <p class="text-muted small mb-0">Monitor request pipelines, assign unassigned tickets, and track progress.</p>
+        </div>
 
-    <div class="mb-3">
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back();">
-            &larr; Back
-        </button>
+        <div class="d-flex gap-2">
+            <a asp-action="Assignments" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-kanban"></i> Assignments Table
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Dashboard
+            </a>
+        </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Manage Service Requests</h2>
-
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Back to Dashboard
-        </a>
-    </div>
-
+    <!-- ALERTS -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>@TempData["Success"]</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <div>@TempData["Error"]</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -87,38 +91,38 @@
     <ul class="nav nav-pills mb-4 flex-wrap gap-2" id="requestStatusTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active fw-bold" id="all-tab" data-bs-toggle="pill" data-bs-target="#tab-all" type="button" role="tab" aria-controls="tab-all" aria-selected="true">
-                All Requests
+                <i class="bi bi-list-task me-1"></i> All Tickets
                 <span class="badge bg-secondary ms-1">@allRequests.Count</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold" id="pending-tab" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="tab-pending" aria-selected="false">
-                Pending
-                <span class="badge bg-warning text-dark ms-1">@pendingRequests.Count</span>
+                <i class="bi bi-hourglass-split me-1 text-warning"></i> Pending
+                <span class="badge bg-warning text-warning-emphasis ms-1">@pendingRequests.Count</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold" id="waiting-tab" data-bs-toggle="pill" data-bs-target="#tab-waiting" type="button" role="tab" aria-controls="tab-waiting" aria-selected="false">
-                Waiting for Worker Response
-                <span class="badge bg-info text-dark ms-1">@waitingRequests.Count</span>
+                <i class="bi bi-clock me-1 text-info"></i> Awaiting Worker Response
+                <span class="badge bg-info text-info-emphasis ms-1">@waitingRequests.Count</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold" id="inprogress-tab" data-bs-toggle="pill" data-bs-target="#tab-inprogress" type="button" role="tab" aria-controls="tab-inprogress" aria-selected="false">
-                In Progress
-                <span class="badge bg-primary ms-1">@inProgressRequests.Count</span>
+                <i class="bi bi-gear-wide-connected me-1 text-primary"></i> In Progress
+                <span class="badge bg-primary text-primary-emphasis ms-1">@inProgressRequests.Count</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold text-danger" id="rejected-tab" data-bs-toggle="pill" data-bs-target="#tab-rejected" type="button" role="tab" aria-controls="tab-rejected" aria-selected="false">
-                Worker Rejected
-                <span class="badge bg-danger ms-1">@rejectedRequests.Count</span>
+                <i class="bi bi-x-octagon me-1"></i> Declined by Worker
+                <span class="badge bg-danger text-danger-emphasis ms-1">@rejectedRequests.Count</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" id="completed-tab" data-bs-toggle="pill" data-bs-target="#tab-completed" type="button" role="tab" aria-controls="tab-completed" aria-selected="false">
-                Completed
-                <span class="badge bg-success ms-1">@completedRequests.Count</span>
+            <button class="nav-link fw-bold text-success" id="completed-tab" data-bs-toggle="pill" data-bs-target="#tab-completed" type="button" role="tab" aria-controls="tab-completed" aria-selected="false">
+                <i class="bi bi-check2-all me-1"></i> Completed
+                <span class="badge bg-success text-success-emphasis ms-1">@completedRequests.Count</span>
             </button>
         </li>
     </ul>
@@ -149,7 +153,6 @@
             @await Html.PartialAsync("_ServiceRequestTable", completedRequests)
         </div>
     </div>
-
 </div>
 
 @section Scripts {

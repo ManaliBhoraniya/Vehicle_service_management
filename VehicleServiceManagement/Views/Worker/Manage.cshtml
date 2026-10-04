@@ -1,180 +1,129 @@
-﻿@model VehicleServiceManagement.Models.Worker
+@model VehicleServiceManagement.Models.Worker
 
 @{
-    ViewData["Title"] = "My Profile";
+    ViewData["Title"] = "Technician Profile";
 }
 
-<div class="container mt-4">
-
-    <h2 class="mb-4">
-        My Profile
-    </h2>
-
-    <div class="card shadow-sm">
-
-        <div class="card-header">
-            <h5 class="mb-0">
-                Worker Information
-            </h5>
+<div class="py-3">
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Manage Account</h2>
+            <p class="text-muted small mb-0">Technician credentials, specialty badges, and system settings.</p>
         </div>
 
-        <div class="card-body">
+        <a asp-action="Dashboard" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Dashboard
+        </a>
+    </div>
 
-            <div class="row">
-
-                <div class="col-md-6">
-
-                    <p>
-                        <strong>Name:</strong>
-                        @(Model.ApplicationUser?.Name ?? "Not provided")
-                    </p>
-
-                    <p>
-                        <strong>Username:</strong>
-                        @(Model.ApplicationUser?.UserName ?? "Not provided")
-                    </p>
-
-                    <p>
-                        <strong>Email:</strong>
-                        @(Model.ApplicationUser?.Email ?? "Not provided")
-                    </p>
-
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-person-lines-fill text-primary me-2"></i> Worker Information
+                    </h5>
                 </div>
-
-                <div class="col-md-6">
-
-                    <p>
-                        <strong>Phone:</strong>
-                        @(Model.ApplicationUser?.PhoneNumber ?? "Not provided")
-                    </p>
-
-                    <p>
-                        <strong>Specialities:</strong>
-                    </p>
-
-                    @if (Model.Specialities != null &&
-                         Model.Specialities.Any())
-                    {
-                        <div class="mb-3">
-
-                            @foreach (var speciality in Model.Specialities)
-                            {
-                                <span class="badge bg-primary me-1 mb-1">
-                                    @speciality.Speciality
-                                </span>
-                            }
-
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Full Name</span>
+                            <span class="fs-6 fw-bold text-dark">@(Model.ApplicationUser?.Name ?? "Not provided")</span>
                         </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted">
-                            No specialities selected.
-                        </p>
-                    }
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Username</span>
+                            <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.UserName ?? "Not provided")</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Email Address</span>
+                            <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.Email ?? "Not provided")</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Contact Phone</span>
+                            <span class="fs-6 fw-semibold text-dark">@(Model.ApplicationUser?.PhoneNumber ?? "Not provided")</span>
+                        </div>
+                    </div>
 
-                    <p>
-                        <strong>Availability:</strong>
+                    <div class="mt-4 pt-3 border-top">
+                        <span class="fw-semibold text-dark d-block mb-2">Active Specialties:</span>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (Model.Specialities != null && Model.Specialities.Any())
+                            {
+                                foreach (var speciality in Model.Specialities)
+                                {
+                                    <span class="badge bg-primary text-primary-emphasis px-3 py-2">
+                                        <i class="bi bi-patch-check-fill me-1"></i> @speciality.Speciality
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">No specialities linked yet.</span>
+                            }
+                        </div>
+                    </div>
 
-                        @if (Model.IsAvailable)
+                    <div class="mt-4 pt-3 border-top">
+                        <span class="fw-semibold text-dark d-block mb-2">Resume:</span>
+                        @if (!string.IsNullOrEmpty(Model.ResumeFilePath))
                         {
-                            <span class="badge bg-success">
-                                Available
-                            </span>
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+                                <span class="fw-medium text-dark"><i class="bi bi-file-earmark-pdf text-danger me-1"></i> @Model.ResumeFileName</span>
+                                <a href="@Model.ResumeFilePath" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                            </div>
                         }
                         else
                         {
-                            <span class="badge bg-danger">
-                                Busy
-                            </span>
+                            <span class="text-muted small">No resume file attached.</span>
                         }
+                    </div>
 
-                    </p>
-
+                    <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                        <a asp-action="Edit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-pencil"></i> Edit Profile
+                        </a>
+                        <a asp-action="Dashboard" class="btn btn-outline-secondary btn-sm">
+                            Dashboard
+                        </a>
+                    </div>
                 </div>
-
             </div>
 
-            <hr />
-
-            <h5>
-                Resume
-            </h5>
-
-            @if (!string.IsNullOrEmpty(Model.ResumeFilePath))
-            {
-                <p>
-                    <strong>
-                        @Model.ResumeFileName
-                    </strong>
-                </p>
-
-                <a href="@Model.ResumeFilePath"
-                   target="_blank"
-                   class="btn btn-outline-primary">
-                    View Resume
-                </a>
-            }
-            else
-            {
-                <p class="text-muted">
-                    No resume uploaded.
-                </p>
-            }
-
-            <hr />
-
-            <div class="mb-3">
-
-                <a asp-action="Edit"
-                   class="btn btn-primary">
-                    Edit Profile
-                </a>
-
-                <a asp-action="Dashboard"
-                   class="btn btn-outline-secondary ms-2">
-                    Dashboard
-                </a>
-
-            </div>
-
-            <div class="border-top pt-3">
-
-                <div class="d-flex gap-2">
-
-                    <form asp-controller="Account"
-                          asp-action="Logout"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <button type="submit"
-                                class="btn btn-secondary">
-                            Logout
-                        </button>
-
-                    </form>
-
-                    <form asp-controller="Account"
-                          asp-action="DeleteAccount"
-                          method="post"
-                          onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-
-                        @Html.AntiForgeryToken()
-
-                        <button type="submit"
-                                class="btn btn-danger">
-                            Delete Account
-                        </button>
-
-                    </form>
-
+            <!-- SECURITY / DANGER ZONE -->
+            <div class="card border-danger border-opacity-25 shadow-sm">
+                <div class="card-header bg-danger-subtle bg-opacity-25 py-3">
+                    <h6 class="fw-bold text-danger mb-0">
+                        <i class="bi bi-exclamation-octagon-fill me-1"></i> Session & Account Actions
+                    </h6>
                 </div>
+                <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        <span class="fw-semibold text-dark d-block">Sign Out or Delete Account</span>
+                        <span class="text-muted small">Manage your current active session or request permanent removal.</span>
+                    </div>
 
+                    <div class="d-flex gap-2">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                        </form>
+
+                        <form asp-controller="Account"
+                              asp-action="DeleteAccount"
+                              method="post"
+                              onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Delete Account
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
-
         </div>
-
     </div>
-
 </div>

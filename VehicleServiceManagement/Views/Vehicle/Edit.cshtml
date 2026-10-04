@@ -1,73 +1,69 @@
-﻿@model VehicleServiceManagement.Models.Vehicle
+@model VehicleServiceManagement.Models.Vehicle
 
 @{
     ViewData["Title"] = "Edit Vehicle";
 }
 
-<h2>Edit Vehicle</h2>
+<div class="row justify-content-center py-3">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-icon" style="width: 34px; height: 34px; font-size: 1rem;">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">Update Vehicle Information</h4>
+                        <p class="text-muted small mb-0">Modify specifications or plate information for this vehicle</p>
+                    </div>
+                </div>
+            </div>
 
-<form asp-action="Edit"
-      asp-route-id="@Model.Id"
-      method="post">
+            <div class="card-body p-4">
+                <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CustomerId" />
 
-    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
 
-    <input type="hidden"
-           asp-for="Id" />
+                    <div class="mb-3">
+                        <label asp-for="VehicleNumber" class="form-label">
+                            <i class="bi bi-card-text me-1 text-muted"></i> License Plate / Registration Number
+                        </label>
+                        <input asp-for="VehicleNumber" class="form-control" required />
+                        <span asp-validation-for="VehicleNumber" class="text-danger small"></span>
+                    </div>
 
-    <input type="hidden"
-           asp-for="CustomerId" />
+                    <div class="mb-3">
+                        <label asp-for="VehicleModel" class="form-label">
+                            <i class="bi bi-speedometer me-1 text-muted"></i> Vehicle Make & Model
+                        </label>
+                        <input asp-for="VehicleModel" class="form-control" required />
+                        <span asp-validation-for="VehicleModel" class="text-danger small"></span>
+                    </div>
 
-    <div asp-validation-summary="ModelOnly"
-         class="text-danger"></div>
+                    <div class="mb-4">
+                        <label asp-for="VehicleType" class="form-label">
+                            <i class="bi bi-tags me-1 text-muted"></i> Vehicle Type / Category
+                        </label>
+                        <input asp-for="VehicleType" class="form-control" required />
+                        <span asp-validation-for="VehicleType" class="text-danger small"></span>
+                    </div>
 
-    <div class="mb-3">
-        <label asp-for="VehicleNumber"
-               class="form-label">
-        </label>
-
-        <input asp-for="VehicleNumber"
-               class="form-control" />
-
-        <span asp-validation-for="VehicleNumber"
-              class="text-danger"></span>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg"></i> Update Vehicle
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="VehicleModel"
-               class="form-label">
-        </label>
-
-        <input asp-for="VehicleModel"
-               class="form-control" />
-
-        <span asp-validation-for="VehicleModel"
-              class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="VehicleType"
-               class="form-label">
-        </label>
-
-        <input asp-for="VehicleType"
-               class="form-control" />
-
-        <span asp-validation-for="VehicleType"
-              class="text-danger"></span>
-    </div>
-
-    <button type="submit"
-            class="btn btn-primary">
-        Save Changes
-    </button>
-
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Cancel
-    </a>
-
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
