@@ -17,10 +17,6 @@ namespace VehicleServiceManagement.Controllers
             _context = context;
         }
 
-        // =====================================================
-        // MANAGER DASHBOARD
-        // GET: /ServiceManager
-        // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -61,10 +57,6 @@ namespace VehicleServiceManagement.Controllers
             return View();
         }
 
-
-        // =====================================================
-        // HELPER: Map Service Type to Matching Specialities
-        // =====================================================
         public static List<string> GetMatchingSpecialities(string? serviceType)
         {
             if (string.IsNullOrWhiteSpace(serviceType))
@@ -159,10 +151,6 @@ namespace VehicleServiceManagement.Controllers
         }
 
 
-        // =====================================================
-        // UPDATE SERVICE REQUEST STATUS
-        // =====================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRequestStatus(
@@ -187,10 +175,6 @@ namespace VehicleServiceManagement.Controllers
                 nameof(ServiceRequests));
         }
 
-
-        // =====================================================
-        // DELETE SERVICE REQUEST
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -243,12 +227,6 @@ namespace VehicleServiceManagement.Controllers
         }
 
 
-        // =====================================================
-        // ASSIGN WORKER - GET
-        // Shows only accepted + available workers
-        // whose speciality matches the service request
-        // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> AssignWorker(
             int id)
@@ -280,11 +258,6 @@ namespace VehicleServiceManagement.Controllers
 
             ViewBag.RejectedWorkerIds = rejectedWorkerIds;
 
-            // -------------------------------------------------
-            // Find workers whose speciality matches
-            // the requested service type.
-            // -------------------------------------------------
-
             var matchingSpecialities = GetMatchingSpecialities(request.ServiceType);
 
             var allMatchingWorkers =
@@ -311,10 +284,6 @@ namespace VehicleServiceManagement.Controllers
         }
 
 
-        // =====================================================
-        // ASSIGN WORKER - POST
-        // =====================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignWorker(
@@ -334,14 +303,6 @@ namespace VehicleServiceManagement.Controllers
             {
                 return NotFound();
             }
-
-            // -------------------------------------------------
-            // Make sure the selected worker:
-            // 1. Exists
-            // 2. Is accepted
-            // 3. Is available
-            // 4. Has matching speciality
-            // -------------------------------------------------
 
             var matchingSpecialities = GetMatchingSpecialities(request.ServiceType);
 
@@ -365,10 +326,6 @@ namespace VehicleServiceManagement.Controllers
                     nameof(ServiceRequests));
             }
 
-            // -------------------------------------------------
-            // Prevent duplicate active assignment
-            // -------------------------------------------------
-
             var existingAssignment =
                 await _context.ServiceAssignments
                     .AnyAsync(
@@ -387,10 +344,6 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction(
                     nameof(ServiceRequests));
             }
-
-            // -------------------------------------------------
-            // Create assignment (Status: Pending)
-            // -------------------------------------------------
 
             var assignment =
                 new ServiceAssignment
@@ -416,9 +369,6 @@ namespace VehicleServiceManagement.Controllers
             // Update service request status to Assigned
             request.Status = "Assigned";
 
-            // Note: Per user requirement, worker remains available until they accept the request.
-            // worker.IsAvailable is NOT set to false here.
-
             await _context.SaveChangesAsync();
 
             TempData["Success"] =
@@ -427,11 +377,6 @@ namespace VehicleServiceManagement.Controllers
             return RedirectToAction(
                 nameof(ServiceRequests));
         }
-
-
-        // =====================================================
-        // REASSIGN REJECTED TASK - GET
-        // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> ReassignWorker(
@@ -467,11 +412,6 @@ namespace VehicleServiceManagement.Controllers
             var rejectedWorkerId =
                 assignment.WorkerId;
 
-            // -------------------------------------------------
-            // Find another accepted and available worker
-            // with the required speciality.
-            // -------------------------------------------------
-
             var matchingSpecialities = GetMatchingSpecialities(serviceType);
 
             var workers =
@@ -492,11 +432,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View(assignment);
         }
-
-
-        // =====================================================
-        // REASSIGN REJECTED TASK - POST
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -528,9 +463,6 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
-            // -------------------------------------------------
-            // Find another matching worker
-            // -------------------------------------------------
 
             var matchingSpecialities = GetMatchingSpecialities(request.ServiceType);
 
@@ -555,10 +487,6 @@ namespace VehicleServiceManagement.Controllers
                 return RedirectToAction(
                     nameof(ServiceRequests));
             }
-
-            // -------------------------------------------------
-            // Create new assignment
-            // -------------------------------------------------
 
             var newAssignment =
                 new ServiceAssignment
@@ -595,10 +523,6 @@ namespace VehicleServiceManagement.Controllers
         }
 
 
-        // =====================================================
-        // CUSTOMERS
-        // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> Customers()
         {
@@ -611,11 +535,6 @@ namespace VehicleServiceManagement.Controllers
             return View(customers);
         }
 
-
-        // =====================================================
-        // WORKERS
-        // Only accepted workers
-        // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> Workers()
@@ -630,11 +549,6 @@ namespace VehicleServiceManagement.Controllers
             return View(workers);
         }
 
-
-        // =====================================================
-        // WORKER DETAILS
-        // GET: /ServiceManager/WorkerDetails/5
-        // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> WorkerDetails(int id)
@@ -662,10 +576,6 @@ namespace VehicleServiceManagement.Controllers
         }
 
 
-        // =====================================================
-        // VEHICLES
-        // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> Vehicles()
         {
@@ -678,11 +588,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View(vehicles);
         }
-
-
-        // =====================================================
-        // ASSIGNMENTS
-        // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> Assignments()
@@ -701,12 +606,6 @@ namespace VehicleServiceManagement.Controllers
             return View(assignments);
         }
 
-
-        // =====================================================
-        // JOB REQUESTS
-        // Worker registration requests
-        // =====================================================
-
         [HttpGet]
         public async Task<IActionResult> JobRequests()
         {
@@ -721,10 +620,6 @@ namespace VehicleServiceManagement.Controllers
             return View(requests);
         }
 
-
-        // =====================================================
-        // ACCEPT WORKER JOB REQUEST
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -763,10 +658,6 @@ namespace VehicleServiceManagement.Controllers
                 nameof(JobRequests));
         }
 
-
-        // =====================================================
-        // REJECT WORKER JOB REQUEST
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]

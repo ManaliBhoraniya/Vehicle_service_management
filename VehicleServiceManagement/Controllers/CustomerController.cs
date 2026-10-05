@@ -21,10 +21,6 @@ namespace VehicleServiceManagement.Controllers
             _userManager = userManager;
         }
 
-        // ====================================================
-        // CUSTOMER DASHBOARD
-        // ====================================================
-
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
@@ -95,10 +91,6 @@ namespace VehicleServiceManagement.Controllers
             return View(customer);
         }
 
-        // ====================================================
-        // MY PROFILE
-        // ====================================================
-
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -123,10 +115,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View(customer);
         }
-
-        // ====================================================
-        // CREATE PROFILE
-        // ====================================================
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -157,9 +145,6 @@ namespace VehicleServiceManagement.Controllers
             return View(customer);
         }
 
-        // ====================================================
-        // CREATE PROFILE - POST
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -205,9 +190,6 @@ namespace VehicleServiceManagement.Controllers
                 nameof(Dashboard));
         }
 
-        // ====================================================
-        // EDIT PROFILE
-        // ====================================================
 
         [HttpGet]
         public async Task<IActionResult> Edit()
@@ -229,9 +211,6 @@ namespace VehicleServiceManagement.Controllers
             return View(customer);
         }
 
-        // ====================================================
-        // EDIT PROFILE - POST
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -29,11 +29,6 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-
-// ======================================================
-// CREATE ROLES AND DEFAULT MANAGER ACCOUNT
-// ======================================================
-
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -45,11 +40,6 @@ using (var scope = app.Services.CreateScope())
     var userManager =
         services.GetRequiredService<
             UserManager<ApplicationUser>>();
-
-
-    // ==================================================
-    // CREATE ROLES
-    // ==================================================
 
     string[] roles =
     {
@@ -77,14 +67,6 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-
-    // ==================================================
-    // DEFAULT MANAGER ACCOUNT
-    // ==================================================
-
-    // This is the ONLY Manager account created by the system.
-    // Managers cannot register from the Register page.
-
     string managerEmail =
         "manager@vehicle.com";
 
@@ -95,11 +77,6 @@ using (var scope = app.Services.CreateScope())
     var managerUser =
         await userManager.FindByEmailAsync(
             managerEmail);
-
-
-    // ==================================================
-    // CREATE MANAGER IF IT DOES NOT EXIST
-    // ==================================================
 
     if (managerUser == null)
     {
@@ -141,12 +118,6 @@ using (var scope = app.Services.CreateScope())
     }
     else
     {
-        // ==================================================
-        // EXISTING MANAGER
-        // ==================================================
-
-        // Make sure the existing account has
-        // the Manager role.
 
         if (!await userManager.IsInRoleAsync(
                 managerUser,
@@ -157,8 +128,6 @@ using (var scope = app.Services.CreateScope())
                 "Manager");
         }
 
-        // Make sure Manager email is confirmed.
-
         if (!managerUser.EmailConfirmed)
         {
             managerUser.EmailConfirmed = true;
@@ -168,11 +137,6 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
-
-
-// ======================================================
-// HTTP PIPELINE
-// ======================================================
 
 if (!app.Environment.IsDevelopment())
 {

@@ -23,19 +23,11 @@ namespace VehicleServiceManagement.Controllers
             _context = context;
         }
 
-        // =====================================================
-        // LOGIN - GET
-        // =====================================================
-
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
-
-        // =====================================================
-        // LOGIN - POST
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -65,10 +57,6 @@ namespace VehicleServiceManagement.Controllers
 
                 return View();
             }
-
-            // =================================================
-            // CHECK WORKER JOB REQUEST STATUS
-            // =================================================
 
             if (await _userManager.IsInRoleAsync(
                     user,
@@ -118,9 +106,6 @@ namespace VehicleServiceManagement.Controllers
                 }
             }
 
-            // =================================================
-            // PASSWORD LOGIN
-            // =================================================
 
             var result =
                 await _signInManager.PasswordSignInAsync(
@@ -138,9 +123,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =================================================
-            // MANAGER
-            // =================================================
 
             if (await _userManager.IsInRoleAsync(
                     user,
@@ -151,9 +133,6 @@ namespace VehicleServiceManagement.Controllers
                     "ServiceManager");
             }
 
-            // =================================================
-            // ADMIN
-            // =================================================
 
             if (await _userManager.IsInRoleAsync(
                     user,
@@ -164,9 +143,6 @@ namespace VehicleServiceManagement.Controllers
                     "ServiceManager");
             }
 
-            // =================================================
-            // WORKER
-            // =================================================
 
             if (await _userManager.IsInRoleAsync(
                     user,
@@ -176,10 +152,6 @@ namespace VehicleServiceManagement.Controllers
                     "Dashboard",
                     "Worker");
             }
-
-            // =================================================
-            // CUSTOMER
-            // =================================================
 
             if (await _userManager.IsInRoleAsync(
                     user,
@@ -191,9 +163,6 @@ namespace VehicleServiceManagement.Controllers
                     "Customer");
             }
 
-            // =================================================
-            // INVALID ROLE
-            // =================================================
 
             await _signInManager.SignOutAsync();
 
@@ -204,19 +173,11 @@ namespace VehicleServiceManagement.Controllers
             return View();
         }
 
-        // =====================================================
-        // REGISTER - GET
-        // =====================================================
-
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
-
-        // =====================================================
-        // REGISTER - POST
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -229,9 +190,6 @@ namespace VehicleServiceManagement.Controllers
             List<string>? specialities,
             IFormFile? resume)
         {
-            // =================================================
-            // BASIC VALIDATION
-            // =================================================
 
             if (string.IsNullOrWhiteSpace(name) ||
                 string.IsNullOrWhiteSpace(email) ||
@@ -255,13 +213,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =================================================
-            // ALLOWED REGISTRATION ROLES
-            // =================================================
-            //
-            // Manager is NOT allowed to register.
-            // Only Customer and Worker can register.
-            // =================================================
 
             if (role != "Customer" &&
                 role != "Worker")
@@ -273,9 +224,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =================================================
-            // WORKER VALIDATION
-            // =================================================
 
             if (role == "Worker")
             {
@@ -341,9 +289,6 @@ namespace VehicleServiceManagement.Controllers
                 }
             }
 
-            // =================================================
-            // CHECK EXISTING USER
-            // =================================================
 
             var existingUser =
                 await _userManager.FindByEmailAsync(
@@ -378,9 +323,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =================================================
-            // CREATE IDENTITY USER
-            // =================================================
 
             var user =
                 new ApplicationUser
@@ -407,10 +349,6 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =================================================
-            // ASSIGN ROLE
-            // =================================================
-
             var roleResult =
                 await _userManager.AddToRoleAsync(
                     user,
@@ -431,15 +369,9 @@ namespace VehicleServiceManagement.Controllers
                 return View();
             }
 
-            // =================================================
-            // WORKER JOB REQUEST
-            // =================================================
 
             if (role == "Worker")
             {
-                // ---------------------------------------------
-                // CREATE RESUME UPLOAD FOLDER
-                // ---------------------------------------------
 
                 var uploadsFolder =
                     Path.Combine(
@@ -455,18 +387,12 @@ namespace VehicleServiceManagement.Controllers
                         uploadsFolder);
                 }
 
-                // ---------------------------------------------
-                // GET FILE EXTENSION
-                // ---------------------------------------------
 
                 var extension =
                     Path.GetExtension(
                         resume!.FileName)
                         .ToLowerInvariant();
 
-                // ---------------------------------------------
-                // CREATE UNIQUE FILE NAME
-                // ---------------------------------------------
 
                 var uniqueFileName =
                     Guid.NewGuid().ToString() +
@@ -477,9 +403,6 @@ namespace VehicleServiceManagement.Controllers
                         uploadsFolder,
                         uniqueFileName);
 
-                // ---------------------------------------------
-                // SAVE RESUME
-                // ---------------------------------------------
 
                 using (var stream =
                        new FileStream(
@@ -490,9 +413,6 @@ namespace VehicleServiceManagement.Controllers
                         stream);
                 }
 
-                // ---------------------------------------------
-                // CREATE WORKER
-                // ---------------------------------------------
 
                 var worker =
                     new Worker
@@ -521,9 +441,6 @@ namespace VehicleServiceManagement.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // ---------------------------------------------
-                // SAVE WORKER SPECIALITIES
-                // ---------------------------------------------
 
                 foreach (var speciality in specialities!)
                 {
@@ -544,24 +461,14 @@ namespace VehicleServiceManagement.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // ---------------------------------------------
-                // WORKER MUST WAIT FOR MANAGER APPROVAL
-                // ---------------------------------------------
-
                 return RedirectToAction(
                     "JobRequestSubmitted",
                     "Account");
             }
 
-            // =================================================
-            // CUSTOMER
-            // =================================================
 
             if (role == "Customer")
             {
-                // ---------------------------------------------
-                // CREATE CUSTOMER PROFILE
-                // ---------------------------------------------
 
                 var customer =
                     new Customer
@@ -578,26 +485,14 @@ namespace VehicleServiceManagement.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // ---------------------------------------------
-                // SIGN IN CUSTOMER
-                // ---------------------------------------------
-
                 await _signInManager.SignInAsync(
                     user,
                     isPersistent: false);
-
-                // ---------------------------------------------
-                // CUSTOMER DASHBOARD
-                // ---------------------------------------------
 
                 return RedirectToAction(
                     "Dashboard",
                     "Customer");
             }
-
-            // =================================================
-            // FALLBACK
-            // =================================================
 
             await _signInManager.SignOutAsync();
 
@@ -606,19 +501,11 @@ namespace VehicleServiceManagement.Controllers
                 "Account");
         }
 
-        // =====================================================
-        // JOB REQUEST SUBMITTED
-        // =====================================================
-
         [HttpGet]
         public IActionResult JobRequestSubmitted()
         {
             return View();
         }
-
-        // =====================================================
-        // LOGOUT
-        // =====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -630,10 +517,6 @@ namespace VehicleServiceManagement.Controllers
                 "Login",
                 "Account");
         }
-
-        // =====================================================
-        // DELETE ACCOUNT
-        // =====================================================
 
         [HttpPost]
         [Authorize]
@@ -648,10 +531,6 @@ namespace VehicleServiceManagement.Controllers
             {
                 return Challenge();
             }
-
-            // ---------------------------------------------
-            // REMOVE WORKER
-            // ---------------------------------------------
 
             var worker =
                 await _context.Workers
@@ -676,9 +555,6 @@ namespace VehicleServiceManagement.Controllers
                     worker);
             }
 
-            // ---------------------------------------------
-            // REMOVE CUSTOMER
-            // ---------------------------------------------
 
             var customer =
                 await _context.Customers
@@ -695,9 +571,6 @@ namespace VehicleServiceManagement.Controllers
 
             await _context.SaveChangesAsync();
 
-            // ---------------------------------------------
-            // REMOVE IDENTITY USER
-            // ---------------------------------------------
 
             var result =
                 await _userManager.DeleteAsync(
@@ -716,10 +589,6 @@ namespace VehicleServiceManagement.Controllers
                 "Login",
                 "Account");
         }
-
-        // =====================================================
-        // ACCESS DENIED
-        // =====================================================
 
         [HttpGet]
         public IActionResult AccessDenied()

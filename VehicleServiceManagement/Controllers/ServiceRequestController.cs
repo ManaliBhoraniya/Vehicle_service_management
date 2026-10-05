@@ -21,10 +21,6 @@ namespace VehicleServiceManagement.Controllers
             _userManager = userManager;
         }
 
-        // ====================================================
-        // INDEX
-        // ====================================================
-
         // GET: /ServiceRequest
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -34,11 +30,6 @@ namespace VehicleServiceManagement.Controllers
 
             if (user == null)
                 return Challenge();
-
-            // =================================================
-            // ADMIN AND WORKER
-            // Can see all service requests
-            // =================================================
 
             if (User.IsInRole("Admin") ||
                 User.IsInRole("Worker"))
@@ -54,11 +45,6 @@ namespace VehicleServiceManagement.Controllers
 
                 return View(allRequests);
             }
-
-            // =================================================
-            // CUSTOMER
-            // Can see only their own service requests
-            // =================================================
 
             var customer =
                 await _context.Customers
@@ -84,11 +70,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View(requests);
         }
-
-
-        // ====================================================
-        // CREATE SERVICE REQUEST - GET
-        // ====================================================
 
         // GET: /ServiceRequest/Create
         [HttpGet]
@@ -125,10 +106,6 @@ namespace VehicleServiceManagement.Controllers
         }
 
 
-        // ====================================================
-        // CREATE SERVICE REQUEST - POST
-        // ====================================================
-
         // POST: /ServiceRequest/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -140,10 +117,6 @@ namespace VehicleServiceManagement.Controllers
 
             if (user == null)
                 return Challenge();
-
-            // =================================================
-            // FIND CUSTOMER
-            // =================================================
 
             var customer =
                 await _context.Customers
@@ -157,10 +130,6 @@ namespace VehicleServiceManagement.Controllers
                     "Customer");
             }
 
-            // =================================================
-            // CHECK SELECTED VEHICLE
-            // =================================================
-
             var vehicle =
                 await _context.Vehicles
                     .FirstOrDefaultAsync(v =>
@@ -173,10 +142,6 @@ namespace VehicleServiceManagement.Controllers
                     "VehicleId",
                     "Please select a valid vehicle.");
             }
-
-            // =================================================
-            // VALIDATE SERVICE REQUEST
-            // =================================================
 
             if (!ModelState.IsValid)
             {
@@ -193,9 +158,6 @@ namespace VehicleServiceManagement.Controllers
                 return View(serviceRequest);
             }
 
-            // =================================================
-            // SET SYSTEM VALUES
-            // =================================================
 
             serviceRequest.CustomerId =
                 customer.Id;
@@ -206,27 +168,15 @@ namespace VehicleServiceManagement.Controllers
             serviceRequest.Status =
                 "Pending";
 
-            // =================================================
-            // SAVE REQUEST
-            // =================================================
-
             _context.ServiceRequests.Add(
                 serviceRequest);
 
             await _context.SaveChangesAsync();
 
-            // =================================================
-            // REDIRECT TO REQUEST LIST
-            // =================================================
-
             return RedirectToAction(
                 nameof(Index));
         }
 
-
-        // ====================================================
-        // DETAILS
-        // ====================================================
 
         // GET: /ServiceRequest/Details/5
         [HttpGet]
@@ -249,10 +199,6 @@ namespace VehicleServiceManagement.Controllers
             return View(request);
         }
 
-
-        // ====================================================
-        // UPDATE STATUS
-        // ====================================================
 
         // POST: /ServiceRequest/UpdateStatus
         [HttpPost]
@@ -280,10 +226,6 @@ namespace VehicleServiceManagement.Controllers
         }
 
 
-        // ====================================================
-        // CANCEL SERVICE REQUEST
-        // ====================================================
-
         // POST: /ServiceRequest/Cancel
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -305,10 +247,6 @@ namespace VehicleServiceManagement.Controllers
             if (user == null)
                 return Challenge();
 
-            // =================================================
-            // ADMIN AND WORKER
-            // =================================================
-
             if (User.IsInRole("Admin") ||
                 User.IsInRole("Worker"))
             {
@@ -321,9 +259,6 @@ namespace VehicleServiceManagement.Controllers
                     nameof(Index));
             }
 
-            // =================================================
-            // CUSTOMER
-            // =================================================
 
             var customer =
                 await _context.Customers
@@ -347,10 +282,6 @@ namespace VehicleServiceManagement.Controllers
                 nameof(Index));
         }
 
-
-        // ====================================================
-        // DELETE SERVICE REQUEST
-        // ====================================================
 
         // POST: /ServiceRequest/Delete/5
         [HttpPost]

@@ -24,10 +24,6 @@ namespace VehicleServiceManagement.Controllers
             _environment = environment;
         }
 
-        // ====================================================
-        // DASHBOARD
-        // ====================================================
-
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
@@ -55,10 +51,6 @@ namespace VehicleServiceManagement.Controllers
             return View(worker);
         }
 
-        // ====================================================
-        // WORKER DETAILS
-        // ====================================================
-
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -82,10 +74,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View(worker);
         }
-
-        // ====================================================
-        // MY PROFILE
-        // ====================================================
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -114,10 +102,6 @@ namespace VehicleServiceManagement.Controllers
             return View(worker);
         }
 
-        // ====================================================
-        // EDIT MY PROFILE - GET
-        // ====================================================
-
         [HttpGet]
         public async Task<IActionResult> Edit()
         {
@@ -141,10 +125,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View(worker);
         }
-
-        // ====================================================
-        // EDIT MY PROFILE - POST
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -173,10 +153,6 @@ namespace VehicleServiceManagement.Controllers
                 return NotFound();
             }
 
-            // -----------------------------------------------
-            // VALIDATE NAME
-            // -----------------------------------------------
-
             if (string.IsNullOrWhiteSpace(name))
             {
                 ModelState.AddModelError(
@@ -184,9 +160,6 @@ namespace VehicleServiceManagement.Controllers
                     "Name is required.");
             }
 
-            // -----------------------------------------------
-            // VALIDATE SPECIALITIES
-            // -----------------------------------------------
 
             if (specialities == null ||
                 specialities.Count == 0)
@@ -201,9 +174,6 @@ namespace VehicleServiceManagement.Controllers
                 return View(worker);
             }
 
-            // -----------------------------------------------
-            // UPDATE USER PROFILE
-            // -----------------------------------------------
 
             worker.ApplicationUser!.Name =
                 name.Trim();
@@ -211,16 +181,8 @@ namespace VehicleServiceManagement.Controllers
             worker.ApplicationUser.PhoneNumber =
                 phone?.Trim();
 
-            // -----------------------------------------------
-            // REMOVE OLD SPECIALITIES
-            // -----------------------------------------------
-
             _context.WorkerSpecialities.RemoveRange(
                 worker.Specialities);
-
-            // -----------------------------------------------
-            // ADD NEW SPECIALITIES
-            // -----------------------------------------------
 
             foreach (var speciality in specialities!)
             {
@@ -246,10 +208,6 @@ namespace VehicleServiceManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ====================================================
-        // AVAILABILITY
-        // ====================================================
-
         [HttpGet]
         public async Task<IActionResult> Availability()
         {
@@ -273,9 +231,6 @@ namespace VehicleServiceManagement.Controllers
             return View(worker);
         }
 
-        // ====================================================
-        // UPDATE GENERAL AVAILABILITY
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -314,10 +269,6 @@ namespace VehicleServiceManagement.Controllers
 
             return RedirectToAction(nameof(Availability));
         }
-
-        // ====================================================
-        // UPDATE WEEKLY AVAILABILITY
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -372,10 +323,6 @@ namespace VehicleServiceManagement.Controllers
 
             return RedirectToAction(nameof(Availability));
         }
-
-        // ====================================================
-        // UPLOAD RESUME
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -479,10 +426,6 @@ namespace VehicleServiceManagement.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ====================================================
-        // MY SERVICES
-        // ====================================================
-
         [HttpGet]
         public async Task<IActionResult> MyServices()
         {
@@ -519,10 +462,6 @@ namespace VehicleServiceManagement.Controllers
 
             return View(assignments);
         }
-
-        // ====================================================
-        // ACCEPT TASK
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -590,10 +529,6 @@ namespace VehicleServiceManagement.Controllers
             return RedirectToAction(
                 nameof(MyServices));
         }
-
-        // ====================================================
-        // REJECT TASK
-        // ====================================================
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -666,10 +601,6 @@ namespace VehicleServiceManagement.Controllers
                 nameof(MyServices));
         }
 
-        // ====================================================
-        // START SERVICE
-        // ====================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> StartService(
@@ -732,10 +663,6 @@ namespace VehicleServiceManagement.Controllers
                 nameof(MyServices));
         }
 
-        // ====================================================
-        // COMPLETE SERVICE
-        // ====================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteService(
@@ -785,9 +712,6 @@ namespace VehicleServiceManagement.Controllers
                 assignment.ServiceRequest.Status =
                     "Completed";
             }
-
-            // Note: Per requirements, the worker remains unavailable until they manually
-            // mark themselves as available (which then appears to manager for new assignment).
             var worker =
                 await _context.Workers
                     .FirstOrDefaultAsync(w =>

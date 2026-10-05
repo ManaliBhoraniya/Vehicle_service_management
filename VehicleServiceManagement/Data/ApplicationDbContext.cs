@@ -32,10 +32,6 @@ namespace VehicleServiceManagement.Data
         {
             base.OnModelCreating(builder);
 
-            // ================================================
-            // Worker -> ApplicationUser
-            // ================================================
-
             builder.Entity<Worker>()
                 .HasOne(w => w.ApplicationUser)
                 .WithOne(u => u.Worker)
@@ -43,19 +39,11 @@ namespace VehicleServiceManagement.Data
                     w => w.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ================================================
-            // WorkerSpeciality -> Worker
-            // ================================================
-
             builder.Entity<WorkerSpeciality>()
                 .HasOne(ws => ws.Worker)
                 .WithMany(w => w.Specialities)
                 .HasForeignKey(ws => ws.WorkerId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // ================================================
-            // Customer -> ApplicationUser
-            // ================================================
 
             builder.Entity<Customer>()
                 .HasOne(c => c.ApplicationUser)
@@ -63,19 +51,11 @@ namespace VehicleServiceManagement.Data
                 .HasForeignKey(c => c.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ================================================
-            // WorkerAvailability -> Worker
-            // ================================================
-
             builder.Entity<WorkerAvailability>()
                 .HasOne(a => a.Worker)
                 .WithMany(w => w.Availabilities)
                 .HasForeignKey(a => a.WorkerId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // ================================================
-            // ServiceRequest -> Customer
-            // ================================================
 
             builder.Entity<ServiceRequest>()
                 .HasOne(s => s.Customer)
@@ -83,29 +63,17 @@ namespace VehicleServiceManagement.Data
                 .HasForeignKey(s => s.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ================================================
-            // ServiceRequest -> Vehicle
-            // ================================================
-
             builder.Entity<ServiceRequest>()
                 .HasOne(s => s.Vehicle)
                 .WithMany()
                 .HasForeignKey(s => s.VehicleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ================================================
-            // ServiceAssignment -> Worker
-            // ================================================
-
             builder.Entity<ServiceAssignment>()
                 .HasOne(sa => sa.Worker)
                 .WithMany(w => w.ServiceAssignments)
                 .HasForeignKey(sa => sa.WorkerId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // ================================================
-            // ServiceAssignment -> ServiceRequest
-            // ================================================
 
             builder.Entity<ServiceAssignment>()
                 .HasOne(sa => sa.ServiceRequest)

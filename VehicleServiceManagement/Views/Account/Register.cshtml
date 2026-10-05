@@ -27,10 +27,6 @@
 
                 @Html.AntiForgeryToken()
 
-                <!-- =====================================================
-                     VALIDATION SUMMARY
-                     Only show the red error box when an error exists
-                     ===================================================== -->
                 @if (!ViewData.ModelState.IsValid)
                 {
                     <div asp-validation-summary="All"
@@ -39,10 +35,6 @@
                 }
 
                 <div class="row g-3">
-
-                    <!-- =================================================
-                         FULL NAME
-                         ================================================= -->
 
                     <div class="col-md-6">
 
@@ -59,10 +51,6 @@
 
                     </div>
 
-                    <!-- =================================================
-                         EMAIL
-                         ================================================= -->
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -77,10 +65,6 @@
                                required />
 
                     </div>
-
-                    <!-- =================================================
-                         ROLE SELECTION
-                         ================================================= -->
 
                     <div class="col-12">
 
@@ -120,10 +104,6 @@
                 </div>
 
 
-                <!-- =====================================================
-                     WORKER SPECIFIC SECTION
-                     ===================================================== -->
-
                 <div id="workerFields"
                      class="mt-4 p-3 bg-light rounded-3 border"
                      style="display:none;">
@@ -142,10 +122,6 @@
                         Select the automotive specialties you are qualified to perform.
                     </p>
 
-
-                    <!-- =================================================
-                         SPECIALITIES
-                         ================================================= -->
 
                     <label class="form-label fw-bold mb-2">
                         Specialities
@@ -332,10 +308,6 @@
                     </div>
 
 
-                    <!-- =================================================
-                         SPECIALITY ERROR
-                         ================================================= -->
-
                     <div id="specialityError"
                          class="alert alert-warning py-2 small mb-3"
                          style="display:none;">
@@ -345,11 +317,6 @@
                         Please select at least one speciality to apply as a technician.
 
                     </div>
-
-
-                    <!-- =================================================
-                         RESUME UPLOAD
-                         ================================================= -->
 
                     <div class="mb-2">
 
@@ -376,11 +343,6 @@
                     </div>
 
                 </div>
-
-
-                <!-- =====================================================
-                     PASSWORD SECTION
-                     ===================================================== -->
 
                 <div class="row g-3 mt-1">
 
@@ -423,11 +385,6 @@
 
                 </div>
 
-
-                <!-- =====================================================
-                     PASSWORD INFORMATION
-                     ===================================================== -->
-
                 <div class="form-text text-muted small mt-2 mb-4">
 
                     <i class="bi bi-info-circle"></i>
@@ -436,11 +393,6 @@
                     including uppercase, lowercase, numbers and symbols.
 
                 </div>
-
-
-                <!-- =====================================================
-                     REGISTER BUTTON
-                     ===================================================== -->
 
                 <button type="submit"
                         class="btn btn-primary w-100 py-2 fs-6">
@@ -454,11 +406,6 @@
             </form>
 
         </div>
-
-
-        <!-- =========================================================
-             FOOTER
-             ========================================================= -->
 
         <div class="auth-footer">
 
@@ -485,10 +432,6 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-
-        // =========================================================
-        // SHOW / HIDE WORKER FIELDS
-        // =========================================================
 
         function updateWorkerFields() {
 
@@ -534,11 +477,6 @@
 
             }
         }
-
-
-        // =========================================================
-        // CLIENT-SIDE SPECIALITY VALIDATION
-        // =========================================================
 
         document
             .querySelector("form")
@@ -589,21 +527,12 @@
             );
 
 
-        // =========================================================
-        // ROLE CHANGE
-        // =========================================================
-
         document
             .getElementById("role")
             .addEventListener(
                 "change",
                 updateWorkerFields
             );
-
-
-        // =========================================================
-        // INITIALIZE
-        // =========================================================
 
         updateWorkerFields();
 
