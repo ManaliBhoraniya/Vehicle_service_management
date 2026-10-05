@@ -27,9 +27,8 @@
         bool isAuthenticated = User.Identity?.IsAuthenticated == true;
     }
 
-    <!-- ================================================= -->
+    
     <!-- NAVBAR -->
-    <!-- ================================================= -->
     <header>
         <nav class="navbar navbar-expand-lg site-navbar sticky-top">
             <div class="container">
@@ -260,9 +259,9 @@
         </nav>
     </header>
 
-    <!-- ================================================= -->
+    
     <!-- BACK BUTTON -->
-    <!-- ================================================= -->
+    
     @if (isAuthenticated &&
          !isAccountPage &&
          ViewData["Title"]?.ToString() != "Customer Dashboard" &&
@@ -276,18 +275,18 @@
         </div>
     }
 
-    <!-- ================================================= -->
+    
     <!-- MAIN CONTENT -->
-    <!-- ================================================= -->
+    
     <main role="main" class="pb-5 pt-3">
         <div class="container">
             @RenderBody()
         </div>
     </main>
 
-    <!-- ================================================= -->
+    
     <!-- FOOTER -->
-    <!-- ================================================= -->
+   
     <footer class="site-footer">
         <div class="container">
             <div class="row g-4 align-items-center">
